@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "Visit": {
+      "title": "Visit",
+      "description": "A record of a user visit to the application.",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date of the visit (YYYY-MM-DD)."
+        },
+        "count": {
+          "type": "integer",
+          "description": "Total number of visits for this date."
+        },
+        "referrers": {
+          "type": "object",
+          "description": "A map of referrer URLs to visit counts."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The last time this record was updated."
+        }
+      },
+      "required": ["date", "count", "referrers", "lastUpdated"]
+    }
+  },
+  "firestore": {
+    "/visits/{date}": {
+      "schema": "Visit",
+      "description": "Daily visit statistics."
+    },
+    "/visits/{date}/ips/{ipHash}": {
+      "schema": "object",
+      "description": "Tracked IPs for the day to prevent duplicates."
+    },
+    "/settings/gameConfig": {
+      "schema": "object",
+      "description": "Global game settings including speed and pill scores."
+    }
+  }
+}

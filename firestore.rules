@@ -1,0 +1,65 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: visits
+// Document ID: {date} (YYYY-MM-DD)
+// Fields:
+//   - date: string (required, YYYY-MM-DD)
+//   - count: number (required, positive)
+//   - referrers: map (required, keys are referrer URLs, values are numbers)
+//   - lastUpdated: timestamp (required)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "jsj20210104@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidVisit(data) {
+      return data.keys().hasAll(['date', 'count', 'referrers', 'lastUpdated']) &&
+             data.date is string && data.date.size() == 10 &&
+             data.count is number && data.count >= 0 &&
+             data.referrers is map &&
+             data.lastUpdated is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /visits/{date} {
+      allow read: if true; 
+      allow create, update: if isValidVisit(request.resource.data);
+      allow delete: if isAdmin();
+
+      match /ips/{ipHash} {
+        allow read, write: if true; // The server handles the logic, but we need to allow the SDK call
+      }
+    }
+
+    match /settings/gameConfig {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}
