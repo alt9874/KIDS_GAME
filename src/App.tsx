@@ -185,6 +185,7 @@ export default function App() {
               ...data.audioSettings,
               // Ensure we don't overwrite with null/empty if we have a default
               opening: data.audioSettings.opening || prev.opening,
+              gameplay: data.audioSettings.gameplay || prev.gameplay,
               hitPositive: data.audioSettings.hitPositive || data.audioSettings.hit || prev.hitPositive,
               hitNegative: data.audioSettings.hitNegative || data.audioSettings.hit || prev.hitNegative,
               ending: data.audioSettings.ending || prev.ending,
@@ -575,6 +576,7 @@ export default function App() {
         startButtonImage: startButtonImage || null,
         audioSettings: {
           opening: audioSettings.opening || null,
+          gameplay: audioSettings.gameplay || null,
           hitPositive: audioSettings.hitPositive || null,
           hitNegative: audioSettings.hitNegative || null,
           ending: audioSettings.ending || null,
