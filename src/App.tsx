@@ -100,10 +100,7 @@ export default function App() {
     ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
     volume: 0.7
   });
-  const [isMuted, setIsMuted] = useState(() => {
-    const saved = localStorage.getItem('safe_touch_muted');
-    return saved === 'true';
-  });
+  const [isMuted, setIsMuted] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
@@ -350,7 +347,11 @@ export default function App() {
     updateAudio();
     
     // Add a one-time global click listener to unlock audio
-    const unlockAudio = () => {
+    const unlockAudio = async () => {
+      // Resume AudioContext for browsers that require it
+      if (Howler.ctx && Howler.ctx.state === 'suspended') {
+        await Howler.ctx.resume();
+      }
       updateAudio();
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('touchstart', unlockAudio);
@@ -647,10 +648,11 @@ export default function App() {
 
   const resetAudioSettings = () => {
     setAudioSettings({
-      opening: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-      hitPositive: 'https://www.soundjay.com/buttons/sounds/button-3.mp3',
-      hitNegative: 'https://www.soundjay.com/buttons/sounds/button-10.mp3',
-      ending: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+      opening: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3',
+      gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/bgm.mp3',
+      hitPositive: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/win.mp3',
+      hitNegative: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/error.mp3',
+      ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
       volume: 0.7
     });
   };
@@ -1113,9 +1115,9 @@ export default function App() {
                         기본음으로 초기화
                       </button>
                     </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div>
-                          <label className="block text-sm text-gray-400 mb-1">게임 배경음 (BGM)</label>
+                          <label className="block text-sm text-gray-400 mb-1">오프닝 BGM (첫 화면)</label>
                           <div className="flex gap-2">
                             <input type="text" value={audioSettings.opening} onChange={(e) => setAudioSettings(prev => ({ ...prev, opening: e.target.value }))}
                               className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-[10px] text-gray-300" />
@@ -1130,7 +1132,22 @@ export default function App() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-sm text-gray-400 mb-1">엔딩 BGM</label>
+                          <label className="block text-sm text-gray-400 mb-1">게임 배경음 (플레이 중)</label>
+                          <div className="flex gap-2">
+                            <input type="text" value={audioSettings.gameplay} onChange={(e) => setAudioSettings(prev => ({ ...prev, gameplay: e.target.value }))}
+                              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-[10px] text-gray-300" />
+                            <button onClick={() => testSound(audioSettings.gameplay)} className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px] hover:bg-white/10">▶</button>
+                            <label className="cursor-pointer px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-[10px] hover:bg-white/20 transition-colors flex items-center">
+                              업로드
+                              <input type="file" className="hidden" accept="audio/*" onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(file, (url) => setAudioSettings(prev => ({ ...prev, gameplay: url })));
+                              }} />
+                            </label>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-1">엔딩 BGM (결과 화면)</label>
                           <div className="flex gap-2">
                             <input type="text" value={audioSettings.ending} onChange={(e) => setAudioSettings(prev => ({ ...prev, ending: e.target.value }))}
                               className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-[10px] text-gray-300" />
