@@ -20,7 +20,7 @@
 }
 
 .score-popup {
-  @apply absolute font-bold text-2xl pointer-events-none;
+  @apply absolute font-bold text-2xl pointer-events-none z-[100];
   animation: moveUp 0.8s ease-out forwards;
 }
 
