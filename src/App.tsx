@@ -669,64 +669,14 @@ export default function App() {
 
   return (
     <div ref={containerRef} className="relative w-full h-[100svh] overflow-hidden font-sans bg-[#f0f7ff]">
-      {/* Mute Toggle & Volume Settings */}
-      <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-[300] flex flex-col gap-3 items-end">
-        <AnimatePresence>
-          {showVolumeSettings && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-primary/20 w-48 sm:w-64"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-gray-600 flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-primary" /> 볼륨 설정
-                </span>
-                <span className="text-[10px] font-mono text-primary">{Math.round((audioSettings.volume || 0.7) * 100)}%</span>
-              </div>
-              <div className="relative h-6 flex items-center">
-                <div className="absolute inset-0 h-1.5 bg-gray-200 rounded-full my-auto" />
-                <div 
-                  className="absolute left-0 h-1.5 bg-primary rounded-full my-auto transition-all" 
-                  style={{ width: `${(audioSettings.volume || 0.7) * 100}%` }}
-                />
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="1" 
-                  step="0.01" 
-                  value={isNaN(audioSettings.volume) ? '' : (audioSettings.volume ?? 0.7)} 
-                  onChange={(e) => setAudioSettings(prev => ({ ...prev, volume: parseFloat(e.target.value) }))}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                />
-                <div 
-                  className="absolute w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md pointer-events-none transition-all"
-                  style={{ left: `calc(${(audioSettings.volume || 0.7) * 100}% - 8px)` }}
-                />
-              </div>
-              <div className="flex justify-between mt-1">
-                <span className="text-[8px] text-gray-400">MIN</span>
-                <span className="text-[8px] text-gray-400">MAX</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
-        <div className="flex gap-3">
-          <button 
-            onClick={() => setShowVolumeSettings(!showVolumeSettings)} 
-            className={`p-4 sm:p-5 bg-white/90 backdrop-blur-md rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all border-2 ${showVolumeSettings ? 'border-primary bg-primary/10' : 'border-primary/20'}`}
-          >
-            <Settings className={`w-8 h-8 sm:w-10 sm:h-10 ${showVolumeSettings ? 'text-primary' : 'text-gray-400'}`} />
-          </button>
-          <button 
-            onClick={() => setIsMuted(!isMuted)} 
-            className="p-4 sm:p-5 bg-white/90 backdrop-blur-md rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all border-2 border-primary/20"
-          >
-            {isMuted ? <VolumeX className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" /> : <Volume2 className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />}
-          </button>
-        </div>
+      {/* Mute Toggle */}
+      <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[300] flex flex-col gap-2 sm:gap-3 items-end">
+        <button 
+          onClick={() => setIsMuted(!isMuted)} 
+          className="p-3 sm:p-5 bg-white/90 backdrop-blur-md rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all border-2 border-primary/20"
+        >
+          {isMuted ? <VolumeX className="w-6 h-6 sm:w-10 sm:h-10 text-gray-400" /> : <Volume2 className="w-6 h-6 sm:w-10 sm:h-10 text-primary" />}
+        </button>
       </div>
 
       <AnimatePresence mode="wait">
