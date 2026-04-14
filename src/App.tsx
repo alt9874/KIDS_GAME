@@ -106,7 +106,6 @@ export default function App() {
   const [user, setUser] = useState<any>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
-  const [showVolumeSettings, setShowVolumeSettings] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const gameLoopRef = useRef<number | null>(null);
@@ -152,6 +151,8 @@ export default function App() {
         // Handle the specific internal assertion error with a more helpful message or retry logic
         console.error("Firebase Internal Assertion Failed:", error);
         alert("로그인 중 내부 오류가 발생했습니다. 페이지를 새로고침한 후 다시 시도해 주세요.");
+      } else if (error.code === 'auth/unauthorized-domain') {
+        alert("파이어베이스 설정에서 이 도메인이 허용되지 않았습니다.\n\n해결 방법:\n1. 파이어베이스 콘솔 > Authentication > Settings > Authorized domains 에 'jsj20210104.github.io'가 추가되어 있는지 확인해 주세요.\n2. 주소 앞에 https:// 가 붙어있다면 삭제하고 도메인만 입력해야 합니다.");
       } else {
         console.error("Login failed:", error);
         alert(`로그인 실패: ${error.message}`);
@@ -300,41 +301,34 @@ export default function App() {
 
   const prevGameStateRef = useRef<string>(gameState);
 
-  // --- [하드웨어 무음 스위치 대응] 게임 상태 및 무음 설정 동기화 ---
+  // Audio initialization with user interaction check
   useEffect(() => {
-    localStorage.setItem('safe_touch_muted', String(isMuted));
-    Howler.mute(isMuted); // 전체 오디오 무음 설정 (시스템 설정과 연동)
-    Howler.volume(audioSettings.volume || 0.7);
-
-    if (isMuted) {
-      openingAudioRef.current?.stop();
-      endingAudioRef.current?.stop();
-      return;
-    }
-
-    const stateChanged = prevGameStateRef.current !== gameState;
-
-    if (gameState === 'start' || gameState === 'how-to' || gameState === 'playing') {
-      if (openingAudioRef.current) {
-        if (stateChanged || !openingAudioRef.current.playing()) {
+    const playOpening = () => {
+      if (!isMuted && openingAudioRef.current && (gameState === 'start' || gameState === 'how-to' || gameState === 'playing')) {
+        if (!openingAudioRef.current.playing()) {
           openingAudioRef.current.play();
         }
       }
-      endingAudioRef.current?.stop();
-    } else if (gameState === 'end') {
-      openingAudioRef.current?.stop();
-      if (endingAudioRef.current) {
-        if (stateChanged || !endingAudioRef.current.playing()) {
-          endingAudioRef.current.play();
-        }
-      }
-    } else {
-      openingAudioRef.current?.stop();
-      endingAudioRef.current?.stop();
-    }
+    };
 
-    prevGameStateRef.current = gameState;
-  }, [gameState, isMuted, audioSettings]);
+    // Try to play, but browsers often block it until first click
+    playOpening();
+    
+    // Add a one-time global click listener to unlock audio
+    const unlockAudio = () => {
+      playOpening();
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+    
+    window.addEventListener('click', unlockAudio);
+    window.addEventListener('touchstart', unlockAudio);
+    
+    return () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+  }, [gameState, isMuted]);
 
   // --- [하드웨어 무음 스위치 대응] 브라우저 가시성 변화에 따른 소리 제어 ---
   useEffect(() => {
@@ -672,14 +666,44 @@ export default function App() {
 
   return (
     <div ref={containerRef} className="relative w-full h-[100svh] overflow-hidden font-sans bg-[#f0f7ff]">
-      {/* Mute Toggle */}
-      <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[300] flex flex-col gap-2 sm:gap-3 items-end">
-        <button 
-          onClick={() => setIsMuted(!isMuted)} 
-          className="p-3 sm:p-5 bg-white/90 backdrop-blur-md rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all border-2 border-primary/20"
-        >
-          {isMuted ? <VolumeX className="w-6 h-6 sm:w-10 sm:h-10 text-gray-400" /> : <Volume2 className="w-6 h-6 sm:w-10 sm:h-10 text-primary" />}
-        </button>
+      {/* Integrated Sound Control (Mute + Volume) */}
+      <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[300] flex items-center group">
+        <div className={`flex items-center bg-white/90 backdrop-blur-md rounded-full shadow-2xl border-2 transition-all duration-500 ease-in-out overflow-hidden ${isMuted ? 'border-gray-200 max-w-[64px] sm:max-w-[84px]' : 'border-primary/20 max-w-[64px] sm:max-w-[84px] hover:max-w-[300px] sm:hover:max-w-[400px]'}`}>
+          <button 
+            onClick={() => setIsMuted(!isMuted)} 
+            className="p-3 sm:p-5 hover:bg-primary/5 transition-colors shrink-0 outline-none"
+            title={isMuted ? "소리 켜기" : "소리 끄기"}
+          >
+            {isMuted ? <VolumeX className="w-6 h-6 sm:w-10 sm:h-10 text-gray-400" /> : <Volume2 className="w-6 h-6 sm:w-10 sm:h-10 text-primary" />}
+          </button>
+          
+          {!isMuted && (
+            <div className="flex items-center pr-6 gap-3 w-32 sm:w-56 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="h-1.5 w-full bg-gray-200 rounded-full relative">
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="1" 
+                  step="0.01" 
+                  value={audioSettings.volume} 
+                  onChange={(e) => setAudioSettings(prev => ({ ...prev, volume: parseFloat(e.target.value) }))}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <div 
+                  className="absolute left-0 top-0 h-full bg-primary rounded-full"
+                  style={{ width: `${audioSettings.volume * 100}%` }}
+                />
+                <div 
+                  className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md pointer-events-none"
+                  style={{ left: `calc(${audioSettings.volume * 100}% - 8px)` }}
+                />
+              </div>
+              <span className="text-[10px] font-mono text-primary font-bold w-8 text-right">
+                {Math.round(audioSettings.volume * 100)}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
