@@ -93,10 +93,10 @@ export default function App() {
   const [openingBgImage, setOpeningBgImage] = useState<string | undefined>(undefined);
   const [startButtonImage, setStartButtonImage] = useState<string | undefined>(undefined);
   const [audioSettings, setAudioSettings] = useState({
-    opening: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    hitPositive: 'https://www.soundjay.com/buttons/sounds/button-3.mp3', // +점수 타격음 (나중에 이미지/사운드 교체 시 주석 참고)
-    hitNegative: 'https://www.soundjay.com/buttons/sounds/button-10.mp3', // -점수 타격음 (나중에 이미지/사운드 교체 시 주석 참고)
-    ending: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    opening: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3',
+    hitPositive: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/win.mp3',
+    hitNegative: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/error.mp3',
+    ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
     volume: 0.7
   });
   const [isMuted, setIsMuted] = useState(() => {
@@ -133,6 +133,9 @@ export default function App() {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     const provider = new GoogleAuthProvider();
+    // Force account selection to prevent "invalid action" errors in some environments
+    provider.setCustomParameters({ prompt: 'select_account' });
+    
     try {
       await signInWithPopup(auth, provider);
     } catch (error: any) {
@@ -311,7 +314,7 @@ export default function App() {
 
     const stateChanged = prevGameStateRef.current !== gameState;
 
-    if (gameState === 'playing') {
+    if (gameState === 'start' || gameState === 'how-to' || gameState === 'playing') {
       if (openingAudioRef.current) {
         if (stateChanged || !openingAudioRef.current.playing()) {
           openingAudioRef.current.play();
