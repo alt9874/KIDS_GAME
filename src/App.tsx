@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Pill as PillIcon, Timer, Trophy, Zap, Info, Settings, ArrowRight, Home, BarChart2, Volume2, VolumeX, Download, Plus, Trash2 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import * as XLSX from 'xlsx';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp, collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, serverTimestamp, collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { Howl, Howler } from 'howler'; // 하드웨어 무음 스위치 대응을 위한 라이브러리
 
@@ -670,6 +670,26 @@ export default function App() {
     */
   };
 
+  const resetVisitStats = async () => {
+    if (!user || user.email !== 'jsj20210104@gmail.com') return;
+    if (!confirm("정말 모든 방문자 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+
+    try {
+      const q = query(collection(db, 'visits'));
+      const querySnapshot = await getDocs(q);
+      
+      const deletePromises = querySnapshot.docs.map(d => deleteDoc(doc(db, 'visits', d.id)));
+      await Promise.all(deletePromises);
+      
+      setVisitStats([]);
+      setTotalVisits(0);
+      alert("모든 방문자 데이터가 리셋되었습니다.");
+    } catch (error) {
+      console.error("Failed to reset stats:", error);
+      alert("데이터 리셋 중 오류가 발생했습니다.");
+    }
+  };
+
   const downloadStatsExcel = () => {
     if (visitStats.length === 0) return;
     
@@ -1250,9 +1270,14 @@ export default function App() {
 
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold">일별 유입 로그 (최근 60일)</h2>
-                    <button onClick={downloadStatsExcel} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition-all shadow-lg">
-                      <Download className="w-4 h-4" /> 엑셀 다운로드
-                    </button>
+                    <div className="flex gap-3">
+                      <button onClick={resetVisitStats} className="flex items-center gap-2 px-4 py-2 bg-red-600/20 border border-red-600/30 text-red-500 text-sm font-bold rounded-lg hover:bg-red-600/30 transition-all">
+                        <Trash2 className="w-4 h-4" /> 데이터 리셋
+                      </button>
+                      <button onClick={downloadStatsExcel} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition-all shadow-lg">
+                        <Download className="w-4 h-4" /> 엑셀 다운로드
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-4">
                     {visitStats.map((stat, idx) => (
