@@ -196,12 +196,35 @@ export default function App() {
 
     const trackVisit = async () => {
       try {
-        await fetch('/api/track-visit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ referrer: document.referrer || 'Direct' })
-        });
-        // After tracking, fetch stats to show on start screen
+        const today = new Date().toISOString().split('T')[0];
+        const referrer = document.referrer || 'Direct';
+        const sanitizedReferrer = referrer.replace(/[^a-zA-Z0-9_-]/g, '_');
+        
+        // Use localStorage to track if this user has visited today (simple client-side tracking)
+        const lastVisitDate = localStorage.getItem('safe_touch_last_visit');
+        
+        if (lastVisitDate !== today) {
+          const dailyVisitRef = doc(db, 'visits', today);
+          const dailyDoc = await getDoc(dailyVisitRef);
+          
+          if (!dailyDoc.exists()) {
+            await setDoc(dailyVisitRef, {
+              date: today,
+              count: 1,
+              referrers: { [sanitizedReferrer]: 1 },
+              lastUpdated: serverTimestamp()
+            });
+          } else {
+            await updateDoc(dailyVisitRef, {
+              count: increment(1),
+              [`referrers.${sanitizedReferrer}`]: increment(1),
+              lastUpdated: serverTimestamp()
+            });
+          }
+          localStorage.setItem('safe_touch_last_visit', today);
+        }
+
+        // Fetch stats to show on start screen
         const q = query(collection(db, 'visits'), orderBy('date', 'desc'), limit(60));
         const querySnapshot = await getDocs(q);
         const stats = querySnapshot.docs.map(doc => doc.data() as VisitData);
@@ -594,40 +617,14 @@ export default function App() {
   };
 
   const handleFileUpload = async (file: File, callback: (url: string) => void) => {
-    // Check for MIDI files
+    alert("GitHub Pages는 정적 호스팅 서비스이므로 직접적인 파일 업로드를 지원하지 않습니다. 대신 이미지나 오디오의 인터넷 주소(URL)를 직접 입력해 주세요.");
+    return;
+    
+    /* 
+    // 기존 서버 기반 업로드 코드 (Node.js 서버가 필요함)
     const extension = file.name.split('.').pop()?.toLowerCase();
-    if (extension === 'mid' || extension === 'midi') {
-      const confirmMidi = window.confirm("MIDI 파일은 일부 브라우저에서 재생되지 않을 수 있습니다. MP3 또는 WAV 파일을 권장합니다. 계속하시겠습니까?");
-      if (!confirmMidi) return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      const contentType = response.headers.get("content-type");
-      if (!response.ok) {
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Upload failed");
-        }
-        throw new Error(`Upload failed with status ${response.status}`);
-      }
-      
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Server returned non-JSON response. Check if the server is running correctly.");
-      }
-
-      const data = await response.json();
-      callback(data.url);
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert(`업로드에 실패했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
-    }
+    ...
+    */
   };
 
   const downloadStatsExcel = () => {
