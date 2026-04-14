@@ -94,6 +94,7 @@ export default function App() {
   const [startButtonImage, setStartButtonImage] = useState<string | undefined>(undefined);
   const [audioSettings, setAudioSettings] = useState({
     opening: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3',
+    gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/bgm.mp3',
     hitPositive: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/win.mp3',
     hitNegative: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/error.mp3',
     ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
@@ -116,6 +117,7 @@ export default function App() {
 
   // --- [하드웨어 무음 스위치 대응] Howler를 이용한 오디오 참조 객체 ---
   const openingAudioRef = useRef<Howl | null>(null);
+  const gameplayAudioRef = useRef<Howl | null>(null);
   const hitPositiveAudioRef = useRef<Howl | null>(null);
   const hitNegativeAudioRef = useRef<Howl | null>(null);
   const endingAudioRef = useRef<Howl | null>(null);
@@ -287,12 +289,14 @@ export default function App() {
     };
 
     openingAudioRef.current = loadAudio(audioSettings.opening, true, "opening");
+    gameplayAudioRef.current = loadAudio(audioSettings.gameplay, true, "gameplay");
     hitPositiveAudioRef.current = loadAudio(audioSettings.hitPositive, false, "hitPositive");
     hitNegativeAudioRef.current = loadAudio(audioSettings.hitNegative, false, "hitNegative");
     endingAudioRef.current = loadAudio(audioSettings.ending, false, "ending");
 
     return () => {
       openingAudioRef.current?.stop();
+      gameplayAudioRef.current?.stop();
       hitPositiveAudioRef.current?.stop();
       hitNegativeAudioRef.current?.stop();
       endingAudioRef.current?.stop();
@@ -303,20 +307,51 @@ export default function App() {
 
   // Audio initialization with user interaction check
   useEffect(() => {
-    const playOpening = () => {
-      if (!isMuted && openingAudioRef.current && (gameState === 'start' || gameState === 'how-to' || gameState === 'playing')) {
-        if (!openingAudioRef.current.playing()) {
+    const updateAudio = () => {
+      if (isMuted) {
+        openingAudioRef.current?.stop();
+        gameplayAudioRef.current?.stop();
+        endingAudioRef.current?.stop();
+        return;
+      }
+
+      // 1. Opening Music (Start & How-to)
+      if (gameState === 'start' || gameState === 'how-to') {
+        gameplayAudioRef.current?.stop();
+        endingAudioRef.current?.stop();
+        if (openingAudioRef.current && !openingAudioRef.current.playing()) {
           openingAudioRef.current.play();
         }
+      } 
+      // 2. Gameplay Music
+      else if (gameState === 'playing') {
+        openingAudioRef.current?.stop();
+        endingAudioRef.current?.stop();
+        if (gameplayAudioRef.current && !gameplayAudioRef.current.playing()) {
+          gameplayAudioRef.current.play();
+        }
+      }
+      // 3. Ending Music
+      else if (gameState === 'end') {
+        openingAudioRef.current?.stop();
+        gameplayAudioRef.current?.stop();
+        if (endingAudioRef.current && !endingAudioRef.current.playing()) {
+          endingAudioRef.current.play();
+        }
+      }
+      // 4. Admin or other
+      else {
+        openingAudioRef.current?.stop();
+        gameplayAudioRef.current?.stop();
+        endingAudioRef.current?.stop();
       }
     };
 
-    // Try to play, but browsers often block it until first click
-    playOpening();
+    updateAudio();
     
     // Add a one-time global click listener to unlock audio
     const unlockAudio = () => {
-      playOpening();
+      updateAudio();
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('touchstart', unlockAudio);
     };
@@ -673,49 +708,6 @@ export default function App() {
 
   return (
     <div ref={containerRef} className="relative w-full h-[100svh] overflow-hidden font-sans bg-[#f0f7ff]">
-      {/* Integrated Sound Control (Mute + Volume) */}
-      <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[300] flex items-center group">
-        <div className={`flex items-center bg-white/90 backdrop-blur-md rounded-full shadow-2xl border-2 transition-all duration-500 ease-in-out overflow-hidden ${isMuted ? 'border-gray-200 max-w-[64px] sm:max-w-[84px]' : 'border-primary/20 max-w-[64px] sm:max-w-[84px] group-hover:max-w-[300px] sm:group-hover:max-w-[400px] group-active:max-w-[300px]'}`}>
-          <button 
-            onClick={() => setIsMuted(!isMuted)} 
-            className="p-3 sm:p-5 hover:bg-primary/5 transition-colors shrink-0 outline-none"
-            title={isMuted ? "소리 켜기" : "소리 끄기"}
-          >
-            {isMuted ? <VolumeX className="w-6 h-6 sm:w-10 sm:h-10 text-gray-400" /> : <Volume2 className="w-6 h-6 sm:w-10 sm:h-10 text-primary" />}
-          </button>
-          
-          {!isMuted && (
-            <div className="flex items-center pr-6 gap-3 w-32 sm:w-56 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300">
-              <div className="h-1.5 w-full bg-gray-200 rounded-full relative">
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="1" 
-                  step="0.01" 
-                  value={audioSettings.volume} 
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    setAudioSettings(prev => ({ ...prev, volume: parseFloat(e.target.value) }));
-                  }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                />
-                <div 
-                  className="absolute left-0 top-0 h-full bg-primary rounded-full"
-                  style={{ width: `${audioSettings.volume * 100}%` }}
-                />
-                <div 
-                  className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md pointer-events-none"
-                  style={{ left: `calc(${audioSettings.volume * 100}% - 8px)` }}
-                />
-              </div>
-              <span className="text-[10px] font-mono text-primary font-bold w-8 text-right">
-                {Math.round(audioSettings.volume * 100)}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
       <AnimatePresence mode="wait">
       {/* 1. 오프닝 화면 */}
       {gameState === 'start' && (
