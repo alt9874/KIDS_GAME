@@ -212,6 +212,17 @@ export default function App() {
         const referrer = document.referrer || 'Direct';
         const sanitizedReferrer = referrer.replace(/[^a-zA-Z0-9_-]/g, '_');
         
+        // IP 주소 체크 (외부 API 사용)
+        let userIp = 'Unknown';
+        try {
+          const ipResponse = await fetch('https://api.ipify.org?format=json');
+          const ipData = await ipResponse.json();
+          userIp = ipData.ip;
+        } catch (ipError) {
+          console.error("Failed to fetch IP:", ipError);
+        }
+        const sanitizedIp = userIp.replace(/\./g, '_');
+
         // Use localStorage to track if this user has visited today (simple client-side tracking)
         const lastVisitDate = localStorage.getItem('safe_touch_last_visit');
         
@@ -224,12 +235,14 @@ export default function App() {
               date: today,
               count: 1,
               referrers: { [sanitizedReferrer]: 1 },
+              ips: { [sanitizedIp]: 1 },
               lastUpdated: serverTimestamp()
             });
           } else {
             await updateDoc(dailyVisitRef, {
               count: increment(1),
               [`referrers.${sanitizedReferrer}`]: increment(1),
+              [`ips.${sanitizedIp}`]: increment(1),
               lastUpdated: serverTimestamp()
             });
           }
@@ -1002,7 +1015,7 @@ export default function App() {
                 <p className="text-primary font-bold text-sm sm:text-lg mb-1">최종 점수</p>
                 <p className="text-3xl sm:text-5xl font-black text-primary">{score}점</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
                 <button onClick={() => setGameState('start')} className="flex-1 py-3 sm:py-4 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
                   <Home className="w-5 h-5" /> 처음으로
                 </button>
@@ -1010,6 +1023,17 @@ export default function App() {
                   다시 도전하기
                 </button>
               </div>
+
+              {/* [나중에 이미지로 교체 예정: 한국의약품안전관리원 바로가기 버튼] */}
+              <a 
+                href="https://www.drugsafe.or.kr/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-3 bg-white border-2 border-primary/20 text-primary font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group"
+              >
+                <Info className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                한국의약품안전관리원 바로가기
+              </a>
             </div>
           </motion.div>
         )}
@@ -1404,13 +1428,30 @@ export default function App() {
                           <span className="font-mono text-primary">{stat.date}</span>
                           <span className="font-bold">{stat.count}명 유입</span>
                         </div>
-                        <div className="grid grid-cols-1 gap-2">
-                          {Object.entries(stat.referrers).map(([ref, count]) => (
-                            <div key={ref} className="flex justify-between text-sm">
-                              <span className="text-gray-400 truncate max-w-[250px]">{ref.replace(/_/g, '.')}</span>
-                              <span className="font-mono">{count}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">유입 경로 (Referrer)</p>
+                            <div className="space-y-1">
+                              {Object.entries(stat.referrers).map(([ref, count]) => (
+                                <div key={ref} className="flex justify-between text-xs bg-white/5 p-2 rounded">
+                                  <span className="text-gray-400 truncate max-w-[150px]">{ref.replace(/_/g, '.')}</span>
+                                  <span className="font-mono text-primary">{count}</span>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">접속 IP (IP Address)</p>
+                            <div className="space-y-1">
+                              {stat.ips && Object.entries(stat.ips).map(([ip, count]) => (
+                                <div key={ip} className="flex justify-between text-xs bg-white/5 p-2 rounded">
+                                  <span className="text-gray-400 font-mono">{ip.replace(/_/g, '.')}</span>
+                                  <span className="font-mono text-green-500">{count}</span>
+                                </div>
+                              ))}
+                              {!stat.ips && <p className="text-[10px] text-gray-600 italic">기록된 IP 없음</p>}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}
