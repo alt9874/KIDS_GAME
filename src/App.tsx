@@ -1016,21 +1016,27 @@ export default function App() {
                 <p className="text-3xl sm:text-5xl font-black text-primary">{score}점</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
-                <button onClick={() => setGameState('start')} className="flex-1 py-3 sm:py-4 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+                {/* [나중에 이미지로 교체 예정: '처음으로' 버튼 이미지 / 권장 크기: 240x100px] */}
+                <button onClick={() => setGameState('start')} className="flex-1 py-3 sm:py-4 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 overflow-hidden">
+                  {/* <img src="이미지_주소_입력" alt="처음으로" className="w-full h-full object-contain" /> */}
                   <Home className="w-5 h-5" /> 처음으로
                 </button>
-                <button onClick={startGame} className="flex-[2] py-3 sm:py-4 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 shadow-lg transition-all">
+
+                {/* [나중에 이미지로 교체 예정: '다시 도전하기' 버튼 이미지 / 권장 크기: 480x100px] */}
+                <button onClick={startGame} className="flex-[2] py-3 sm:py-4 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 shadow-lg transition-all overflow-hidden">
+                  {/* <img src="이미지_주소_입력" alt="다시 도전하기" className="w-full h-full object-contain" /> */}
                   다시 도전하기
                 </button>
               </div>
 
-              {/* [나중에 이미지로 교체 예정: 한국의약품안전관리원 바로가기 버튼] */}
+              {/* [나중에 이미지로 교체 예정: '한국의약품안전관리원' 버튼 이미지 / 권장 크기: 600x120px] */}
               <a 
                 href="https://www.drugsafe.or.kr/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-full py-3 bg-white border-2 border-primary/20 text-primary font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group"
+                className="w-full py-3 bg-white border-2 border-primary/20 text-primary font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group overflow-hidden"
               >
+                {/* <img src="이미지_주소_입력" alt="한국의약품안전관리원" className="w-full h-full object-contain" /> */}
                 <Info className="w-4 h-4 group-hover:scale-110 transition-transform" />
                 한국의약품안전관리원 바로가기
               </a>
