@@ -94,7 +94,7 @@ export default function App() {
   const [startButtonImage, setStartButtonImage] = useState<string | undefined>(undefined);
   const [audioSettings, setAudioSettings] = useState({
     opening: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3',
-    gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/bgm.mp3',
+    gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/main.mp3',
     hitPositive: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/win.mp3',
     hitNegative: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/error.mp3',
     ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
