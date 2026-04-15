@@ -40,8 +40,8 @@ const AUDIO_URLS = {
 const OPENING_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/main_pc.jpg"; 
 const OPENING_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/main_mo.jpg"; 
 const START_BUTTON_IMAGE = "https://raw.githubusercontent.com/alt9874/game/main/start_bt.png"; 
-const PLAY_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/play_pc.jpg";
-const PLAY_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/play_mo.jpg";
+const PLAY_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/play_pc.jpg"; // PC 버전 플레이 배경
+const PLAY_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/game_play_mo.gif"; // 모바일 버전 플레이 배경
 const ENDING_IMAGES = {
   LEVEL_1: undefined, // 100점 미만
   LEVEL_2: undefined, // 100~299점
@@ -800,7 +800,7 @@ export default function App() {
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
             {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
-            <div className="w-full flex justify-center pt-4 sm:pt-8 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
+            <div className="w-full flex justify-center pt-4 sm:pt-24 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
               <motion.button 
                 onClick={() => setGameState('how-to')} 
                 className="group relative"
