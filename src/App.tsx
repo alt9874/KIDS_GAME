@@ -37,8 +37,11 @@ const AUDIO_URLS = {
 };
 
 // --- [3. 이미지 설정] ---
-const OPENING_BG_IMAGE = undefined; 
-const START_BUTTON_IMAGE = undefined; 
+const OPENING_BG_IMAGE_PC = "https://cdn.jsdelivr.net/gh/alt9874/game@main/main_pc.jpg"; 
+const OPENING_BG_IMAGE_MO = "https://cdn.jsdelivr.net/gh/alt9874/game@main/main_mo.jpg"; 
+const START_BUTTON_IMAGE = "https://cdn.jsdelivr.net/gh/alt9874/game@main/start_bt.png"; 
+const PLAY_BG_IMAGE_PC = "https://cdn.jsdelivr.net/gh/alt9874/game@main/play_pc.jpg";
+const PLAY_BG_IMAGE_MO = "https://cdn.jsdelivr.net/gh/alt9874/game@main/play_mo.jpg";
 const ENDING_IMAGES = {
   LEVEL_1: undefined, // 100점 미만
   LEVEL_2: undefined, // 100~299점
@@ -760,15 +763,22 @@ export default function App() {
               중요한 피사체는 이미지 중앙에 배치하는 것이 좋습니다.
           */}
           <motion.div key="start" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-            className="fixed inset-0 flex flex-col items-center justify-center z-[200] text-center p-4 sm:p-6 bg-white/90 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
-            style={{ 
-              backgroundImage: OPENING_BG_IMAGE ? `url(${OPENING_BG_IMAGE})` : 'none', 
-              backgroundSize: 'cover', // 이미지가 화면보다 작아도 빈 공간 없이 꽉 채움
-              backgroundPosition: 'center' // 이미지의 중앙을 기준으로 배치하여 잘림 최소화
-            }}>
+            className="fixed inset-0 flex flex-col items-center justify-center z-[200] text-center p-4 sm:p-6 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+          >
+            {/* Responsive Background Images */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center z-[-1] hidden sm:block" 
+              style={{ backgroundImage: (openingBgImage && openingBgImage.trim() !== "") ? `url(${openingBgImage})` : `url(${OPENING_BG_IMAGE_PC})` }} 
+            />
+            <div 
+              className="absolute inset-0 bg-cover bg-center z-[-1] block sm:hidden" 
+              style={{ backgroundImage: (openingBgImage && openingBgImage.trim() !== "") ? `url(${openingBgImage})` : `url(${OPENING_BG_IMAGE_MO})` }} 
+            />
+            {/* Overlay for readability if no image is set or as a fallback */}
+            {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
             <div className="max-w-md w-full flex flex-col items-center justify-center py-8">
-            {!OPENING_BG_IMAGE && (
+            {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && (
               <div className="mb-8 sm:mb-12">
                 <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
                   <PillIcon className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4" />
@@ -786,11 +796,12 @@ export default function App() {
               - 'max-w'와 'w-full'을 적절히 섞어 모바일에서는 화면 너비에 맞게, PC에서는 적정 크기로 유지되게 합니다.
             */}
             <button onClick={() => setGameState('how-to')} className="group relative">
-                {START_BUTTON_IMAGE ? (
+                {(startButtonImage && startButtonImage.trim() !== "" || START_BUTTON_IMAGE) ? (
                   <img 
-                    src={START_BUTTON_IMAGE} 
+                    src={(startButtonImage && startButtonImage.trim() !== "") ? startButtonImage : START_BUTTON_IMAGE} 
                     alt="시작" 
                     className="max-w-[240px] sm:max-w-[320px] w-full h-auto hover:scale-105 transition-transform active:scale-95" 
+                    referrerPolicy="no-referrer"
                   />
                 ) : (
                   <div className="px-10 py-4 sm:px-12 sm:py-5 bg-primary text-white text-xl sm:text-2xl font-bold rounded-full shadow-2xl hover:bg-blue-600 transition-all flex items-center gap-3">
@@ -816,7 +827,7 @@ export default function App() {
                     <div key={p.id} className="flex items-center gap-2 sm:gap-3">
                       {p.image ? (
                         <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 shrink-0">
-                          <img src={p.image} alt={p.label} className="max-w-full max-h-full object-contain" />
+                          <img src={p.image} alt={p.label} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
                         </div>
                       ) : (
                         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full shadow-sm shrink-0" style={{ backgroundColor: p.color }} />
@@ -843,7 +854,16 @@ export default function App() {
         {/* 3. 게임 화면 */}
         {gameState === 'playing' && (
           <div key="playing" className="relative w-full h-full">
-            {/* [나중에 이미지로 교체 예정: 게임 화면 배경 이미지] */}
+            {/* Responsive Background Images for Gameplay */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center z-0 hidden sm:block" 
+              style={{ backgroundImage: `url(${PLAY_BG_IMAGE_PC})` }} 
+            />
+            <div 
+              className="absolute inset-0 bg-cover bg-center z-0 block sm:hidden" 
+              style={{ backgroundImage: `url(${PLAY_BG_IMAGE_MO})` }} 
+            />
+            
             <div className="fixed top-[calc(1rem+env(safe-area-inset-top))] left-4 right-4 sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:left-6 sm:right-6 z-50 flex justify-between items-start pointer-events-none">
               <div className="flex flex-col gap-2 pointer-events-auto">
                 {/* [나중에 이미지로 교체 예정: 메인(홈) 버튼 이미지] */}
@@ -884,7 +904,7 @@ export default function App() {
                   borderRadius: pill.image ? '0' : (pill.type === 'good' || pill.label === '중복 복용' ? '25px' : '50%') 
                 }}>
                 {/* [나중에 이미지로 교체 예정: 약물(Pill) 이미지] */}
-                {pill.image ? <img src={pill.image} alt={pill.label} className="w-full h-full object-contain" /> : pill.label}
+                {pill.image ? <img src={pill.image} alt={pill.label} className="w-full h-full object-contain" referrerPolicy="no-referrer" /> : pill.label}
               </motion.div>
             ))}
 
@@ -899,7 +919,7 @@ export default function App() {
           <motion.div key="end" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="fixed inset-0 bg-white z-[220] flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
             <div className="max-w-md w-full py-8">
               {getEndingLevel().img ? (
-                <img src={getEndingLevel().img} alt="결과" className="w-full h-40 sm:h-64 object-cover rounded-3xl mb-4 sm:mb-8 shadow-2xl" />
+                <img src={getEndingLevel().img} alt="결과" className="w-full h-40 sm:h-64 object-cover rounded-3xl mb-4 sm:mb-8 shadow-2xl" referrerPolicy="no-referrer" />
               ) : (
                 <div className="w-full h-32 sm:h-48 bg-gray-100 rounded-3xl flex items-center justify-center mb-4 sm:mb-8 border-4 border-dashed border-gray-200">
                   <span className="text-gray-300 font-bold">엔딩 이미지 (Level {getEndingLevel().level})</span>
@@ -997,7 +1017,7 @@ export default function App() {
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden">
                                   {p.image ? (
-                                    <img src={p.image} alt="" className="max-w-full max-h-full object-contain" />
+                                    <img src={p.image} alt="" className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
                                   ) : (
                                     <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.color }} />
                                   )}
