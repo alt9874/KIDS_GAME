@@ -19,13 +19,13 @@ setPersistence(auth, browserLocalPersistence).catch(err => console.error("Failed
 // --- [1. 약물 점수 및 이미지 제어 센터] ---
 // 여기서 각 약물의 점수와 이미지를 직접 수정하세요.
 const PILL_SETTINGS = [
-  { id: 1, type: 'good' as const, label: "올바른 복용", score: 15, size: [80, 40], image: undefined, color: "#2ecc71", enabled: true },
-  { id: 2, type: 'good' as const, label: "식후 30분", score: 10, size: [80, 40], image: undefined, color: "#27ae60", enabled: true },
-  { id: 3, type: 'good' as const, label: "정량 복용", score: 10, size: [80, 40], image: undefined, color: "#16a085", enabled: true },
-  { id: 4, type: 'good' as const, label: "충분한 물과 함께", score: 10, size: [80, 40], image: undefined, color: "#3498db", enabled: true },
-  { id: 5, type: 'misuse' as const, label: "유효기간 경과", score: -15, size: [70, 70], image: undefined, color: "#f1c40f", enabled: true },
-  { id: 6, type: 'misuse' as const, label: "약물 오남용", score: -25, size: [60, 60], image: undefined, color: "#e74c3c", enabled: true },
-  { id: 7, type: 'misuse' as const, label: "중복 복용", score: -30, size: [90, 45], image: undefined, color: "#c0392b", enabled: true }
+  { id: 1, type: 'good' as const, label: "올바른 복용", score: 15, size: [80, 40], image: undefined, color: "#2ecc71", enabled: true, spawnChance: 20 },
+  { id: 2, type: 'good' as const, label: "식후 30분", score: 10, size: [80, 40], image: undefined, color: "#27ae60", enabled: true, spawnChance: 20 },
+  { id: 3, type: 'good' as const, label: "정량 복용", score: 10, size: [80, 40], image: undefined, color: "#16a085", enabled: true, spawnChance: 20 },
+  { id: 4, type: 'good' as const, label: "충분한 물과 함께", score: 10, size: [80, 40], image: undefined, color: "#3498db", enabled: true, spawnChance: 20 },
+  { id: 5, type: 'misuse' as const, label: "유효기간 경과", score: -15, size: [70, 70], image: undefined, color: "#f1c40f", enabled: true, spawnChance: 10 },
+  { id: 6, type: 'misuse' as const, label: "약물 오남용", score: -25, size: [60, 60], image: undefined, color: "#e74c3c", enabled: true, spawnChance: 5 },
+  { id: 7, type: 'misuse' as const, label: "중복 복용", score: -30, size: [90, 45], image: undefined, color: "#c0392b", enabled: true, spawnChance: 5 }
 ];
 
 // --- [2. 오디오 파일 설정] ---
@@ -402,7 +402,19 @@ export default function App() {
     const activeConfigs = pillConfigs.filter(p => p.enabled !== false);
     if (activeConfigs.length === 0) return;
     
-    const config = activeConfigs[Math.floor(Math.random() * activeConfigs.length)];
+    // Weighted random selection based on spawnChance
+    const totalChance = activeConfigs.reduce((sum, p) => sum + (p.spawnChance || 10), 0);
+    let random = Math.random() * totalChance;
+    let config = activeConfigs[0];
+    
+    for (const p of activeConfigs) {
+      if (random < (p.spawnChance || 10)) {
+        config = p;
+        break;
+      }
+      random -= (p.spawnChance || 10);
+    }
+
     const width = config.size?.[0] || (config.type === 'good' ? 80 : 70);
     const height = config.size?.[1] || (config.type === 'good' ? 40 : 70);
 
@@ -573,7 +585,8 @@ export default function App() {
       const configData = {
         pillConfigs: pillConfigs.map(p => ({
           ...p,
-          image: p.image || null
+          image: p.image || null,
+          spawnChance: p.spawnChance || 10
         })),
         gameSpeed: {
           base: gameSpeed.base || 2.5,
@@ -617,6 +630,10 @@ export default function App() {
 
   const updatePillImage = (id: number, image: string) => {
     setPillConfigs(prev => prev.map(p => p.id === id ? { ...p, image: image || undefined } : p));
+  };
+
+  const updatePillChance = (id: number, spawnChance: number) => {
+    setPillConfigs(prev => prev.map(p => p.id === id ? { ...p, spawnChance } : p));
   };
 
   const togglePillEnabled = (id: number) => {
@@ -1087,6 +1104,12 @@ export default function App() {
                                   <input type="number" value={isNaN(p.score) ? '' : p.score} onChange={(e) => updatePillScore(p.id, parseInt(e.target.value))}
                                     disabled={p.enabled === false}
                                     className="w-16 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-right text-white disabled:opacity-30" />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500">빈도:</span>
+                                  <input type="number" value={isNaN(p.spawnChance as number) ? '' : (p.spawnChance || 10)} onChange={(e) => updatePillChance(p.id, parseInt(e.target.value))}
+                                    disabled={p.enabled === false}
+                                    className="w-12 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-right text-primary font-bold disabled:opacity-30" />
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-gray-500">색상:</span>
