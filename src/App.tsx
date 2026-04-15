@@ -777,30 +777,30 @@ export default function App() {
             {/* Overlay for readability if no image is set or as a fallback */}
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
-            <div className="max-w-md w-full flex flex-col items-center justify-center py-8">
-            {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && (
+            <div className="max-w-md w-full flex flex-col items-center justify-center py-8 z-10">
+              {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && (
+                <div className="mb-8 sm:mb-12">
+                  <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
+                    <PillIcon className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4" />
+                  </motion.div>
+                  <h1 className="text-3xl sm:text-6xl font-black text-gray-800 mb-2 sm:mb-4 tracking-tighter break-keep">안전한 손길</h1>
+                  <p className="text-base sm:text-xl text-gray-500 font-medium mb-4 sm:mb-6 break-keep">올바른 약 복용, 당신의 건강을 지킵니다.</p>
+                </div>
+              )}
+
+              {/* 누적 방문자 카운터 - 항상 표시 */}
               <div className="mb-8 sm:mb-12">
-                <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
-                  <PillIcon className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4" />
-                </motion.div>
-                <h1 className="text-3xl sm:text-6xl font-black text-gray-800 mb-2 sm:mb-4 tracking-tighter break-keep">안전한 손길</h1>
-                <p className="text-base sm:text-xl text-gray-500 font-medium mb-4 sm:mb-6 break-keep">올바른 약 복용, 당신의 건강을 지킵니다.</p>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-gray-100 rounded-full text-xs sm:text-sm font-bold text-gray-500">
-                  <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 누적 방문자: <span className="text-primary">{totalVisits.toLocaleString()}명</span>
+                <div className={`inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg ${(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) ? 'bg-gray-100 text-gray-500' : 'bg-black/50 text-white backdrop-blur-md border border-white/20'}`}>
+                  <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 누적 방문자: <span className="text-primary-foreground bg-primary px-2 py-0.5 rounded-full ml-1">{totalVisits.toLocaleString()}명</span>
                 </div>
               </div>
-            )}
-            {/* 
-              [반응형 버튼 이미지 설정 가이드]
-              - 버튼 이미지는 투명 배경(PNG)을 권장합니다.
-              - 'max-w'와 'w-full'을 적절히 섞어 모바일에서는 화면 너비에 맞게, PC에서는 적정 크기로 유지되게 합니다.
-            */}
-            <button onClick={() => setGameState('how-to')} className="group relative">
+
+              <button onClick={() => setGameState('how-to')} className="group relative">
                 {(startButtonImage && startButtonImage.trim() !== "" || START_BUTTON_IMAGE) ? (
                   <img 
                     src={(startButtonImage && startButtonImage.trim() !== "") ? startButtonImage : START_BUTTON_IMAGE} 
                     alt="시작" 
-                    className="max-w-[240px] sm:max-w-[320px] w-full h-auto hover:scale-105 transition-transform active:scale-95" 
+                    className="w-[40vw] sm:w-[20vw] h-auto mx-auto hover:scale-105 transition-transform active:scale-95 drop-shadow-2xl" 
                     referrerPolicy="no-referrer"
                   />
                 ) : (
