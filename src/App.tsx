@@ -558,11 +558,11 @@ export default function App() {
   };
 
   const getEndingLevel = () => {
-    if (score >= 1000) return { level: 5, text: "전설적인 약물 안전 마스터! 🏆", img: ENDING_IMAGES.LEVEL_5 };
-    if (score >= 600) return { level: 4, text: "진정한 약물 안전 관리 전문가! ✨", img: ENDING_IMAGES.LEVEL_4 };
-    if (score >= 300) return { level: 3, text: "약물 안전 수칙의 모범생! 👍", img: ENDING_IMAGES.LEVEL_3 };
+    if (score >= 1000) return { level: 5, text: "레전드👍 의약품 안전 마스터! 🏆", img: ENDING_IMAGES.LEVEL_5 };
+    if (score >= 600) return { level: 4, text: "진정한 의약품 안전 관리 전문가! ✨", img: ENDING_IMAGES.LEVEL_4 };
+    if (score >= 300) return { level: 3, text: "안전 수칙의 모범생! 👍", img: ENDING_IMAGES.LEVEL_3 };
     if (score >= 100) return { level: 2, text: "조금 더 주의가 필요해요! 😊", img: ENDING_IMAGES.LEVEL_2 };
-    return { level: 1, text: "약물 안전 공부가 시급합니다! ⚠️", img: ENDING_IMAGES.LEVEL_1 };
+    return { level: 1, text: "의약품 안전 공부가 시급합니다! ⚠️", img: ENDING_IMAGES.LEVEL_1 };
   };
 
   const saveGameSettings = async () => {
@@ -783,7 +783,7 @@ export default function App() {
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
             {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
-            <div className="w-full flex justify-center pt-4 sm:pt-8 z-10 absolute sm:relative top-1/2 sm:top-0 -translate-y-1/2 sm:translate-y-0">
+            <div className="w-full flex justify-center pt-4 sm:pt-8 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
               <motion.button 
                 onClick={() => setGameState('how-to')} 
                 className="group relative"
@@ -867,14 +867,14 @@ export default function App() {
                 </div>
                 <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200">
                   <p className="text-gray-600 text-xs sm:text-sm leading-relaxed break-keep">
-                    하늘에서 떨어지는 약 중 <b>안전한 약</b>만 클릭하세요!<br/>
-                    연속 성공 시 <b>콤보 보너스</b>가 쌓입니다.<br/>
+                    하늘에서 떨어지는 약 중 <b>올바른 의약품 안전 정보</b>만 클릭하세요!<br/>
+                    연속 성공 시 <b>콤보 보세요너스</b>가 쌓입니다.<br/>
                     {gameSpeed.duration}초 동안 최고의 점수를 기록해 보세요.
                   </p>
                 </div>
               </div>
               <button onClick={startGame} className="mt-6 sm:mt-12 w-full py-4 sm:py-5 bg-gray-800 text-white text-lg sm:text-xl font-bold rounded-2xl hover:bg-black transition-colors">
-                이해했습니다! 시작하기
+                시작하기!
               </button>
             </div>
           </motion.div>
