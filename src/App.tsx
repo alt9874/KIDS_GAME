@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Pill as PillIcon, Timer, Trophy, Zap, Info, Settings, ArrowRight, Home, BarChart2, Volume2, VolumeX, Download, Plus, Trash2 } from 'lucide-react';
+import { Pill as PillIcon, Timer, Trophy, Zap, Info, Settings, ArrowRight, Home, BarChart2, Volume2, VolumeX, Download, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import * as XLSX from 'xlsx';
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, increment, serverTimestamp, collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
@@ -636,6 +636,20 @@ export default function App() {
     setPillConfigs(prev => prev.map(p => p.id === id ? { ...p, spawnChance } : p));
   };
 
+  const movePill = (id: number, direction: 'up' | 'down') => {
+    setPillConfigs(prev => {
+      const index = prev.findIndex(p => p.id === id);
+      if (index === -1) return prev;
+      if (direction === 'up' && index === 0) return prev;
+      if (direction === 'down' && index === prev.length - 1) return prev;
+
+      const newConfigs = [...prev];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      [newConfigs[index], newConfigs[targetIndex]] = [newConfigs[targetIndex], newConfigs[index]];
+      return newConfigs;
+    });
+  };
+
   const togglePillEnabled = (id: number) => {
     setPillConfigs(prev => prev.map(p => p.id === id ? { ...p, enabled: !p.enabled } : p));
   };
@@ -1078,11 +1092,19 @@ export default function App() {
                       </div>
 
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                        {pillConfigs.map(p => (
+                        {pillConfigs.map((p, index) => (
                           <div key={p.id} className="bg-white/5 p-4 rounded-xl space-y-3 border border-white/5 relative group">
-                            <button onClick={() => removePill(p.id)} className="absolute top-2 right-2 p-1.5 text-gray-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                            <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button onClick={() => movePill(p.id, 'up')} disabled={index === 0} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20">
+                                <ChevronUp className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => movePill(p.id, 'down')} disabled={index === pillConfigs.length - 1} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20">
+                                <ChevronDown className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => removePill(p.id)} className="p-1.5 text-gray-600 hover:text-red-500 transition-colors">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden">
