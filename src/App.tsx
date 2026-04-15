@@ -868,13 +868,13 @@ export default function App() {
                 <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200">
                   <p className="text-gray-600 text-xs sm:text-sm leading-relaxed break-keep">
                     하늘에서 떨어지는 약 중 <b>올바른 의약품 안전 정보</b>만 클릭하세요!<br/>
-                    연속 성공 시 <b>콤보 보세요너스</b>가 쌓입니다.<br/>
+                    연속 성공 시 <b>콤보 보너스</b>가 쌓입니다.<br/>
                     {gameSpeed.duration}초 동안 최고의 점수를 기록해 보세요.
                   </p>
                 </div>
               </div>
               <button onClick={startGame} className="mt-6 sm:mt-12 w-full py-4 sm:py-5 bg-gray-800 text-white text-lg sm:text-xl font-bold rounded-2xl hover:bg-black transition-colors">
-                시작하기!
+                시작하기
               </button>
             </div>
           </motion.div>
