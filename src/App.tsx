@@ -685,14 +685,25 @@ export default function App() {
   };
 
   const handleFileUpload = async (file: File, callback: (url: string) => void) => {
-    alert("GitHub Pages는 정적 호스팅 서비스이므로 직접적인 파일 업로드를 지원하지 않습니다. 대신 이미지나 오디오의 인터넷 주소(URL)를 직접 입력해 주세요.");
-    return;
-    
-    /* 
-    // 기존 서버 기반 업로드 코드 (Node.js 서버가 필요함)
-    const extension = file.name.split('.').pop()?.toLowerCase();
-    ...
-    */
+    // 파일 크기 제한 (Firestore 문서 크기 제한 1MB 고려하여 500KB로 제한)
+    const MAX_FILE_SIZE = 500 * 1024; // 500KB
+    if (file.size > MAX_FILE_SIZE) {
+      alert("파일 크기가 너무 큽니다. 500KB 이하의 이미지만 업로드 가능합니다. 더 큰 이미지는 외부 URL을 사용해 주세요.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result;
+      if (typeof result === 'string') {
+        callback(result);
+        alert("이미지가 성공적으로 로드되었습니다. '설정 저장' 버튼을 눌러야 최종 반영됩니다.");
+      }
+    };
+    reader.onerror = () => {
+      alert("파일을 읽는 중 오류가 발생했습니다.");
+    };
+    reader.readAsDataURL(file);
   };
 
   const resetVisitStats = async () => {
@@ -1053,6 +1064,19 @@ export default function App() {
                           <Plus className="w-3 h-3" /> 약물 추가
                         </button>
                       </div>
+
+                      {/* GitHub Asset Guide */}
+                      <div className="mb-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                        <h3 className="text-xs font-bold text-blue-400 mb-2 flex items-center gap-2">
+                          <Info className="w-3.5 h-3.5" /> 깃허브(GitHub) 이미지 사용 가이드
+                        </h3>
+                        <p className="text-[10px] text-gray-400 leading-relaxed">
+                          직접 깃허브에 올린 이미지를 사용하려면 <b>Raw 주소</b>를 입력해야 합니다.<br/>
+                          예: <code className="text-blue-300">https://raw.githubusercontent.com/사용자/저장소/main/이미지.png</code><br/>
+                          이미지 주소창에 주소를 직접 붙여넣고 <b>[설정 저장]</b>을 누르세요. (직접 업로드 버튼도 계속 사용 가능합니다.)
+                        </p>
+                      </div>
+
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {pillConfigs.map(p => (
                           <div key={p.id} className="bg-white/5 p-4 rounded-xl space-y-3 border border-white/5 relative group">
