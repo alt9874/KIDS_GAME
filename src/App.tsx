@@ -1093,12 +1093,12 @@ export default function App() {
 
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {pillConfigs.map((p, index) => (
-                          <div key={p.id} className="bg-white/5 p-4 rounded-xl space-y-3 border border-white/5 relative group">
-                            <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => movePill(p.id, 'up')} disabled={index === 0} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20">
+                          <div key={p.id} className="bg-white/5 p-4 rounded-xl space-y-3 border border-white/5 relative">
+                            <div className="absolute top-2 right-2 flex items-center gap-1">
+                              <button onClick={() => movePill(p.id, 'up')} disabled={index === 0} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20 transition-colors">
                                 <ChevronUp className="w-4 h-4" />
                               </button>
-                              <button onClick={() => movePill(p.id, 'down')} disabled={index === pillConfigs.length - 1} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20">
+                              <button onClick={() => movePill(p.id, 'down')} disabled={index === pillConfigs.length - 1} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20 transition-colors">
                                 <ChevronDown className="w-4 h-4" />
                               </button>
                               <button onClick={() => removePill(p.id)} className="p-1.5 text-gray-600 hover:text-red-500 transition-colors">
