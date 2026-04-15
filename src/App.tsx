@@ -37,11 +37,11 @@ const AUDIO_URLS = {
 };
 
 // --- [3. 이미지 설정] ---
-const OPENING_BG_IMAGE_PC = "https://cdn.jsdelivr.net/gh/alt9874/game@main/main_pc.jpg"; 
-const OPENING_BG_IMAGE_MO = "https://cdn.jsdelivr.net/gh/alt9874/game@main/main_mo.jpg"; 
-const START_BUTTON_IMAGE = "https://cdn.jsdelivr.net/gh/alt9874/game@main/start_bt.png"; 
-const PLAY_BG_IMAGE_PC = "https://cdn.jsdelivr.net/gh/alt9874/game@main/play_pc.jpg";
-const PLAY_BG_IMAGE_MO = "https://cdn.jsdelivr.net/gh/alt9874/game@main/play_mo.jpg";
+const OPENING_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/main_pc.jpg"; 
+const OPENING_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/main_mo.jpg"; 
+const START_BUTTON_IMAGE = "https://raw.githubusercontent.com/alt9874/game/main/start_bt.png"; 
+const PLAY_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/play_pc.jpg";
+const PLAY_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/play_mo.jpg";
 const ENDING_IMAGES = {
   LEVEL_1: undefined, // 100점 미만
   LEVEL_2: undefined, // 100~299점
@@ -95,12 +95,13 @@ export default function App() {
   const [gameSpeed, setGameSpeed] = useState({ base: 2.5, increment: 0.06, duration: 60 });
   const [openingBgImage, setOpeningBgImage] = useState<string | undefined>(undefined);
   const [startButtonImage, setStartButtonImage] = useState<string | undefined>(undefined);
+  const [btnImageError, setBtnImageError] = useState(false);
   const [audioSettings, setAudioSettings] = useState({
-    opening: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3',
-    gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/main.mp3',
-    hitPositive: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/win.mp3',
-    hitNegative: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/error.mp3',
-    ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
+    opening: 'https://raw.githubusercontent.com/alt9874/game/main/opening.mp3',
+    gameplay: 'https://raw.githubusercontent.com/alt9874/game/main/main.mp3',
+    hitPositive: 'https://raw.githubusercontent.com/alt9874/game/main/win.mp3',
+    hitNegative: 'https://raw.githubusercontent.com/alt9874/game/main/error.mp3',
+    ending: 'https://raw.githubusercontent.com/alt9874/game/main/ending.mp3',
     volume: 0.7
   });
   const [isMuted, setIsMuted] = useState(false);
@@ -763,7 +764,7 @@ export default function App() {
               중요한 피사체는 이미지 중앙에 배치하는 것이 좋습니다.
           */}
           <motion.div key="start" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-            className="fixed inset-0 flex flex-col items-center justify-center z-[200] text-center p-4 sm:p-6 overflow-y-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+            className="fixed inset-0 flex flex-col items-center justify-between z-[200] text-center p-6 sm:p-12 overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
           >
             {/* Responsive Background Images */}
             <div 
@@ -777,38 +778,48 @@ export default function App() {
             {/* Overlay for readability if no image is set or as a fallback */}
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
-            <div className="max-w-md w-full flex flex-col items-center justify-center py-8 z-10">
+            {/* 1. 상단: 시작 버튼 (깜빡이는 애니메이션 -> 스케일 펄스로 변경) */}
+            <div className="w-full flex justify-center pt-4 sm:pt-8 z-10">
+              <motion.button 
+                onClick={() => setGameState('how-to')} 
+                className="group relative"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              >
+                  {((startButtonImage && startButtonImage.trim() !== "" || START_BUTTON_IMAGE) && !btnImageError) ? (
+                    <img 
+                      src={(startButtonImage && startButtonImage.trim() !== "") ? startButtonImage : START_BUTTON_IMAGE} 
+                      alt="시작" 
+                      className="w-[35vw] sm:w-[15vw] h-auto mx-auto hover:scale-110 transition-transform active:scale-95 drop-shadow-2xl" 
+                      referrerPolicy="no-referrer"
+                      onError={() => setBtnImageError(true)}
+                    />
+                  ) : (
+                    <div className="px-8 py-3 sm:px-10 sm:py-4 bg-primary text-white text-lg sm:text-xl font-bold rounded-full shadow-2xl hover:bg-blue-600 transition-all flex items-center gap-3">
+                      게임 시작 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </div>
+                  )}
+              </motion.button>
+            </div>
+
+            {/* 2. 중앙: 제목 및 로고 (배경 이미지가 없을 때만 표시) */}
+            <div className="max-w-md w-full flex flex-col items-center justify-center z-10">
               {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && (
-                <div className="mb-8 sm:mb-12">
+                <div className="mb-4">
                   <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
                     <PillIcon className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4" />
                   </motion.div>
                   <h1 className="text-3xl sm:text-6xl font-black text-gray-800 mb-2 sm:mb-4 tracking-tighter break-keep">안전한 손길</h1>
-                  <p className="text-base sm:text-xl text-gray-500 font-medium mb-4 sm:mb-6 break-keep">올바른 약 복용, 당신의 건강을 지킵니다.</p>
+                  <p className="text-base sm:text-xl text-gray-500 font-medium break-keep">올바른 약 복용, 당신의 건강을 지킵니다.</p>
                 </div>
               )}
+            </div>
 
-              {/* 누적 방문자 카운터 - 항상 표시 */}
-              <div className="mb-8 sm:mb-12">
-                <div className={`inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg ${(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) ? 'bg-gray-100 text-gray-500' : 'bg-black/50 text-white backdrop-blur-md border border-white/20'}`}>
-                  <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 누적 방문자: <span className="text-primary-foreground bg-primary px-2 py-0.5 rounded-full ml-1">{totalVisits.toLocaleString()}명</span>
-                </div>
+            {/* 3. 하단: 누적 방문자 카운터 */}
+            <div className="w-full flex justify-center pb-8 sm:pb-12 z-10">
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg ${(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) ? 'bg-gray-100 text-gray-500' : 'bg-black/50 text-white backdrop-blur-md border border-white/20'}`}>
+                <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 누적 방문자: <span className="text-primary-foreground bg-primary px-2 py-0.5 rounded-full ml-1">{totalVisits.toLocaleString()}명</span>
               </div>
-
-              <button onClick={() => setGameState('how-to')} className="group relative">
-                {(startButtonImage && startButtonImage.trim() !== "" || START_BUTTON_IMAGE) ? (
-                  <img 
-                    src={(startButtonImage && startButtonImage.trim() !== "") ? startButtonImage : START_BUTTON_IMAGE} 
-                    alt="시작" 
-                    className="w-[40vw] sm:w-[20vw] h-auto mx-auto hover:scale-105 transition-transform active:scale-95 drop-shadow-2xl" 
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="px-10 py-4 sm:px-12 sm:py-5 bg-primary text-white text-xl sm:text-2xl font-bold rounded-full shadow-2xl hover:bg-blue-600 transition-all flex items-center gap-3">
-                    게임 시작 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                  </div>
-                )}
-              </button>
             </div>
           </motion.div>
           </>
