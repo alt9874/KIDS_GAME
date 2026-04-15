@@ -181,8 +181,12 @@ export default function App() {
             });
             currentBaseSpeed.current = data.gameSpeed.base;
           }
-          if (data.openingBgImage) setOpeningBgImage(data.openingBgImage);
-          if (data.startButtonImage) setStartButtonImage(data.startButtonImage);
+          if (data.openingBgImage && data.openingBgImage !== 'undefined' && data.openingBgImage !== 'null') {
+            setOpeningBgImage(data.openingBgImage);
+          }
+          if (data.startButtonImage && data.startButtonImage !== 'undefined' && data.startButtonImage !== 'null') {
+            setStartButtonImage(data.startButtonImage);
+          }
           if (data.audioSettings) {
             setAudioSettings(prev => ({
               ...prev,
@@ -778,7 +782,7 @@ export default function App() {
             {/* Overlay for readability if no image is set or as a fallback */}
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
-            {/* 1. 상단: 시작 버튼 (깜빡이는 애니메이션 -> 스케일 펄스로 변경) */}
+            {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
             <div className="w-full flex justify-center pt-4 sm:pt-8 z-10">
               <motion.button 
                 onClick={() => setGameState('how-to')} 
@@ -786,13 +790,27 @@ export default function App() {
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               >
-                  {((startButtonImage && startButtonImage.trim() !== "" || START_BUTTON_IMAGE) && !btnImageError) ? (
+                  {/* 
+                    이미지 로딩 전략:
+                    1. DB에 저장된 커스텀 이미지가 있으면 그것을 먼저 시도.
+                    2. 커스텀 이미지가 없거나 로딩에 실패하면 기본 상수(START_BUTTON_IMAGE)를 시도.
+                    3. 둘 다 실패하면 텍스트 버튼으로 폴백.
+                  */}
+                  {(!btnImageError) ? (
                     <img 
-                      src={(startButtonImage && startButtonImage.trim() !== "") ? startButtonImage : START_BUTTON_IMAGE} 
+                      src={(startButtonImage && startButtonImage.trim() !== "" && startButtonImage !== 'undefined') ? startButtonImage : START_BUTTON_IMAGE} 
                       alt="시작" 
                       className="w-[35vw] sm:w-[15vw] h-auto mx-auto hover:scale-110 transition-transform active:scale-95 drop-shadow-2xl" 
                       referrerPolicy="no-referrer"
-                      onError={() => setBtnImageError(true)}
+                      onError={(e) => {
+                        // 만약 커스텀 이미지가 실패한 거라면 기본 이미지로 교체 시도
+                        if (startButtonImage && e.currentTarget.src !== START_BUTTON_IMAGE) {
+                          e.currentTarget.src = START_BUTTON_IMAGE;
+                        } else {
+                          // 기본 이미지마저 실패하면 텍스트 버튼으로 전환
+                          setBtnImageError(true);
+                        }
+                      }}
                     />
                   ) : (
                     <div className="px-8 py-3 sm:px-10 sm:py-4 bg-primary text-white text-lg sm:text-xl font-bold rounded-full shadow-2xl hover:bg-blue-600 transition-all flex items-center gap-3">
