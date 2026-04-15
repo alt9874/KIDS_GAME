@@ -783,7 +783,7 @@ export default function App() {
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
             {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
-            <div className="w-full flex justify-center pt-4 sm:pt-8 z-10">
+            <div className="w-full flex justify-center pt-4 sm:pt-8 z-10 absolute sm:relative top-1/2 sm:top-0 -translate-y-1/2 sm:translate-y-0">
               <motion.button 
                 onClick={() => setGameState('how-to')} 
                 className="group relative"
