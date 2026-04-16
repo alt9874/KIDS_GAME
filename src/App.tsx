@@ -1029,12 +1029,11 @@ export default function App() {
                 </button>
               </div>
 
-              {/* [나중에 이미지로 교체 예정: '한국의약품안전관리원' 버튼 이미지 / 권장 크기: 600x120px] */}
               <a 
                 href="https://www.drugsafe.or.kr/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-full py-3 bg-white border-2 border-primary/20 text-primary font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group overflow-hidden"
+                className="w-full transition-all flex items-center justify-center group overflow-hidden"
               >
                 <img src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" alt="한국의약품안전관리원" className="w-full h-full object-contain" />
               </a>
