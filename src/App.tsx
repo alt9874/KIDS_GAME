@@ -839,7 +839,7 @@ export default function App() {
             
             {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
             {/* [PC 버전 시작 버튼 위치 조정 주석]: 아래 sm:pt-48 값을 키우면 버튼이 더 아래로 내려갑니다. (예: sm:pt-60) */}
-            <div className="w-full flex justify-center pt-4 sm:pt-80 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
+            <div className="w-full flex justify-center pt-4 sm:pt-54 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
               <motion.button 
                 onClick={() => setGameState('how-to')} 
                 className="group relative"
