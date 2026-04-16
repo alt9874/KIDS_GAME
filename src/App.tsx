@@ -79,6 +79,7 @@ interface VisitData {
   date: string;
   count: number;
   referrers: { [key: string]: number };
+  ips?: { [key: string]: number };
   lastUpdated: any;
 }
 
@@ -761,10 +762,17 @@ export default function App() {
         .map(([ref, count]) => `${ref.replace(/_/g, '.')}: ${count}`)
         .join(', ');
       
+      const ipDetails = stat.ips 
+        ? Object.entries(stat.ips)
+            .map(([ip, count]) => `${ip.replace(/_/g, '.')}: ${count}`)
+            .join(', ')
+        : '기록 없음';
+      
       return {
         '날짜': stat.date,
         '총 유입수': stat.count,
-        '상세 유입 경로 (경로: 건수)': referrerDetails
+        '상세 유입 경로 (경로: 건수)': referrerDetails,
+        '접속 IP 내역 (IP: 건수)': ipDetails
       };
     });
 
@@ -838,8 +846,8 @@ export default function App() {
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
             {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
-            {/* [PC 버전 시작 버튼 위치 조정 주석]: 아래 sm:pt-48 값을 키우면 버튼이 더 아래로 내려갑니다. (예: sm:pt-60) */}
-            <div className="w-full flex justify-center pt-4 sm:pt-54 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
+            {/* [PC 버전 시작 버튼 위치 조정 주석]: 아래 top-[40%] 값을 조절하면 버튼의 높이가 변합니다. (예: top-[50%]) */}
+            <div className="w-full flex justify-center pt-4 sm:pt-0 z-10 absolute top-[40%] -translate-y-1/2">
               <motion.button 
                 onClick={() => setGameState('how-to')} 
                 className="group relative"
@@ -856,7 +864,7 @@ export default function App() {
                     <img 
                       src={(startButtonImage && startButtonImage.trim() !== "" && startButtonImage !== 'undefined') ? startButtonImage : START_BUTTON_IMAGE} 
                       alt="시작" 
-                      className="w-[35vw] sm:w-[15vw] h-auto mx-auto hover:scale-110 transition-transform active:scale-95 drop-shadow-2xl" 
+                      className="w-[35vw] sm:w-[9vw] h-auto mx-auto hover:scale-110 transition-transform active:scale-95 drop-shadow-2xl" 
                       referrerPolicy="no-referrer"
                       onError={(e) => {
                         // 만약 커스텀 이미지가 실패한 거라면 기본 이미지로 교체 시도
