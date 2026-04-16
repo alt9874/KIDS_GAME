@@ -1036,9 +1036,7 @@ export default function App() {
                 rel="noopener noreferrer"
                 className="w-full py-3 bg-white border-2 border-primary/20 text-primary font-bold rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group overflow-hidden"
               >
-                {/* <img src="이미지_주소_입력" alt="한국의약품안전관리원" className="w-full h-full object-contain" /> */}
-                <Info className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                한국의약품안전관리원 바로가기
+                <img src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" alt="한국의약품안전관리원" className="w-full h-full object-contain" />
               </a>
             </div>
           </motion.div>
