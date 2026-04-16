@@ -40,7 +40,7 @@ const AUDIO_URLS = {
 const OPENING_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/main_pc.jpg"; 
 const OPENING_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/main_mo.jpg"; 
 const START_BUTTON_IMAGE = "https://raw.githubusercontent.com/alt9874/game/main/start_bt.png"; 
-const PLAY_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/play_pc.jpg"; // PC 버전 플레이 배경
+const PLAY_BG_IMAGE_PC = "https://raw.githubusercontent.com/alt9874/game/main/game_play_pc.gif"; // PC 버전 플레이 배경
 const PLAY_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/game_play_mo.gif"; // 모바일 버전 플레이 배경
 const ENDING_IMAGES = {
   LEVEL_1: undefined, // 100점 미만
@@ -838,7 +838,8 @@ export default function App() {
             {(!(openingBgImage && openingBgImage.trim() !== "") && !OPENING_BG_IMAGE_PC) && <div className="absolute inset-0 bg-white/90 z-[-2]" />}
             
             {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
-            <div className="w-full flex justify-center pt-4 sm:pt-24 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
+            {/* [PC 버전 시작 버튼 위치 조정 주석]: 아래 sm:pt-48 값을 키우면 버튼이 더 아래로 내려갑니다. (예: sm:pt-60) */}
+            <div className="w-full flex justify-center pt-4 sm:pt-48 z-10 absolute sm:relative top-[40%] sm:top-0 -translate-y-1/2 sm:translate-y-0">
               <motion.button 
                 onClick={() => setGameState('how-to')} 
                 className="group relative"
@@ -1023,7 +1024,7 @@ export default function App() {
                 </button>
 
                 {/* [나중에 이미지로 교체 예정: '다시 도전하기' 버튼 이미지 / 권장 크기: 480x100px] */}
-                <button onClick={startGame} className="flex-[2] py-3 sm:py-4 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 shadow-lg transition-all overflow-hidden">
+                <button onClick={startGame} className="flex-1 py-3 sm:py-4 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 shadow-lg transition-all overflow-hidden">
                   {/* <img src="이미지_주소_입력" alt="다시 도전하기" className="w-full h-full object-contain" /> */}
                   다시 도전하기
                 </button>
