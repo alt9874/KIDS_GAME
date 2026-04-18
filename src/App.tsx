@@ -952,30 +952,30 @@ export default function App() {
             exit={{ opacity: 0 }} 
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[210] flex flex-col items-center justify-center p-3 sm:p-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
           >
-            <div className="max-w-xl sm:max-w-5xl w-full bg-white rounded-[2.5rem] p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.25)] flex flex-col gap-4 sm:gap-8 max-h-[95vh] overflow-hidden border border-white/20">
+            <div className="max-w-xl sm:max-w-5xl w-full bg-white rounded-[2.5rem] p-4 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.25)] flex flex-col gap-2 sm:gap-8 max-h-[96vh] overflow-hidden border border-white/20">
               {/* Header section */}
               <div className="text-center">
-                <h2 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tight">
+                <h2 className="text-lg sm:text-3xl font-black text-slate-800 tracking-tight">
                   게임 방법
                 </h2>
               </div>
 
-              {/* Items List Wrapper with internal scroll if needed */}
-              <div className="flex-1 overflow-y-auto pr-1 -mr-1 custom-scrollbar">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 overflow-visible">
+              {/* Items List Wrapper with internal scroll */}
+              <div className="flex-1 overflow-y-auto pr-2 -mr-1 custom-scrollbar">
+                <div className="grid grid-cols-2 gap-x-3 sm:gap-x-12">
                   {pillConfigs.filter(p => p.enabled !== false).map((p) => (
-                    <div key={p.id} className="flex items-center gap-2 sm:gap-4 p-2.5 sm:p-4 bg-slate-50/80 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm transition-all hover:bg-slate-100/50">
-                      <div className="w-16 h-16 sm:w-28 sm:h-28 flex items-center justify-center shrink-0 bg-white rounded-lg sm:rounded-xl shadow-inner border border-slate-100">
+                    <div key={p.id} className="flex items-center gap-2 sm:gap-8 py-2 sm:py-6 border-b border-slate-100 transition-all hover:bg-slate-50/50 group">
+                      <div className="w-11 h-11 sm:w-32 sm:h-32 flex items-center justify-center shrink-0 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 transition-transform group-hover:scale-105">
                         {p.image ? (
-                          <img src={p.image} alt={p.label} className="w-14 h-14 sm:w-24 sm:h-24 object-contain" referrerPolicy="no-referrer" />
+                          <img src={p.image} alt={p.label} className="w-9 h-9 sm:w-28 sm:h-28 object-contain" referrerPolicy="no-referrer" />
                         ) : (
-                          <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
+                          <div className="w-6 h-6 sm:w-16 sm:h-16 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[13px] sm:text-lg font-black text-slate-800 leading-tight truncate">{p.label}</div>
-                        <div className={`text-[14px] sm:text-2xl font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {p.score > 0 ? `+${p.score}` : p.score} <span className="text-[10px] sm:text-base font-bold opacity-80">점</span>
+                        <div className="text-[12px] sm:text-2xl font-black text-slate-800 leading-tight mb-0.5 sm:mb-2 truncate">{p.label}</div>
+                        <div className={`text-[13px] sm:text-3xl font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                          {p.score > 0 ? `+${p.score}` : p.score} <span className="text-[9px] sm:text-lg font-bold opacity-80">점</span>
                         </div>
                       </div>
                     </div>
@@ -984,18 +984,18 @@ export default function App() {
               </div>
 
               {/* Footer section with Instruction and Button */}
-              <div className="flex flex-col gap-4 sm:gap-6 border-t border-slate-100 pt-4 sm:pt-6">
+              <div className="flex flex-col gap-3 sm:gap-6 border-t border-slate-100 pt-3 sm:pt-6">
                 <div className="text-center">
-                  <p className="text-slate-800 text-[13px] sm:text-3xl font-bold leading-relaxed break-keep">
+                  <p className="text-slate-800 text-[12px] sm:text-3xl font-bold leading-relaxed break-keep">
                     <span className="text-emerald-700 font-black">올바른 의약품 안전정보</span>만 {gameSpeed.duration}초 안에 클릭하세요!
                   </p>
                 </div>
 
                 <button 
                   onClick={startGame} 
-                  className="w-full py-4 sm:py-6 bg-slate-900 text-lg sm:text-3xl text-white font-black rounded-2xl sm:rounded-4xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-3 shrink-0"
+                  className="w-full py-3 sm:py-6 bg-slate-900 text-base sm:text-3xl text-white font-black rounded-2xl sm:rounded-4xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-2.5 shrink-0"
                 >
-                  시작하기 <ArrowRight className="w-5 h-5 sm:w-9 sm:h-9" />
+                  시작하기 <ArrowRight className="w-4 h-4 sm:w-9 sm:h-9" />
                 </button>
               </div>
             </div>
