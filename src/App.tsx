@@ -98,11 +98,11 @@ export default function App() {
   const [startButtonImage, setStartButtonImage] = useState<string | undefined>(undefined);
   const [btnImageError, setBtnImageError] = useState(false);
   const [audioSettings, setAudioSettings] = useState({
-    opening: 'https://raw.githubusercontent.com/alt9874/game/main/opening.mp3',
-    gameplay: 'https://raw.githubusercontent.com/alt9874/game/main/main.mp3',
-    hitPositive: 'https://raw.githubusercontent.com/alt9874/game/main/win.mp3',
-    hitNegative: 'https://raw.githubusercontent.com/alt9874/game/main/error.mp3',
-    ending: 'https://raw.githubusercontent.com/alt9874/game/main/ending.mp3',
+    opening: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3',
+    gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/main.mp3',
+    hitPositive: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/win.mp3',
+    hitNegative: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/error.mp3',
+    ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
     volume: 0.7
   });
   const [isMuted, setIsMuted] = useState(false);
@@ -288,6 +288,8 @@ export default function App() {
     }
   }, [user]);
 
+  const [audioBlocked, setAudioBlocked] = useState(false);
+
   // --- [하드웨어 무음 스위치 대응] 오디오 로드 및 초기 설정 ---
   useEffect(() => {
     // Stop and unload previous sounds
@@ -301,10 +303,18 @@ export default function App() {
       return new Howl({
         src: [url],
         loop: isLoop,
+        autoplay: false, // 자동 재생은 updateAudio에서 제어
         volume: audioSettings.volume || 0.7,
         mute: isMuted,
-        html5: false, // Web Audio API를 사용하여 iOS 등에서 하드웨어 무음 스위치 설정을 따르도록 함
+        html5: false, // Web Audio API 사용
         onloaderror: (id, err) => console.warn(`Failed to load ${label} audio: ${url}. Error:`, err),
+        onplayerror: (id, err) => {
+          console.warn(`${label} play blocked by browser:`, err);
+          if (label === 'opening') setAudioBlocked(true);
+        },
+        onplay: () => {
+          if (label === 'opening') setAudioBlocked(false);
+        }
       });
     };
 
@@ -371,31 +381,47 @@ export default function App() {
     
     // Add a one-time global click listener to unlock audio
     const unlockAudio = async () => {
+      console.log("User interaction detected, unlocking audio...");
       // Resume AudioContext for browsers that require it
-      if (Howler.ctx && Howler.ctx.state === 'suspended') {
-        await Howler.ctx.resume();
+      if (Howler.ctx && (Howler.ctx.state === 'suspended')) {
+        try {
+          await Howler.ctx.resume();
+        } catch (e) {
+          console.error("AudioContext resume failed:", e);
+        }
       }
+      
+      // Force track play check
       updateAudio();
+      
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('mousedown', unlockAudio);
     };
     
     window.addEventListener('click', unlockAudio);
     window.addEventListener('touchstart', unlockAudio);
+    window.addEventListener('mousedown', unlockAudio);
     
     return () => {
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('mousedown', unlockAudio);
     };
   }, [gameState, isMuted]);
 
-  // --- [하드웨어 무음 스위치 대응] 브라우저 가시성 변화에 따른 소리 제어 ---
+  // --- [하드웨어 무음 스위치 대응] 브라우저 가시성 변화 및 무음 설정 동기화 ---
+  useEffect(() => {
+    // 1. 앱 내 무음 버튼과 Howler 글로벌 설정 동기화
+    Howler.mute(isMuted);
+  }, [isMuted]);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        Howler.mute(true); // 화면이 가려지면 소리 차단
+        Howler.mute(true); // 화면이 가려지면 즉시 소리 차단
       } else {
-        Howler.mute(isMuted); // 화면이 다시 보이면 기존 무음 설정 복구
+        Howler.mute(isMuted); // 화면이 다시 보이면 버튼 상태에 따라 복구
       }
     };
 
@@ -563,12 +589,9 @@ export default function App() {
 
   const startGame = async () => {
     // Resume AudioContext on user gesture to "unlock" audio on mobile
-    const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
-    if (AudioContextClass) {
+    if (Howler.ctx && (Howler.ctx.state === 'suspended')) {
       try {
-        const tempCtx = new AudioContextClass();
-        if (tempCtx.state === 'suspended') await tempCtx.resume();
-        await tempCtx.close();
+        await Howler.ctx.resume();
       } catch (e) {
         console.warn("AudioContext unlock failed:", e);
       }
@@ -704,7 +727,7 @@ export default function App() {
   const resetAudioSettings = () => {
     setAudioSettings({
       opening: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3',
-      gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/bgm.mp3',
+      gameplay: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/main.mp3',
       hitPositive: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/win.mp3',
       hitNegative: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/error.mp3',
       ending: 'https://cdn.jsdelivr.net/gh/alt9874/game@main/ending.mp3',
@@ -848,40 +871,53 @@ export default function App() {
             {/* 1. 상단: 시작 버튼 (스케일 펄스 애니메이션) */}
             {/* [PC 버전 시작 버튼 위치 조정 주석]: 아래 top-[40%] 값을 조절하면 버튼의 높이가 변합니다. (예: top-[50%]) */}
             <div className="w-full flex justify-center pt-4 sm:pt-0 z-10 absolute top-[40%] -translate-y-1/2">
-              <motion.button 
-                onClick={() => setGameState('how-to')} 
-                className="group relative"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              >
-                  {/* 
-                    이미지 로딩 전략:
-                    1. DB에 저장된 커스텀 이미지가 있으면 그것을 먼저 시도.
-                    2. 커스텀 이미지가 없거나 로딩에 실패하면 기본 상수(START_BUTTON_IMAGE)를 시도.
-                    3. 둘 다 실패하면 텍스트 버튼으로 폴백.
-                  */}
-                  {(!btnImageError) ? (
-                    <img 
-                      src={(startButtonImage && startButtonImage.trim() !== "" && startButtonImage !== 'undefined') ? startButtonImage : START_BUTTON_IMAGE} 
-                      alt="시작" 
-                      className="w-[35vw] sm:w-[9vw] h-auto mx-auto hover:scale-110 transition-transform active:scale-95 drop-shadow-2xl" 
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        // 만약 커스텀 이미지가 실패한 거라면 기본 이미지로 교체 시도
-                        if (startButtonImage && e.currentTarget.src !== START_BUTTON_IMAGE) {
-                          e.currentTarget.src = START_BUTTON_IMAGE;
-                        } else {
-                          // 기본 이미지마저 실패하면 텍스트 버튼으로 전환
-                          setBtnImageError(true);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div className="px-8 py-3 sm:px-10 sm:py-4 bg-primary text-white text-lg sm:text-xl font-bold rounded-full shadow-2xl hover:bg-blue-600 transition-all flex items-center gap-3">
-                      게임 시작 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </div>
-                  )}
-              </motion.button>
+              <div className="flex flex-col items-center gap-4">
+                <motion.button 
+                  onClick={() => setGameState('how-to')} 
+                  className="group relative"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                >
+                    {/* 
+                      이미지 로딩 전략:
+                      1. DB에 저장된 커스텀 이미지가 있으면 그것을 먼저 시도.
+                      2. 커스텀 이미지가 없거나 로딩에 실패하면 기본 상수(START_BUTTON_IMAGE)를 시도.
+                      3. 둘 다 실패하면 텍스트 버튼으로 폴백.
+                    */}
+                    {(!btnImageError) ? (
+                      <img 
+                        src={(startButtonImage && startButtonImage.trim() !== "" && startButtonImage !== 'undefined') ? startButtonImage : START_BUTTON_IMAGE} 
+                        alt="시작" 
+                        className="w-[35vw] sm:w-[9vw] h-auto mx-auto hover:scale-110 transition-transform active:scale-95 drop-shadow-2xl" 
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          // 만약 커스텀 이미지가 실패한 거라면 기본 이미지로 교체 시도
+                          if (startButtonImage && e.currentTarget.src !== START_BUTTON_IMAGE) {
+                            e.currentTarget.src = START_BUTTON_IMAGE;
+                          } else {
+                            // 기본 이미지마저 실패하면 텍스트 버튼으로 전환
+                            setBtnImageError(true);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="px-8 py-3 sm:px-10 sm:py-4 bg-primary text-white text-lg sm:text-xl font-bold rounded-full shadow-2xl hover:bg-blue-600 transition-all flex items-center gap-3">
+                        게임 시작 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                    )}
+                </motion.button>
+                
+                {/* 브라우저 정책상 자동재생이 막혔을 때 보여주는 안내 메시지 */}
+                {audioBlocked && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full text-white text-[10px] sm:text-xs animate-bounce"
+                  >
+                    <Volume2 className="w-3 h-3" /> 화면을 클릭하면 배경음악이 시작됩니다
+                  </motion.div>
+                )}
+              </div>
             </div>
 
             {/* 2. 중앙: 제목 및 로고 (배경 이미지가 없을 때만 표시) */}
@@ -925,12 +961,13 @@ export default function App() {
                       ) : (
                         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full shadow-sm shrink-0" style={{ backgroundColor: p.color }} />
                       )}
-                      <span className="text-xs sm:text-sm break-keep">{p.label}: <b>{p.score > 0 ? `+${p.score}` : p.score}점</b></span>
+                      <span className="text-sm sm:text-lg break-keep">{p.label}: <b>{p.score > 0 ? `+${p.score}` : p.score}점</b></span>
                     </div>
                   ))}
                 </div>
                 <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200">
-                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed break-keep">
+                  {/* [게임 방법 설명 텍스트 수정]: 아래 <p> 태그 안의 내용을 수정하세요. */}
+                  <p className="text-gray-600 text-sm sm:text-xl leading-relaxed break-keep">
                     하늘에서 떨어지는 약 중 <b>올바른 의약품 안전 정보</b>만 클릭하세요!<br/>
                     연속 성공 시 <b>콤보 보너스</b>가 쌓입니다.<br/>
                     {gameSpeed.duration}초 동안 최고의 점수를 기록해 보세요.
