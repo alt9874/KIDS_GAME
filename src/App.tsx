@@ -954,8 +954,8 @@ export default function App() {
           >
             <div className="max-w-xl sm:max-w-5xl w-full bg-white rounded-[2.5rem] p-4 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.25)] flex flex-col gap-2 sm:gap-8 max-h-[96vh] overflow-hidden border border-white/20">
               {/* Header section */}
-              <div className="text-center">
-                <h2 className="text-lg sm:text-3xl font-black text-slate-800 tracking-tight">
+              <div className="text-center pt-2 sm:pt-4">
+                <h2 className="text-2xl sm:text-5xl font-black text-slate-900 tracking-tighter">
                   게임 방법
                 </h2>
               </div>
@@ -986,11 +986,15 @@ export default function App() {
               {/* Footer section with Instruction and Button */}
               <div className="flex flex-col gap-3 sm:gap-6 border-t border-slate-100 pt-3 sm:pt-6">
                 <div className="text-center">
-                  <p className="text-slate-800 text-[12px] sm:text-3xl font-bold leading-relaxed break-keep">
-                    <span className="text-emerald-700 font-black">올바른 의약품 안전정보</span>만 {gameSpeed.duration}초 안에 클릭하세요!
+                  <p className="text-slate-800 text-[16px] sm:text-3xl font-black leading-relaxed break-keep">
+                    <span className="text-emerald-700">올바른 의약품 안전정보</span>만 {gameSpeed.duration}초 안에 클릭하세요!
                   </p>
                 </div>
 
+                {/* TODO: Replace with image button later. 
+                    Recommended size: 1000x200px (approx 5:1 ratio) for high quality.
+                    Usage: <img src="button_image.png" className="w-full h-auto" /> 
+                */}
                 <button 
                   onClick={startGame} 
                   className="w-full py-3 sm:py-6 bg-slate-900 text-base sm:text-3xl text-white font-black rounded-2xl sm:rounded-4xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-2.5 shrink-0"
