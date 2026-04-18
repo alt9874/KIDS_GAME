@@ -952,29 +952,29 @@ export default function App() {
             exit={{ opacity: 0 }} 
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[210] flex flex-col items-center justify-center p-3 sm:p-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
           >
-            <div className="max-w-xl sm:max-w-4xl w-full bg-white rounded-[2.5rem] p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col gap-3 sm:gap-4 max-h-[98vh] sm:max-h-[95vh] overflow-hidden border border-white/20">
+            <div className="max-w-xl sm:max-w-4xl w-full bg-white rounded-[2.5rem] p-3 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col gap-1.5 sm:gap-3 max-h-[98vh] sm:max-h-[92vh] overflow-hidden border border-white/20">
               {/* Header section */}
               <div className="text-center">
-                <h2 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tight">
+                <h2 className="text-lg sm:text-2xl font-black text-slate-800 tracking-tight">
                   게임 방법
                 </h2>
               </div>
 
-              {/* Items Grid - Horizontal boxes for better clarity */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 mb-2 overflow-visible">
-                {pillConfigs.filter(p => p.enabled !== false).map(p => (
-                  <div key={p.id} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 bg-slate-50/80 rounded-2xl border border-slate-100 shadow-sm transition-all">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center shrink-0 bg-white rounded-xl shadow-inner border border-slate-100">
+              {/* Items Grid - 2 columns on mobile, 4 columns on PC to save vertical space */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-2.5 mb-1 overflow-visible">
+                {pillConfigs.filter(p => p.enabled !== false).map((p) => (
+                  <div key={p.id} className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 bg-slate-50/80 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm transition-all">
+                    <div className="w-9 h-9 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 bg-white rounded-lg sm:rounded-xl shadow-inner border border-slate-100">
                       {p.image ? (
-                        <img src={p.image} alt={p.label} className="w-10 h-10 sm:w-14 sm:h-14 object-contain" referrerPolicy="no-referrer" />
+                        <img src={p.image} alt={p.label} className="w-7 h-7 sm:w-12 sm:h-12 object-contain" referrerPolicy="no-referrer" />
                       ) : (
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
+                        <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[11px] sm:text-base font-bold text-slate-800 leading-tight truncate">{p.label}</div>
-                      <div className={`text-[12px] sm:text-lg font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {p.score > 0 ? `+${p.score}` : p.score} <span className="text-[10px] sm:text-sm font-bold opacity-80">점</span>
+                      <div className="text-[9px] sm:text-xs font-bold text-slate-800 leading-tight truncate">{p.label}</div>
+                      <div className={`text-[10px] sm:text-base font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        {p.score > 0 ? `+${p.score}` : p.score} <span className="text-[8px] sm:text-[10px] font-bold opacity-80">점</span>
                       </div>
                     </div>
                   </div>
@@ -982,17 +982,17 @@ export default function App() {
               </div>
 
               {/* Main Instruction - No Box, No Scroll */}
-              <div className="text-center py-2 sm:py-4">
-                <p className="text-slate-800 text-sm sm:text-2xl font-medium leading-relaxed break-keep">
+              <div className="text-center py-1 sm:py-3">
+                <p className="text-slate-800 text-[11px] sm:text-xl font-medium leading-relaxed break-keep">
                   <span className="text-emerald-600 font-black">올바른 의약품 안전정보</span>만 {gameSpeed.duration}초 안에 클릭하세요!
                 </p>
               </div>
 
               <button 
                 onClick={startGame} 
-                className="w-full py-3 sm:py-6 bg-slate-900 text-lg sm:text-3xl text-white font-black rounded-3xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-3 shrink-0"
+                className="w-full py-2.5 sm:py-5 bg-slate-900 text-base sm:text-2xl text-white font-black rounded-2xl sm:rounded-3xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-2 sm:gap-3 shrink-0"
               >
-                시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
+                시작하기 <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6" />
               </button>
             </div>
           </motion.div>
