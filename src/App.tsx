@@ -970,7 +970,6 @@ export default function App() {
                   <p className="text-gray-700 text-xl sm:text-3xl font-bold leading-snug break-keep">
                     하늘에서 떨어지는 약 중<br/>
                     <b>올바른 의약품 안전 정보</b>만 클릭하세요!<br/>
-                    연속 성공 시 <b>콤보 보너스</b>가 쌓입니다.<br/>
                     {gameSpeed.duration}초 동안 최고의 점수를 기록해 보세요.
                   </p>
                 </div>
