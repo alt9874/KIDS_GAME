@@ -982,11 +982,9 @@ export default function App() {
               </div>
 
               {/* Main Instruction - No Box, No Scroll */}
-              <div className="text-center py-1 sm:py-2">
-                <p className="text-slate-600 text-[10px] sm:text-xl font-bold leading-tight sm:leading-relaxed break-keep">
-                  하늘에서 떨어지는 약 중<br/>
-                  <span className="text-[#064e3b] text-xs sm:text-2xl font-black block my-0.5 sm:my-1">올바른 의약품 안전정보만</span>
-                  {gameSpeed.duration}초 안에 클릭하세요!
+              <div className="text-center py-2 sm:py-4">
+                <p className="text-slate-800 text-sm sm:text-2xl font-medium leading-relaxed break-keep">
+                  <span className="text-emerald-600 font-black">올바른 의약품 안전정보</span>만 {gameSpeed.duration}초 안에 클릭하세요!
                 </p>
               </div>
 
