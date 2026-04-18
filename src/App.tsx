@@ -945,59 +945,38 @@ export default function App() {
 
         {/* 2. 게임 방법 설명 */}
         {gameState === 'how-to' && (
-          <motion.div 
-            key="how-to" 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[210] flex flex-col items-center justify-center p-4 sm:p-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
-          >
-              <div className="max-w-md w-full bg-white rounded-2xl p-4 sm:p-8 shadow-2xl flex flex-col gap-3 sm:gap-6 max-h-[95vh] overflow-y-auto scrollbar-hide">
-                <div className="text-center">
-                  <h2 className="text-lg sm:text-2xl font-black text-slate-800 flex items-center justify-center">
-                    게임 방법
-                  </h2>
+          <motion.div key="how-to" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }} className="fixed inset-0 bg-white z-[210] flex flex-col items-center justify-center p-2 sm:p-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+            <div className="max-w-2xl w-full bg-gray-50 rounded-3xl p-4 sm:p-10 shadow-inner overflow-y-auto max-h-full scrollbar-hide flex flex-col items-center">
+              <h2 className="text-xl sm:text-4xl font-bold text-gray-800 mb-3 sm:mb-8 text-center break-keep">
+                게임 방법
+              </h2>
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 text-left">
+                <div className="grid grid-cols-2 md:grid-cols-1 gap-2 sm:gap-4">
+                  {pillConfigs.filter(p => p.enabled !== false).map(p => (
+                    <div key={p.id} className="flex items-center gap-2 sm:gap-3">
+                      {p.image ? (
+                        <div className="w-10 h-10 sm:w-16 sm:h-16 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 shrink-0">
+                          <img src={p.image} alt={p.label} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
+                        </div>
+                      ) : (
+                        <div className="w-4 h-4 sm:w-6 sm:h-6 rounded-full shadow-sm shrink-0" style={{ backgroundColor: p.color }} />
+                      )}
+                      <span className="text-[12px] sm:text-lg break-keep leading-tight">{p.label}: <b>{p.score > 0 ? `+${p.score}` : p.score}점</b></span>
+                    </div>
+                  ))}
                 </div>
-
-                {/* Pill Score Guide - More compact */}
-                <div className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100">
-                  <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-                    {pillConfigs.filter(p => p.enabled !== false).map(p => (
-                      <div key={p.id} className="flex flex-col items-center p-1.5 sm:p-2 bg-white rounded-lg border border-slate-100 shadow-sm min-w-[65px] sm:min-w-[90px]">
-                        {p.image ? (
-                          <img src={p.image} alt={p.label} className="w-6 h-6 sm:w-10 sm:h-10 object-contain mb-0.5" referrerPolicy="no-referrer" />
-                        ) : (
-                          <div className="w-3 h-3 sm:w-5 sm:h-5 rounded-full mb-0.5" style={{ backgroundColor: p.color }} />
-                        )}
-                        <span className="text-[9px] sm:text-xs font-bold text-slate-700">{p.label}</span>
-                        <span className={`text-[9px] sm:text-xs font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {p.score > 0 ? `+${p.score}` : p.score}점
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Main Instruction */}
-                <div className="text-center px-1">
-                  <p className="text-slate-700 text-base sm:text-xl font-bold leading-snug break-keep">
+                <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 flex items-center justify-center">
+                  <p className="text-gray-600 text-sm sm:text-xl leading-relaxed break-keep text-center">
                     하늘에서 떨어지는 약 중<br/>
-                    <span className="text-[#064e3b] font-black">올바른 의약품 안전 정보</span>만<br/>
-                    클릭하세요!
+                    <span className="text-[#064e3b] font-bold">올바른 의약품 안전 정보</span>만 클릭하세요!<br/>
+                    {gameSpeed.duration}초 동안 최고의 점수를 기록해 보세요.
                   </p>
-                  <div className="mt-2 flex items-center justify-center gap-2 text-slate-400 font-bold text-[10px] sm:text-base">
-                    <Timer className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-                    제한 시간: <span className="text-slate-800">{gameSpeed.duration}초</span>
-                  </div>
                 </div>
-
-                <button 
-                  onClick={startGame} 
-                  className="w-full py-3 sm:py-4 bg-slate-900 text-white text-base sm:text-lg font-bold rounded-xl hover:bg-emerald-600 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
-                >
-                  시작하기 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
               </div>
+              <button onClick={startGame} className="mt-4 sm:mt-12 w-full py-3 sm:py-5 bg-gray-800 text-white text-lg sm:text-xl font-bold rounded-2xl hover:bg-black transition-colors">
+                시작하기
+              </button>
+            </div>
           </motion.div>
         )}
 
