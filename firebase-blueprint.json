@@ -28,17 +28,13 @@
     }
   },
   "firestore": {
-    "/visits/{date}": {
-      "schema": "Visit",
-      "description": "Daily visit statistics."
-    },
-    "/visits/{date}/ips/{ipHash}": {
+    "/stats/global": {
       "schema": "object",
-      "description": "Tracked IPs for the day to prevent duplicates."
+      "description": "Global statistics like total visit counts."
     },
-    "/settings/gameConfig": {
+    "/settings/game": {
       "schema": "object",
-      "description": "Global game settings including speed and pill scores."
+      "description": "Global game configuration including pill types and speed."
     }
   }
 }

@@ -15,50 +15,54 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // ===============================================================
-    // Helper Functions
-    // ===============================================================
     
-    function isAuthenticated() {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
       return request.auth != null;
     }
 
     function isAdmin() {
-      return isAuthenticated() &&
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-          (request.auth.token.email == "jsj20210104@gmail.com" && request.auth.token.email_verified == true));
+      return isSignedIn() && (
+        request.auth.token.email == "jsj20210104@gmail.com" && 
+        request.auth.token.email_verified == true
+      );
     }
 
-    function isValidVisit(data) {
-      return data.keys().hasAll(['date', 'count', 'referrers', 'lastUpdated']) &&
-             data.date is string && data.date.size() == 10 &&
-             data.count is number && data.count >= 0 &&
-             data.referrers is map &&
-             data.lastUpdated is timestamp;
+    function incoming() {
+      return request.resource.data;
     }
 
-    // ===============================================================
-    // Rules
-    // ===============================================================
+    function existing() {
+      return resource.data;
+    }
 
-    match /visits/{date} {
-      allow read: if true; 
-      allow create, update: if isValidVisit(request.resource.data);
+    // --- Statistics ---
+    match /stats/global {
+      // Everyone can read the visit count
+      allow get: if true;
+      
+      // Everyone can increment the visit count or create the initial document
+      allow update: if incoming().diff(existing()).affectedKeys().hasOnly(['totalVisits']) 
+                    && incoming().totalVisits is number;
+      
+      allow create: if incoming().keys().hasOnly(['totalVisits'])
+                    && incoming().totalVisits is number;
+      
+      // Only admin can reset or delete stats
       allow delete: if isAdmin();
-
-      match /ips/{ipHash} {
-        allow read, write: if true; // The server handles the logic, but we need to allow the SDK call
-      }
     }
 
-    match /settings/gameConfig {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    match /users/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+    // --- Game Settings ---
+    match /settings/game {
+      // Everyone can read the game configuration to play
+      allow get: if true;
+      
+      // Only admin can change the game settings
       allow write: if isAdmin();
     }
   }
