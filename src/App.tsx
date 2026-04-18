@@ -952,48 +952,52 @@ export default function App() {
             exit={{ opacity: 0 }} 
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[210] flex flex-col items-center justify-center p-3 sm:p-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
           >
-            <div className="max-w-xl sm:max-w-5xl w-full bg-white rounded-[2.5rem] p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col gap-1 sm:gap-2 max-h-[98vh] sm:max-h-[92vh] overflow-hidden border border-white/20">
-              {/* Header section (Compact) */}
+            <div className="max-w-xl sm:max-w-5xl w-full bg-white rounded-[2.5rem] p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.25)] flex flex-col gap-4 sm:gap-8 max-h-[95vh] overflow-hidden border border-white/20">
+              {/* Header section */}
               <div className="text-center">
-                <h2 className="text-lg sm:text-2xl font-black text-slate-800 tracking-tight">
+                <h2 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tight">
                   게임 방법
                 </h2>
               </div>
 
-              {/* Items Grid - Maximizing size, 4 columns on PC */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-2 mb-0.5 overflow-visible">
-                {pillConfigs.filter(p => p.enabled !== false).map((p) => (
-                  <div key={p.id} className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 bg-slate-50/80 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm transition-all">
-                    <div className="w-16 h-16 sm:w-28 sm:h-28 flex items-center justify-center shrink-0 bg-white rounded-lg sm:rounded-xl shadow-inner border border-slate-100">
-                      {p.image ? (
-                        <img src={p.image} alt={p.label} className="w-14 h-14 sm:w-24 sm:h-24 object-contain" referrerPolicy="no-referrer" />
-                      ) : (
-                        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] sm:text-lg font-black text-slate-800 leading-tight truncate">{p.label}</div>
-                      <div className={`text-[14px] sm:text-2xl font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {p.score > 0 ? `+${p.score}` : p.score} <span className="text-[10px] sm:text-base font-bold opacity-80">점</span>
+              {/* Items List Wrapper with internal scroll if needed */}
+              <div className="flex-1 overflow-y-auto pr-1 -mr-1 custom-scrollbar">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 overflow-visible">
+                  {pillConfigs.filter(p => p.enabled !== false).map((p) => (
+                    <div key={p.id} className="flex items-center gap-2 sm:gap-4 p-2.5 sm:p-4 bg-slate-50/80 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm transition-all hover:bg-slate-100/50">
+                      <div className="w-16 h-16 sm:w-28 sm:h-28 flex items-center justify-center shrink-0 bg-white rounded-lg sm:rounded-xl shadow-inner border border-slate-100">
+                        {p.image ? (
+                          <img src={p.image} alt={p.label} className="w-14 h-14 sm:w-24 sm:h-24 object-contain" referrerPolicy="no-referrer" />
+                        ) : (
+                          <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] sm:text-lg font-black text-slate-800 leading-tight truncate">{p.label}</div>
+                        <div className={`text-[14px] sm:text-2xl font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                          {p.score > 0 ? `+${p.score}` : p.score} <span className="text-[10px] sm:text-base font-bold opacity-80">점</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              {/* Main Instruction - Larger and Bolder */}
-              <div className="text-center py-1 sm:py-2">
-                <p className="text-slate-800 text-[13px] sm:text-3xl font-bold leading-relaxed break-keep">
-                  <span className="text-emerald-700 font-black">올바른 의약품 안전정보</span>만 {gameSpeed.duration}초 안에 클릭하세요!
-                </p>
-              </div>
+              {/* Footer section with Instruction and Button */}
+              <div className="flex flex-col gap-4 sm:gap-6 border-t border-slate-100 pt-4 sm:pt-6">
+                <div className="text-center">
+                  <p className="text-slate-800 text-[13px] sm:text-3xl font-bold leading-relaxed break-keep">
+                    <span className="text-emerald-700 font-black">올바른 의약품 안전정보</span>만 {gameSpeed.duration}초 안에 클릭하세요!
+                  </p>
+                </div>
 
-              <button 
-                onClick={startGame} 
-                className="w-full py-2.5 sm:py-3.5 bg-slate-900 text-base sm:text-3xl text-white font-black rounded-2xl sm:rounded-3xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-2 sm:gap-3 shrink-0"
-              >
-                시작하기 <ArrowRight className="w-4 h-4 sm:w-8 sm:h-8" />
-              </button>
+                <button 
+                  onClick={startGame} 
+                  className="w-full py-4 sm:py-6 bg-slate-900 text-lg sm:text-3xl text-white font-black rounded-2xl sm:rounded-4xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-3 shrink-0"
+                >
+                  시작하기 <ArrowRight className="w-5 h-5 sm:w-9 sm:h-9" />
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
