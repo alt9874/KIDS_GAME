@@ -952,56 +952,49 @@ export default function App() {
             exit={{ opacity: 0 }} 
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[210] flex flex-col items-center justify-center p-3 sm:p-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
           >
-            <div className="max-w-xl w-full bg-white rounded-[2.5rem] p-5 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col gap-5 sm:gap-8 max-h-[92vh] overflow-hidden border border-white/20">
+            <div className="max-w-xl sm:max-w-4xl w-full bg-white rounded-[2.5rem] p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col gap-3 sm:gap-4 max-h-[98vh] sm:max-h-[95vh] overflow-hidden border border-white/20">
               {/* Header section */}
-              <div className="text-center space-y-1">
-                <h2 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight">
+              <div className="text-center">
+                <h2 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tight">
                   게임 방법
                 </h2>
-                <div className="h-1 w-12 bg-emerald-400 mx-auto rounded-full" />
               </div>
 
-              {/* Items Grid - Large visibility focus */}
-              <div className="flex-1 overflow-y-auto scrollbar-hide px-1">
-                <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-                  {pillConfigs.filter(p => p.enabled !== false).map(p => (
-                    <div key={p.id} className="flex flex-col items-center justify-center p-3 sm:p-5 bg-slate-50 rounded-3xl border border-slate-100 shadow-sm transition-transform active:scale-95">
-                      <div className="w-14 h-14 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-2xl mb-3 shadow-inner">
-                        {p.image ? (
-                          <img src={p.image} alt={p.label} className="w-10 h-10 sm:w-16 sm:h-16 object-contain" referrerPolicy="no-referrer" />
-                        ) : (
-                          <div className="w-6 h-6 sm:w-10 sm:h-10 rounded-full" style={{ backgroundColor: p.color }} />
-                        )}
-                      </div>
-                      <div className="text-center">
-                        <div className="text-sm sm:text-xl font-bold text-slate-700 mb-1 leading-tight break-keep">{p.label}</div>
-                        <div className={`text-base sm:text-2xl font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {p.score > 0 ? `+${p.score}` : p.score}점
-                        </div>
+              {/* Items Grid - 4 columns on PC for horizontal efficiency */}
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3 mb-1 overflow-visible">
+                {pillConfigs.filter(p => p.enabled !== false).map(p => (
+                  <div key={p.id} className="flex flex-col items-center justify-center">
+                    <div className="w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center mb-1">
+                      {p.image ? (
+                        <img src={p.image} alt={p.label} className="w-12 h-12 sm:w-18 sm:h-18 object-contain" referrerPolicy="no-referrer" />
+                      ) : (
+                        <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[10px] sm:text-base font-bold text-slate-700 leading-tight">{p.label}</div>
+                      <div className={`text-[11px] sm:text-lg font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        {p.score > 0 ? `+${p.score}` : p.score}점
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                {/* Main Instruction Box */}
-                <div className="bg-emerald-50/50 p-4 sm:p-6 rounded-3xl border border-emerald-100/50 mb-2">
-                  <p className="text-slate-600 text-sm sm:text-xl font-bold leading-relaxed break-keep text-center">
-                    하늘에서 떨어지는 약 중<br/>
-                    <span className="text-[#064e3b] text-base sm:text-2xl font-black block my-1">올바른 의약품 안전 정보</span>
-                    만 클릭하세요!
-                  </p>
-                  <div className="mt-3 flex items-center justify-center gap-2 text-emerald-600/60 font-black text-[10px] sm:text-base uppercase tracking-wider">
-                    <Timer className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-                    제한 시간: <span className="text-slate-700">{gameSpeed.duration}초</span>
                   </div>
-                </div>
+                ))}
+              </div>
+
+              {/* Main Instruction - No Box, No Scroll */}
+              <div className="text-center py-1 sm:py-2">
+                <p className="text-slate-600 text-[10px] sm:text-xl font-bold leading-tight sm:leading-relaxed break-keep">
+                  하늘에서 떨어지는 약 중<br/>
+                  <span className="text-[#064e3b] text-xs sm:text-2xl font-black block my-0.5 sm:my-1">올바른 의약품 안전정보만</span>
+                  {gameSpeed.duration}초 안에 클릭하세요!
+                </p>
               </div>
 
               <button 
                 onClick={startGame} 
-                className="w-full py-4 sm:py-6 bg-slate-900 text-white text-xl sm:text-3xl font-black rounded-3xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-3"
+                className="w-full py-3 sm:py-6 bg-slate-900 text-lg sm:text-3xl text-white font-black rounded-3xl hover:bg-emerald-600 transition-all shadow-xl active:translate-y-1 active:shadow-lg flex items-center justify-center gap-3 shrink-0"
               >
-                시작하기 <ArrowRight className="w-6 h-6 sm:w-8 sm:h-8" />
+                시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
               </button>
             </div>
           </motion.div>
@@ -1192,16 +1185,33 @@ export default function App() {
 
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {pillConfigs.map((p, index) => (
-                          <div key={p.id} className="bg-white/5 p-4 rounded-xl space-y-3 border border-white/5 relative">
-                            <div className="absolute top-2 right-2 flex items-center gap-1">
-                              <button onClick={() => movePill(p.id, 'up')} disabled={index === 0} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20 transition-colors">
-                                <ChevronUp className="w-4 h-4" />
-                              </button>
-                              <button onClick={() => movePill(p.id, 'down')} disabled={index === pillConfigs.length - 1} className="p-1.5 text-gray-400 hover:text-primary disabled:opacity-20 transition-colors">
-                                <ChevronDown className="w-4 h-4" />
-                              </button>
-                              <button onClick={() => removePill(p.id)} className="p-1.5 text-gray-600 hover:text-red-500 transition-colors">
-                                <Trash2 className="w-3.5 h-3.5" />
+                          <div key={p.id} className="bg-white/5 p-4 rounded-xl space-y-3 border border-white/5 relative group transition-all hover:bg-white/10">
+                            {/* Reordering and Delete Controls */}
+                            <div className="absolute top-3 right-3 flex items-center gap-2 bg-black/40 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/10">
+                              <div className="flex items-center border-r border-white/10 pr-1 mr-1">
+                                <button 
+                                  onClick={() => movePill(p.id, 'up')} 
+                                  disabled={index === 0} 
+                                  className="p-1.5 text-gray-400 hover:text-emerald-400 disabled:opacity-20 transition-all hover:scale-110"
+                                  title="위로 이동"
+                                >
+                                  <ChevronUp className="w-5 h-5" />
+                                </button>
+                                <button 
+                                  onClick={() => movePill(p.id, 'down')} 
+                                  disabled={index === pillConfigs.length - 1} 
+                                  className="p-1.5 text-gray-400 hover:text-emerald-400 disabled:opacity-20 transition-all hover:scale-110"
+                                  title="아래로 이동"
+                                >
+                                  <ChevronDown className="w-5 h-5" />
+                                </button>
+                              </div>
+                              <button 
+                                onClick={() => removePill(p.id)} 
+                                className="p-1.5 text-gray-500 hover:text-rose-500 transition-all hover:scale-110"
+                                title="삭제"
+                              >
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
                             <div className="flex items-center justify-between">
