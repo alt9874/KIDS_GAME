@@ -961,14 +961,15 @@ export default function App() {
                       ) : (
                         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full shadow-sm shrink-0" style={{ backgroundColor: p.color }} />
                       )}
-                      <span className="text-sm sm:text-lg break-keep">{p.label}: <b>{p.score > 0 ? `+${p.score}` : p.score}점</b></span>
+                      <span className="text-lg sm:text-2xl break-keep font-medium">{p.label}: <b className="text-primary">{p.score > 0 ? `+${p.score}` : p.score}점</b></span>
                     </div>
                   ))}
                 </div>
                 <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200">
                   {/* [게임 방법 설명 텍스트 수정]: 아래 <p> 태그 안의 내용을 수정하세요. */}
-                  <p className="text-gray-600 text-sm sm:text-xl leading-relaxed break-keep">
-                    하늘에서 떨어지는 약 중 <b>올바른 의약품 안전 정보</b>만 클릭하세요!<br/>
+                  <p className="text-gray-700 text-xl sm:text-3xl font-bold leading-snug break-keep">
+                    하늘에서 떨어지는 약 중<br/>
+                    <b>올바른 의약품 안전 정보</b>만 클릭하세요!<br/>
                     연속 성공 시 <b>콤보 보너스</b>가 쌓입니다.<br/>
                     {gameSpeed.duration}초 동안 최고의 점수를 기록해 보세요.
                   </p>
