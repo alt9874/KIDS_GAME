@@ -950,75 +950,54 @@ export default function App() {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
-            className="fixed inset-0 bg-[#f8fafc] z-[210] flex flex-col items-center justify-center p-4 sm:p-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[210] flex flex-col items-center justify-center p-4 sm:p-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
           >
-            <div className="max-w-3xl w-full bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-12 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] flex flex-col gap-8 sm:gap-12 relative overflow-hidden border border-slate-100">
-              {/* Decorative accent */}
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 via-primary to-blue-500" />
-              
-              <div className="space-y-4 sm:space-y-6">
-                <h2 className="text-3xl sm:text-5xl font-black text-slate-800 flex items-center gap-4 break-keep">
-                  <div className="w-10 h-10 sm:w-14 sm:h-14 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                    <Info className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600" />
-                  </div> 
-                  게임 방법
-                </h2>
-                <div className="h-1 w-20 bg-slate-200 rounded-full" />
-              </div>
+              <div className="max-w-md w-full bg-white rounded-2xl p-4 sm:p-8 shadow-2xl flex flex-col gap-3 sm:gap-6 max-h-[95vh] overflow-y-auto scrollbar-hide">
+                <div className="text-center">
+                  <h2 className="text-lg sm:text-2xl font-black text-slate-800 flex items-center justify-center">
+                    게임 방법
+                  </h2>
+                </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
-                {/* Left: Pill Score Guide */}
-                <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-sm sm:text-base font-bold text-slate-400 uppercase tracking-widest px-1">의약품 점수표</h3>
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                {/* Pill Score Guide - More compact */}
+                <div className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100">
+                  <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                     {pillConfigs.filter(p => p.enabled !== false).map(p => (
-                      <div key={p.id} className="flex items-center gap-4 p-3 sm:p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-colors group">
+                      <div key={p.id} className="flex flex-col items-center p-1.5 sm:p-2 bg-white rounded-lg border border-slate-100 shadow-sm min-w-[65px] sm:min-w-[90px]">
                         {p.image ? (
-                          <div className="w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center bg-white rounded-xl shadow-sm group-hover:scale-110 transition-transform">
-                            <img src={p.image} alt={p.label} className="max-w-[80%] max-h-[80%] object-contain" referrerPolicy="no-referrer" />
-                          </div>
+                          <img src={p.image} alt={p.label} className="w-6 h-6 sm:w-10 sm:h-10 object-contain mb-0.5" referrerPolicy="no-referrer" />
                         ) : (
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow-inner group-hover:scale-125 transition-transform" style={{ backgroundColor: p.color }} />
+                          <div className="w-3 h-3 sm:w-5 sm:h-5 rounded-full mb-0.5" style={{ backgroundColor: p.color }} />
                         )}
-                        <div className="flex flex-col">
-                          <span className="text-base sm:text-xl font-bold text-slate-700">{p.label}</span>
-                          <span className={`text-sm sm:text-lg font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                            {p.score > 0 ? `+${p.score}` : p.score}점
-                          </span>
-                        </div>
+                        <span className="text-[9px] sm:text-xs font-bold text-slate-700">{p.label}</span>
+                        <span className={`text-[9px] sm:text-xs font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                          {p.score > 0 ? `+${p.score}` : p.score}점
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Right: Main Instruction & Start Button */}
-                <div className="flex flex-col justify-between gap-8 sm:gap-12">
-                  <div className="space-y-6 sm:space-y-8">
-                    <h3 className="text-sm sm:text-base font-bold text-slate-400 uppercase tracking-widest px-1">조작 가이드</h3>
-                    <div className="bg-slate-50 p-6 sm:p-10 rounded-[2rem] border border-slate-100 relative shadow-inner">
-                      {/* [게임 방법 설명 텍스트 수정 위치] */}
-                      <p className="text-slate-600 text-xl sm:text-[2.5rem] font-bold leading-[1.3] break-keep">
-                        하늘에서 떨어지는 약 중<br/>
-                        <span className="text-[#064e3b] underline decoration-emerald-200 decoration-4 underline-offset-8">올바른 의약품 안전 정보</span>만<br/>
-                        클릭하세요!
-                      </p>
-                      <div className="mt-8 sm:mt-12 flex items-center gap-3 text-slate-400 font-medium text-lg sm:text-2xl">
-                        <Timer className="w-6 h-6 sm:w-8 sm:h-8" />
-                        제한 시간: <span className="text-slate-800 font-black">{gameSpeed.duration}초</span>
-                      </div>
-                    </div>
+                {/* Main Instruction */}
+                <div className="text-center px-1">
+                  <p className="text-slate-700 text-base sm:text-xl font-bold leading-snug break-keep">
+                    하늘에서 떨어지는 약 중<br/>
+                    <span className="text-[#064e3b] font-black">올바른 의약품 안전 정보</span>만<br/>
+                    클릭하세요!
+                  </p>
+                  <div className="mt-2 flex items-center justify-center gap-2 text-slate-400 font-bold text-[10px] sm:text-base">
+                    <Timer className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                    제한 시간: <span className="text-slate-800">{gameSpeed.duration}초</span>
                   </div>
-
-                  <button 
-                    onClick={startGame} 
-                    className="group relative w-full py-5 sm:py-8 bg-slate-900 text-white text-2xl sm:text-4xl font-black rounded-[1.5rem] sm:rounded-[2rem] hover:bg-emerald-600 transition-all shadow-xl hover:shadow-emerald-200 active:scale-95 flex items-center justify-center gap-4 overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    시작하기 <ArrowRight className="w-8 h-8 sm:w-12 sm:h-12 group-hover:translate-x-2 transition-transform" />
-                  </button>
                 </div>
+
+                <button 
+                  onClick={startGame} 
+                  className="w-full py-3 sm:py-4 bg-slate-900 text-white text-base sm:text-lg font-bold rounded-xl hover:bg-emerald-600 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
+                >
+                  시작하기 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
               </div>
-            </div>
           </motion.div>
         )}
 
