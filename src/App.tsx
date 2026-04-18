@@ -960,21 +960,21 @@ export default function App() {
                 </h2>
               </div>
 
-              {/* Items Grid - 4 columns on PC for horizontal efficiency */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3 mb-1 overflow-visible">
+              {/* Items Grid - Horizontal boxes for better clarity */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 mb-2 overflow-visible">
                 {pillConfigs.filter(p => p.enabled !== false).map(p => (
-                  <div key={p.id} className="flex flex-col items-center justify-center">
-                    <div className="w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center mb-1">
+                  <div key={p.id} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 bg-slate-50/80 rounded-2xl border border-slate-100 shadow-sm transition-all">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center shrink-0 bg-white rounded-xl shadow-inner border border-slate-100">
                       {p.image ? (
-                        <img src={p.image} alt={p.label} className="w-12 h-12 sm:w-18 sm:h-18 object-contain" referrerPolicy="no-referrer" />
+                        <img src={p.image} alt={p.label} className="w-10 h-10 sm:w-14 sm:h-14 object-contain" referrerPolicy="no-referrer" />
                       ) : (
-                        <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow-sm" style={{ backgroundColor: p.color }} />
                       )}
                     </div>
-                    <div className="text-center">
-                      <div className="text-[10px] sm:text-base font-bold text-slate-700 leading-tight">{p.label}</div>
-                      <div className={`text-[11px] sm:text-lg font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {p.score > 0 ? `+${p.score}` : p.score}점
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[11px] sm:text-base font-bold text-slate-800 leading-tight truncate">{p.label}</div>
+                      <div className={`text-[12px] sm:text-lg font-black ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        {p.score > 0 ? `+${p.score}` : p.score} <span className="text-[10px] sm:text-sm font-bold opacity-80">점</span>
                       </div>
                     </div>
                   </div>
