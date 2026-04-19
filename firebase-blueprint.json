@@ -25,6 +25,17 @@
         }
       },
       "required": ["date", "count", "referrers", "lastUpdated"]
+    },
+    "VisitLog": {
+      "title": "VisitLog",
+      "description": "Details of an individual visit including IP address.",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "ip": { "type": "string" },
+        "userAgent": { "type": "string" }
+      },
+      "required": ["timestamp", "ip"]
     }
   },
   "firestore": {
@@ -32,7 +43,11 @@
       "schema": "object",
       "description": "Global statistics like total visit counts."
     },
-    "/settings/game": {
+    "/visit_logs/{logId}": {
+      "schema": "VisitLog",
+      "description": "Individual visit logs for analytics."
+    },
+    "/settings/gameConfig": {
       "schema": "object",
       "description": "Global game configuration including pill types and speed."
     }
