@@ -278,7 +278,7 @@ const GamePlay = ({
 
   return (
     <div className="relative w-full h-full overflow-hidden" onMouseDown={handleClick} onTouchStart={handleClick}>
-      <div className="absolute inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${safeUrl(playBgImage)})`, backgroundColor: '#f0f7ff' }} />
+      <div className="absolute inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url("${safeUrl(playBgImage)}")`, backgroundColor: '#f0f7ff' }} />
       <canvas ref={canvasRef} className="absolute inset-0 z-10 touch-none pointer-events-none" />
       <div className="fixed top-[calc(1rem+env(safe-area-inset-top))] left-4 right-4 z-50 flex justify-between items-center pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
@@ -534,15 +534,18 @@ export default function App() {
       <AnimatePresence mode="wait">
         {gameState === 'start' && (
           <motion.div key="start" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-            className="fixed inset-0 flex flex-col items-center justify-between z-[200] p-6 text-center"
+            className="fixed inset-0 z-[200] overflow-hidden"
           >
-            <div className="absolute inset-0 bg-cover bg-center z-[-1]" 
-              style={{ backgroundImage: `url(${safeUrl(openingBgImage) || (windowWidth < 640 ? OPENING_BG_IMAGE_MO : OPENING_BG_IMAGE_PC)})` }} 
+            {/* Background Layer moved to Z-0 and using double quotes for stability */}
+            <div className="absolute inset-0 bg-cover bg-center z-0" 
+              style={{ backgroundImage: `url("${safeUrl(openingBgImage) || (windowWidth < 640 ? OPENING_BG_IMAGE_MO : OPENING_BG_IMAGE_PC)}")` }} 
               onClick={() => { if (audioBlocked) { playBgm('opening'); setAudioBlocked(false); } }}
             />
-            <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+
+            {/* Admin Portal UI */}
+            <div className="absolute top-6 right-6 z-50 flex items-center gap-3">
               {isAdmin && (
-                <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center bg-slate-900/60 backdrop-blur-xl px-4 py-2 rounded-2xl border border-emerald-500/50 text-[10px] font-black text-emerald-400 tracking-tighter uppercase shadow-lg shadow-emerald-500/20">
+                <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center bg-slate-900/80 backdrop-blur-xl px-4 py-2 rounded-2xl border border-emerald-500/50 text-[10px] font-black text-emerald-400 tracking-tighter uppercase shadow-lg shadow-emerald-500/20">
                   <ShieldCheck size={14} className="mr-2"/> Admin Authenticated
                 </motion.div>
               )}
@@ -554,21 +557,29 @@ export default function App() {
                     getAuth().signOut();
                   }
                 }).catch(() => {});
-              }} className={`p-4 rounded-2xl transition-all backdrop-blur-md border ${isAdmin ? 'bg-emerald-500 text-slate-900 border-emerald-400 shadow-lg shadow-emerald-500/20' : 'bg-white/10 text-white border-white/20 opacity-20 hover:opacity-100'}`}>
+              }} className={`p-4 rounded-2xl transition-all backdrop-blur-md border ${isAdmin ? 'bg-emerald-500 text-slate-900 border-emerald-400 shadow-xl' : 'bg-black/20 text-white border-white/10 opacity-30 hover:opacity-100'}`}>
                 <Settings2 size={22}/>
               </button>
             </div>
             
-            <div className="absolute top-[40%] -translate-y-1/2 w-full flex flex-col items-center gap-4">
+            {/* Main Action Hub */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
               <motion.button onClick={() => setGameState('how-to')} animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
-                <img src={safeUrl(startButtonImage) || START_BUTTON_IMAGE} alt="시작" className="w-[35vw] sm:w-[9vw] h-auto drop-shadow-2xl hover:scale-110 transition-transform" referrerPolicy="no-referrer" />
+                <img src={safeUrl(startButtonImage) || START_BUTTON_IMAGE} alt="시작" className="w-[40vw] sm:w-[10vw] h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:scale-110 transition-all active:scale-95" referrerPolicy="no-referrer" />
               </motion.button>
-              {audioBlocked && <div className="px-3 py-1 bg-black/40 text-white text-[10px] rounded-full animate-bounce">화면 클릭 시 배경음악 재생</div>}
+              {audioBlocked && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="px-5 py-2 bg-slate-900/80 backdrop-blur text-white text-[10px] font-black tracking-widest uppercase rounded-full border border-white/10 animate-pulse">
+                  Tap background to enable audio
+                </motion.div>
+              )}
             </div>
 
-            <div className="pb-12 text-white/70 text-xs font-bold drop-shadow-lg">
-              <div className="bg-black/30 backdrop-blur px-4 py-2 rounded-full border border-white/20">
-                누적 방문자: <span className="text-primary font-black ml-1 font-mono">{totalVisits.toLocaleString()}</span> 명
+            {/* Counter Node - Repositioned to Bottom Central */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+              <div className="bg-black/40 backdrop-blur-2xl px-8 py-3 rounded-full border border-white/10 shadow-3xl flex items-center gap-4">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.8)]"/>
+                <span className="text-white/40 text-[9px] font-black tracking-[0.2em] uppercase">Session Count</span>
+                <span className="text-emerald-400 font-black font-mono text-lg tabular-nums">{totalVisits.toLocaleString()}</span>
               </div>
             </div>
           </motion.div>
