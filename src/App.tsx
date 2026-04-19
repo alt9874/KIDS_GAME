@@ -434,6 +434,31 @@ export default function App() {
     }
   }, [isMuted, gameState, playBgm, stopBgm]);
 
+  // --- 오디오 동기화 (화면 레이어별 자동 재생/정지) ---
+  useEffect(() => {
+    if (audioBlocked) return;
+    
+    const syncAudio = async () => {
+      // 1. 상태에 맞는 오디오 타입 결정
+      let targetType: 'opening' | 'gameplay' | 'ending' | null = null;
+      if (gameState === 'start' || gameState === 'how-to') targetType = 'opening';
+      else if (gameState === 'playing') targetType = 'gameplay';
+      else if (gameState === 'result') targetType = 'ending';
+
+      // 2. 재생 시도
+      if (targetType) {
+        await playBgm(targetType);
+      } else {
+        stopBgm();
+      }
+    };
+
+    syncAudio();
+    
+    // Cleanup: 컴포넌트 언마운트 시 정지
+    return () => stopBgm();
+  }, [gameState, audioBlocked, playBgm, stopBgm]);
+
   useEffect(() => {
     const auth = getAuth();
     const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
@@ -485,12 +510,11 @@ export default function App() {
     return () => { unsubscribeAuth(); unsubStats(); unsubConfig(); };
   }, []);
 
-  const startGame = () => { setScore(0); setCombo(0); setGameState('playing'); playBgm('gameplay'); };
+  const startGame = () => { setScore(0); setCombo(0); setGameState('playing'); };
   const finishGame = useCallback(() => {
     setGameState('result');
-    playBgm('ending');
     if (score > highScore) { setHighScore(score); localStorage.setItem('pill_game_high_score', score.toString()); }
-  }, [score, highScore, playBgm]);
+  }, [score, highScore]);
 
   const handleHitResult = useCallback((point: number, isGood: boolean) => {
     if (isGood) {
