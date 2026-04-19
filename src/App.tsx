@@ -334,64 +334,105 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const playBgm = useCallback((type: 'opening' | 'gameplay' | 'ending') => {
-    if (isMuted) return;
-    let url = audioSettings ? (audioSettings as any)[type] : null;
-    if (!url && type === 'opening') url = BGM_URL;
-    if (!url) return;
+  const audioBufferCache = useRef<Record<string, AudioBuffer>>({});
+  const bgmSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const bgmGainNodeRef = useRef<GainNode | null>(null);
 
-    if (!audioRef.current) audioRef.current = new Audio();
-    const audio = audioRef.current;
-    
+  const initAudioCtx = useCallback(() => {
     if (!audioCtxRef.current && (window.AudioContext || (window as any).webkitAudioContext)) {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       audioCtxRef.current = new AudioCtx();
     }
+    if (audioCtxRef.current?.state === 'suspended') {
+      audioCtxRef.current.resume();
+    }
+  }, []);
 
-    if (audio.src !== url) {
-      audio.pause();
-      audio.src = url;
-      audio.loop = true;
-      audio.crossOrigin = "anonymous";
-      
-      if (audioCtxRef.current && !audioSourceRef.current) {
-        audioSourceRef.current = audioCtxRef.current.createMediaElementSource(audio);
-        audioSourceRef.current.connect(audioCtxRef.current.destination);
-      }
+  const loadAudioBuffer = async (url: string): Promise<AudioBuffer | null> => {
+    if (audioBufferCache.current[url]) return audioBufferCache.current[url];
+    try {
+      initAudioCtx();
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await audioCtxRef.current!.decodeAudioData(arrayBuffer);
+      audioBufferCache.current[url] = audioBuffer;
+      return audioBuffer;
+    } catch (e) {
+      console.error("Audio Load Error:", e);
+      return null;
+    }
+  };
+
+  const stopBgm = useCallback(() => {
+    if (bgmSourceRef.current) {
+      try { bgmSourceRef.current.stop(); } catch(e) {}
+      bgmSourceRef.current = null;
+    }
+  }, []);
+
+  const playBgm = useCallback(async (type: 'opening' | 'gameplay' | 'ending') => {
+    initAudioCtx();
+    if (isMuted) {
+      stopBgm();
+      return;
     }
 
-    audio.volume = audioSettings?.volume || 0.5;
-    if (audioCtxRef.current?.state === 'suspended') audioCtxRef.current.resume();
-    audio.play().catch(() => setAudioBlocked(true));
-  }, [isMuted, audioSettings]);
+    let url = audioSettings ? (audioSettings as any)[type] : null;
+    if (!url && type === 'opening') url = BGM_URL;
+    if (!url) return;
 
-  const playSfx = useCallback((type: 'hitPositive' | 'hitNegative') => {
+    const buffer = await loadAudioBuffer(url);
+    if (!buffer || !audioCtxRef.current) return;
+
+    stopBgm();
+
+    const source = audioCtxRef.current.createBufferSource();
+    const gainNode = audioCtxRef.current.createGain();
+    
+    source.buffer = buffer;
+    source.loop = true;
+    gainNode.gain.value = audioSettings?.volume || 0.5;
+    
+    source.connect(gainNode);
+    gainNode.connect(audioCtxRef.current.destination);
+    
+    source.start(0);
+    bgmSourceRef.current = source;
+    bgmGainNodeRef.current = gainNode;
+  }, [isMuted, audioSettings, stopBgm]);
+
+  const playSfx = useCallback(async (type: 'hitPositive' | 'hitNegative') => {
+    initAudioCtx();
     if (!audioSettings || isMuted) return;
     const url = audioSettings[type];
     if (!url) return;
     
-    const sfx = new Audio(url);
-    sfx.volume = (audioSettings.volume || 0.5) * 0.7;
+    const buffer = await loadAudioBuffer(url);
+    if (!buffer || !audioCtxRef.current) return;
+
+    const source = audioCtxRef.current.createBufferSource();
+    const gainNode = audioCtxRef.current.createGain();
     
-    if (audioCtxRef.current) {
-      try {
-        const source = audioCtxRef.current.createMediaElementSource(sfx);
-        source.connect(audioCtxRef.current.destination);
-        if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
-      } catch (e) {}
-    }
-    sfx.play().catch(() => {});
+    source.buffer = buffer;
+    gainNode.gain.value = (audioSettings.volume || 0.5) * 0.7;
+    
+    source.connect(gainNode);
+    gainNode.connect(audioCtxRef.current.destination);
+    
+    source.start(0);
   }, [isMuted, audioSettings]);
 
   const toggleMute = useCallback(() => {
     const nextMute = !isMuted;
     setIsMuted(nextMute);
     localStorage.setItem('pill_game_muted', nextMute.toString());
-    if (audioRef.current) {
-      if (nextMute) audioRef.current.pause();
-      else playBgm(gameState === 'playing' ? 'gameplay' : gameState === 'result' ? 'ending' : 'opening');
+    if (nextMute) {
+      stopBgm();
+    } else {
+      const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
+      playBgm(currentType);
     }
-  }, [isMuted, gameState, playBgm]);
+  }, [isMuted, gameState, playBgm, stopBgm]);
 
   useEffect(() => {
     const auth = getAuth();
@@ -524,17 +565,57 @@ export default function App() {
         )}
 
         {gameState === 'result' && (
-          <motion.div key="result" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="fixed inset-0 z-[300] flex flex-col items-center justify-center p-6 bg-slate-900/40 backdrop-blur-xl">
-             <div className="max-w-md w-full bg-white rounded-[3rem] p-10 shadow-2xl text-center border-t-8 border-primary">
-                <Trophy className="w-20 h-20 text-yellow-500 mx-auto mb-6 drop-shadow-lg"/>
-                <h2 className="text-3xl font-black text-gray-800 mb-2">게임 종료!</h2>
-                <div className="text-7xl font-black text-primary my-6">{score}</div>
-                <div className="text-lg font-bold text-gray-400 mb-10">최고 기록: {highScore}</div>
-                <div className="space-y-3">
-                  <button onClick={startGame} className="w-full py-4 bg-primary text-white text-xl font-bold rounded-2xl hover:bg-blue-600 transition-all flex items-center justify-center gap-2"><RotateCcw/> 다시 하기</button>
-                  <button onClick={() => setGameState('start')} className="w-full py-4 bg-gray-100 text-gray-500 text-xl font-bold rounded-2xl hover:bg-gray-200 transition-all">메인으로</button>
-                </div>
-             </div>
+          <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[300] bg-white grid grid-cols-1 md:grid-cols-2"
+          >
+            {/* Left Page: Score and Branding */}
+            <div className="flex flex-col items-center justify-center p-8 sm:p-20 relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-slate-900" />
+               <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }} className="text-center z-10 w-full max-w-sm">
+                 <Trophy className="w-20 h-20 text-yellow-500 mx-auto mb-6 drop-shadow-xl"/>
+                 <h2 className="text-4xl sm:text-6xl font-black text-slate-900 leading-none mb-4 uppercase">Game<br/>Over</h2>
+                 <p className="text-slate-500 font-bold tracking-widest uppercase text-xs mb-10">Analysis Result</p>
+                 
+                 <div className="bg-slate-900 text-white p-10 rounded-[3rem] shadow-2xl mb-12">
+                   <div className="text-8xl font-black leading-none mb-2">{score}</div>
+                   <div className="text-xs uppercase tracking-widest opacity-50">Total Score</div>
+                 </div>
+
+                 <div className="flex justify-between items-center text-slate-400 font-mono text-xs border-t border-slate-100 pt-6">
+                   <span>BEST RECORD</span>
+                   <span className="font-bold text-slate-900 underline underline-offset-4">{highScore}</span>
+                 </div>
+               </motion.div>
+               
+               {/* Background Decorative */}
+               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 40, ease: "linear" }} className="absolute -bottom-40 -left-40 pointer-events-none opacity-5">
+                 <Sparkles className="w-96 h-96 text-slate-900" />
+               </motion.div>
+            </div>
+
+            {/* Right Page: Action and Feedback */}
+            <div className="bg-slate-900 flex flex-col items-center justify-center p-12 sm:p-20 text-white relative">
+               <div className="absolute top-10 right-10 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Safe Touch v2.0</div>
+               
+               <div className="w-full max-w-sm space-y-6">
+                 <div className="text-3xl font-black mb-10 italic">Your safety reflex is improving.</div>
+                 
+                 <button onClick={startGame} className="w-full py-6 bg-white text-slate-900 text-2xl font-black rounded-2xl hover:bg-emerald-400 transition-all flex items-center justify-center gap-4 group">
+                   <RotateCcw className="group-hover:rotate-180 transition-transform duration-500"/> 
+                   AGAIN
+                 </button>
+                 
+                 <button onClick={() => setGameState('start')} className="w-full py-6 border-2 border-slate-700 text-white text-2xl font-black rounded-2xl hover:bg-slate-800 transition-all">
+                   MAIN MENU
+                 </button>
+               </div>
+
+               <div className="absolute bottom-10 left-10 flex gap-4 opacity-30">
+                 <ShieldCheck size={20}/>
+                 <BarChart2 size={20}/>
+                 <Zap size={20}/>
+               </div>
+            </div>
           </motion.div>
         )}
 
@@ -608,63 +689,104 @@ function AdminPage({ pillConfigs, gameSpeed, openingBgImage, playBgImage, startB
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[1000] bg-slate-900 overflow-y-auto p-4 sm:p-10 text-white font-sans">
-      <div className="max-w-6xl mx-auto bg-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-[85vh]">
-        <div className="flex justify-between items-center p-6 border-b border-slate-700">
-          <h2 className="text-2xl font-black">관리 포인트</h2>
-          <div className="flex gap-2">
-            <button onClick={() => onSave({ pillConfigs: localPills, gameSpeed: localSpeed, openingBgImage: localOpeningBg, playBgImage: localPlayBg, startButtonImage: localStartBtn, audioSettings: localAudio })} className="px-6 py-2 bg-primary rounded-xl font-bold">설정 저장</button>
-            <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-xl transition-colors">닫기</button>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[1000] bg-[#E4E3E0] overflow-y-auto p-4 sm:p-10 text-slate-900 font-sans">
+      <div className="max-w-6xl mx-auto border-2 border-slate-900 bg-white overflow-hidden shadow-[12px_12px_0px_#141414] flex flex-col min-h-[85vh]">
+        <div className="flex justify-between items-center p-6 border-b-2 border-slate-900">
+          <h2 className="text-2xl font-black italic">CONTROL CENTER</h2>
+          <div className="flex gap-4">
+            <button onClick={() => onSave({ pillConfigs: localPills, gameSpeed: localSpeed, openingBgImage: localOpeningBg, playBgImage: localPlayBg, startButtonImage: localStartBtn, audioSettings: localAudio })} className="px-8 py-2 bg-slate-900 text-white font-bold hover:bg-emerald-500 hover:text-slate-900 transition-all border-2 border-slate-900">COMMIT CHANGES</button>
+            <button onClick={onClose} className="p-2 hover:bg-slate-100 transition-colors">CLOSE</button>
           </div>
         </div>
 
-        <div className="flex bg-slate-900/50 p-2 gap-2 border-b border-slate-700">
-          <button onClick={() => setActiveTab('settings')} className={`flex-1 py-3 font-bold rounded-xl ${activeTab === 'settings' ? 'bg-slate-700 text-primary' : 'text-slate-500'}`}>기본 설정</button>
-          <button onClick={() => setActiveTab('items')} className={`flex-1 py-3 font-bold rounded-xl ${activeTab === 'items' ? 'bg-slate-700 text-primary' : 'text-slate-500'}`}>약물 관리</button>
-          <button onClick={() => setActiveTab('analytics')} className={`flex-1 py-3 font-bold rounded-xl ${activeTab === 'analytics' ? 'bg-slate-700 text-primary' : 'text-slate-500'}`}>분석 로그</button>
+        <div className="flex border-b-2 border-slate-900 bg-slate-50 font-mono text-[10px] uppercase font-black">
+          <button onClick={() => setActiveTab('settings')} className={`flex-1 py-3 px-4 text-center border-r-2 border-slate-900 last:border-r-0 ${activeTab === 'settings' ? 'bg-slate-900 text-white' : 'hover:bg-slate-200'}`}>01. CORE CONFIG</button>
+          <button onClick={() => setActiveTab('items')} className={`flex-1 py-3 px-4 text-center border-r-2 border-slate-900 last:border-r-0 ${activeTab === 'items' ? 'bg-slate-900 text-white' : 'hover:bg-slate-200'}`}>02. ENTITY LIST</button>
+          <button onClick={() => setActiveTab('analytics')} className={`flex-1 py-3 px-4 text-center border-r-2 border-slate-900 last:border-r-0 ${activeTab === 'analytics' ? 'bg-slate-900 text-white' : 'hover:bg-slate-200'}`}>03. SYSTEM LOGS</button>
         </div>
 
-        <div className="p-6 sm:p-8 flex-1">
+        <div className="p-6 sm:p-10 flex-1 overflow-y-auto">
           {activeTab === 'settings' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-in slide-in-from-bottom-2 duration-300">
-              <div className="space-y-4">
-                <h3 className="font-bold text-slate-400 uppercase text-xs">이미지 자산</h3>
-                <input placeholder="오프닝 배경" type="text" value={localOpeningBg} onChange={e => setLocalOpeningBg(e.target.value)} className="w-full bg-slate-700 rounded-xl p-3 border border-slate-600 outline-none focus:border-primary" />
-                <input placeholder="게임 배경" type="text" value={localPlayBg} onChange={e => setLocalPlayBg(e.target.value)} className="w-full bg-slate-700 rounded-xl p-3 border border-slate-600 outline-none focus:border-primary" />
-                <input placeholder="시작 버튼" type="text" value={localStartBtn} onChange={e => setLocalStartBtn(e.target.value)} className="w-full bg-slate-700 rounded-xl p-3 border border-slate-600 outline-none focus:border-primary" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-in fade-in duration-500">
+              <div className="space-y-10">
+                <div>
+                  <label className="block font-mono text-[10px] uppercase font-black text-slate-400 mb-4 italic">Asset Endpoints</label>
+                  <div className="space-y-4">
+                    <div className="group">
+                      <div className="text-[9px] font-mono mb-1 opacity-50 group-hover:opacity-100 transition-opacity">OPENING_IMAGE</div>
+                      <input type="text" value={localOpeningBg} onChange={e => setLocalOpeningBg(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 focus:border-slate-900 rounded-none p-3 font-mono text-xs outline-none transition-all" />
+                    </div>
+                    <div className="group">
+                        <div className="text-[9px] font-mono mb-1 opacity-50">GAMEPLAY_IMAGE</div>
+                        <input type="text" value={localPlayBg} onChange={e => setLocalPlayBg(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 focus:border-slate-900 rounded-none p-3 font-mono text-xs outline-none" />
+                    </div>
+                    <div className="group">
+                        <div className="text-[9px] font-mono mb-1 opacity-50">START_BT_IMAGE</div>
+                        <input type="text" value={localStartBtn} onChange={e => setLocalStartBtn(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 focus:border-slate-900 rounded-none p-3 font-mono text-xs outline-none" />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-4">
-                <h3 className="font-bold text-slate-400 uppercase text-xs">오디오 볼륨</h3>
-                <input type="number" step="0.1" value={localAudio.volume} onChange={e => setLocalAudio({...localAudio, volume: parseFloat(e.target.value)})} className="w-full bg-slate-700 rounded-xl p-3 border border-slate-600 outline-none focus:border-primary" />
-                <h3 className="font-bold text-slate-400 uppercase text-xs pt-4">밸런스</h3>
-                <input placeholder="시간(초)" type="number" value={localSpeed.duration} onChange={e => setLocalSpeed({...localSpeed, duration: parseInt(e.target.value)})} className="w-full bg-slate-700 rounded-xl p-3 border border-slate-600 outline-none focus:border-primary" />
-                <input placeholder="간격(ms)" type="number" value={localSpeed.spawnInterval} onChange={e => setLocalSpeed({...localSpeed, spawnInterval: parseInt(e.target.value)})} className="w-full bg-slate-700 rounded-xl p-3 border border-slate-600 outline-none focus:border-primary" />
+
+              <div className="space-y-10">
+                  <div>
+                    <label className="block font-mono text-[10px] uppercase font-black text-slate-400 mb-4 italic">Audio Metrics</label>
+                    <div className="space-y-4">
+                        <div className="group">
+                            <div className="text-[9px] font-mono mb-1 opacity-50">MASTER_VOLUME</div>
+                            <input type="number" step="0.1" value={localAudio.volume} onChange={e => setLocalAudio({...localAudio, volume: parseFloat(e.target.value)})} className="w-full bg-slate-50 border-2 border-slate-200 focus:border-slate-900 rounded-none p-3 font-mono text-xs outline-none" />
+                        </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block font-mono text-[10px] uppercase font-black text-slate-400 mb-4 italic">Engine Balance</label>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <div className="text-[9px] font-mono mb-1 opacity-50">SESSION_DUR</div>
+                            <input type="number" value={localSpeed.duration} onChange={e => setLocalSpeed({...localSpeed, duration: parseInt(e.target.value)})} className="w-full bg-slate-50 border-2 border-slate-200 focus:border-slate-900 rounded-none p-3 font-mono text-xs outline-none" />
+                        </div>
+                        <div>
+                            <div className="text-[9px] font-mono mb-1 opacity-50">SPAWN_HZ_MS</div>
+                            <input type="number" value={localSpeed.spawnInterval} onChange={e => setLocalSpeed({...localSpeed, spawnInterval: parseInt(e.target.value)})} className="w-full bg-slate-50 border-2 border-slate-200 focus:border-slate-900 rounded-none p-3 font-mono text-xs outline-none" />
+                        </div>
+                    </div>
+                  </div>
               </div>
             </div>
           )}
 
           {activeTab === 'items' && (
-            <div className="animate-in slide-in-from-bottom-2 duration-300">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-slate-400">약물 구성</h3>
-                <button onClick={() => setLocalPills([...localPills, { id: Date.now(), label: '새 아이템', score: 10, color: '#3498db', type: 'good', freq: 1.0, image: '' }])} className="px-4 py-2 bg-emerald-600 text-sm font-bold rounded-lg">+ 추가</button>
+            <div className="animate-in fade-in duration-500">
+              <div className="flex justify-between items-end mb-8 border-b-2 border-slate-900 pb-4">
+                <h3 className="font-mono text-[10px] uppercase font-black text-slate-400 italic">Entity Definition Map</h3>
+                <button onClick={() => setLocalPills([...localPills, { id: Date.now(), label: 'NEW_ENTITY', score: 10, color: '#141414', type: 'good', freq: 1.0, image: '' }])} className="px-4 py-1 bg-slate-900 text-white text-[10px] font-black uppercase tracking-tighter hover:bg-emerald-500 hover:text-slate-900 transition-all">0+ ADD_NEW</button>
               </div>
-              <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+
+              <div className="border-t-2 border-slate-900">
                 {localPills.map((p, idx) => (
-                  <div key={idx} className="bg-slate-700/30 p-4 rounded-2xl flex flex-wrap gap-4 items-center group">
-                    <div className="flex flex-col gap-1">
-                      <button onClick={() => moveItem(idx, 'up')} className="p-1 hover:text-primary"><ArrowUp size={16}/></button>
-                      <button onClick={() => moveItem(idx, 'down')} className="p-1 hover:text-primary"><ArrowDown size={16}/></button>
+                  <div key={idx} className="grid grid-cols-[40px_1fr_60px_2fr_100px_40px] border-b border-slate-100 hover:bg-slate-900 hover:text-white transition-all group items-center">
+                    <div className="p-4 font-mono text-[10px] border-r border-slate-100 group-hover:border-slate-800 flex flex-col gap-1 items-center">
+                      <button onClick={() => moveItem(idx, 'up')} className="hover:text-emerald-400 focus:outline-none"><ArrowUp size={10}/></button>
+                      <button onClick={() => moveItem(idx, 'down')} className="hover:text-emerald-400 focus:outline-none"><ArrowDown size={10}/></button>
                     </div>
-                    <input type="text" value={p.label} onChange={e => { const n = [...localPills]; n[idx].label = e.target.value; setLocalPills(n); }} className="w-24 bg-transparent border-b border-slate-600 focus:border-primary outline-none" />
-                    <input type="number" value={p.score} onChange={e => { const n = [...localPills]; n[idx].score = parseInt(e.target.value); setLocalPills(n); }} className="w-16 bg-transparent border-b border-slate-600 focus:border-primary outline-none" />
-                    <input type="text" placeholder="이미지 URL" value={p.image} onChange={e => { const n = [...localPills]; n[idx].image = e.target.value; setLocalPills(n); }} className="flex-1 min-w-[150px] bg-transparent border-b border-slate-600 focus:border-primary outline-none text-xs" />
-                    <select value={p.type} onChange={e => { const n = [...localPills]; n[idx].type = e.target.value; setLocalPills(n); }} className="bg-slate-700 rounded p-1 text-xs">
-                       <option value="good">Good</option>
-                       <option value="bad">Bad</option>
-                    </select>
-                    <input type="checkbox" checked={!p.disabled} onChange={e => { const n = [...localPills]; n[idx].disabled = !e.target.checked; setLocalPills(n); }} />
-                    <button onClick={() => setLocalPills(localPills.filter((_, i) => i !== idx))} className="text-slate-500 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"><Trash2 size={18}/></button>
+                    <div className="p-4 border-r border-slate-100 group-hover:border-slate-800">
+                      <input type="text" value={p.label} onChange={e => { const n = [...localPills]; n[idx].label = e.target.value; setLocalPills(n); }} className="w-full bg-transparent font-black tracking-tight outline-none" />
+                    </div>
+                    <div className="p-4 border-r border-slate-100 group-hover:border-slate-800 font-mono text-xs text-center italic">
+                        <input type="number" value={p.score} onChange={e => { const n = [...localPills]; n[idx].score = parseInt(e.target.value); setLocalPills(n); }} className="w-full bg-transparent text-center outline-none" />
+                    </div>
+                    <div className="p-4 border-r border-slate-100 group-hover:border-slate-800 overflow-hidden">
+                        <input type="text" value={p.image} placeholder="NULL" onChange={e => { const n = [...localPills]; n[idx].image = e.target.value; setLocalPills(n); }} className="w-full bg-transparent text-[9px] font-mono outline-none group-hover:text-emerald-200" />
+                    </div>
+                    <div className="p-4 border-r border-slate-100 group-hover:border-slate-800 flex justify-center">
+                        <select value={p.type} onChange={e => { const n = [...localPills]; n[idx].type = e.target.value; setLocalPills(n); }} className="bg-transparent font-mono text-[9px] uppercase font-black outline-none cursor-pointer">
+                            <option value="good">01. POS</option>
+                            <option value="bad">02. NEG</option>
+                        </select>
+                    </div>
+                    <div className="p-4 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => setLocalPills(localPills.filter((_, i) => i !== idx))} className="text-rose-400 hover:text-rose-600"><Trash2 size={14}/></button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -672,32 +794,42 @@ function AdminPage({ pillConfigs, gameSpeed, openingBgImage, playBgImage, startB
           )}
 
           {activeTab === 'analytics' && (
-            <div className="animate-in slide-in-from-bottom-2 duration-300">
-               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                  <div className="bg-slate-700/50 p-6 rounded-2xl border border-slate-700">
-                    <div className="text-slate-500 text-xs font-bold uppercase mb-1">총 누적 방문자</div>
-                    <div className="text-4xl font-black text-primary">{totalVisits.toLocaleString()} 명</div>
+            <div className="animate-in fade-in duration-500 space-y-12">
+               <div className="grid grid-cols-1 sm:grid-cols-3 border-2 border-slate-900 bg-white">
+                  <div className="p-8 border-b sm:border-b-0 sm:border-r-2 border-slate-900">
+                    <div className="font-mono text-[10px] uppercase font-black text-slate-400 mb-2 italic">Session Count</div>
+                    <div className="text-4xl font-black italic">{totalVisits.toLocaleString()}</div>
                   </div>
-                  <button onClick={exportCSV} className="bg-emerald-600 hover:bg-emerald-700 rounded-2xl p-6 flex items-center justify-center gap-2 font-bold transition-all"><Download/> 엑셀(CSV) 추출</button>
-                  <button onClick={resetVisits} className="bg-rose-600 hover:bg-rose-700 rounded-2xl p-6 flex items-center justify-center gap-2 font-bold transition-all"><ResetIcon/> 카운터 초기화</button>
+                  <div className="p-8 border-b sm:border-b-0 sm:border-r-2 border-slate-900 cursor-pointer hover:bg-slate-900 hover:text-white transition-all" onClick={exportCSV}>
+                    <div className="font-mono text-[10px] uppercase font-black text-slate-400 mb-2 italic">Export Node</div>
+                    <div className="text-lg font-black flex items-center gap-3">CSV DOWNLOAD <Download size={20}/></div>
+                  </div>
+                  <div className="p-8 cursor-pointer hover:bg-rose-500 hover:text-white transition-all" onClick={resetVisits}>
+                    <div className="font-mono text-[10px] uppercase font-black text-slate-400 mb-2 italic">Purge Data</div>
+                    <div className="text-lg font-black flex items-center gap-3">FACTORY RESET <ResetIcon size={20}/></div>
+                  </div>
                </div>
-               <div className="bg-slate-900/50 rounded-2xl overflow-hidden border border-slate-700">
-                 <table className="w-full text-left text-xs">
-                   <thead className="bg-slate-800 text-slate-500 uppercase font-black uppercase">
-                     <tr><th className="p-4">시간</th><th className="p-4">IP</th><th className="p-4">브라우저</th></tr>
-                   </thead>
-                   <tbody className="divide-y divide-slate-800">
-                     {isLoadingLogs ? <tr><td colSpan={3} className="p-10 text-center animate-pulse">로딩 중...</td></tr> : 
-                      logs.map((l, i) => (
-                        <tr key={i} className="hover:bg-slate-800/50 transition-colors">
-                          <td className="p-4 text-slate-400">{l.timestamp?.toDate().toLocaleString()}</td>
-                          <td className="p-4 font-bold text-primary">{l.ip}</td>
-                          <td className="p-4 text-slate-600 truncate max-w-xs">{l.userAgent}</td>
-                        </tr>
-                      ))
-                     }
-                   </tbody>
-                 </table>
+
+               <div className="border-2 border-slate-900">
+                  <div className="bg-slate-900 p-2 font-mono text-[8px] text-slate-500 uppercase tracking-widest font-black italic">Live Traffic Stream // Limit 100</div>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    <table className="w-full text-left text-[10px] border-collapse">
+                        <thead className="sticky top-0 bg-white border-b-2 border-slate-900 font-mono text-[9px] italic">
+                            <tr><th className="px-4 py-3 border-r-2 border-slate-900">TIMESTAMP</th><th className="px-4 py-3 border-r-2 border-slate-900">NODE_IP</th><th className="px-4 py-3">USER_AGENT_STRING</th></tr>
+                        </thead>
+                        <tbody className="divide-y border-slate-200">
+                             {isLoadingLogs ? <tr><td colSpan={3} className="p-10 text-center animate-pulse font-mono">CONNECTING...</td></tr> : 
+                              logs.map((l, i) => (
+                                <tr key={i} className="hover:bg-slate-50 transition-colors font-mono uppercase">
+                                  <td className="px-4 py-3 border-r border-slate-100">{l.timestamp?.toDate().toLocaleString()}</td>
+                                  <td className="px-4 py-3 border-r border-slate-100 font-black">{l.ip}</td>
+                                  <td className="px-4 py-3 text-slate-400 leading-tight">{l.userAgent}</td>
+                                </tr>
+                              ))
+                             }
+                        </tbody>
+                    </table>
+                  </div>
                </div>
             </div>
           )}
