@@ -1,4 +1,5 @@
 {
-  "name": "KIDS GAME",
-  "description": "미니 게임"
+  "name": "Pill Safety Master",
+  "description": "올바른 약 복용 습관을 길러주는 약물 안전 교육 게임",
+  "requestFramePermissions": []
 }

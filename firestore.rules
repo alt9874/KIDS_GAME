@@ -1,57 +1,49 @@
 // ===============================================================
-// App Model: KIDS GAME
+// App Model: Pill Safety Game (Admin Protected)
 // ===============================================================
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Default deny
+    // [PILLAR 0] Global Default Deny
     match /{document=**} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.email == "jsj20210104@gmail.com";
+      allow read, write: if false;
     }
 
-    // Helper functions
+    // --- Helper Functions ---
     function isSignedIn() {
       return request.auth != null;
     }
 
     function isAdmin() {
-      return isSignedIn() && (
-        request.auth.token.email == "jsj20210104@gmail.com" && 
-        request.auth.token.email_verified == true
-      );
+      return isSignedIn() && 
+             request.auth.token.email == "jsj20210104@gmail.com" && 
+             request.auth.token.email_verified == true;
     }
 
-    function incoming() {
-      return request.resource.data;
+    function isValidId(id) {
+       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    function existing() {
-      return resource.data;
-    }
-
-    // --- Statistics ---
-    match /stats/{docId} {
-      allow get: if true;
-      allow create, update: if true; // Let everyone count visits
-      allow delete: if isAdmin();
-    }
-
-    // --- Game Settings ---
-    match /settings/{docId} {
+    // --- System Settings (Admin Only Write) ---
+    match /settings/{settingsId} {
       allow get: if true;
       allow write: if isAdmin();
     }
 
-    // --- Daily Visits ---
-    match /visits/{date} {
+    // --- Statistics (Global Counter) ---
+    match /stats/{statsId} {
       allow get: if true;
-      allow write: if true;
-      match /ips/{ip} {
-        allow get, write: if true;
-      }
+      allow update: if true; // Increment total visits
+      allow write: if isAdmin();
+    }
+
+    // --- Visit Logs (Security Hardened) ---
+    match /visit_logs/{logId} {
+      // Anyone can create a log, but NO ONE can read/list/delete except Admin
+      allow create: if true; 
+      allow read, list, delete: if isAdmin();
     }
   }
 }

@@ -540,11 +540,23 @@ export default function App() {
               style={{ backgroundImage: `url(${safeUrl(openingBgImage) || (windowWidth < 640 ? OPENING_BG_IMAGE_MO : OPENING_BG_IMAGE_PC)})` }} 
               onClick={() => { if (audioBlocked) { playBgm('opening'); setAudioBlocked(false); } }}
             />
-            <div className="absolute top-4 right-4 z-50">
+            <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+              {isAdmin && (
+                <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center bg-slate-900/60 backdrop-blur-xl px-4 py-2 rounded-2xl border border-emerald-500/50 text-[10px] font-black text-emerald-400 tracking-tighter uppercase shadow-lg shadow-emerald-500/20">
+                  <ShieldCheck size={14} className="mr-2"/> Admin Authenticated
+                </motion.div>
+              )}
               <button onClick={() => {
                 if (isAdmin) setGameState('admin');
-                else signInWithPopup(getAuth(), new GoogleAuthProvider()).catch(() => {});
-              }} className="p-3 text-white opacity-5 hover:opacity-100 transition-all"><Settings2/></button>
+                else signInWithPopup(getAuth(), new GoogleAuthProvider()).then((res) => {
+                  if (res.user.email !== "jsj20210104@gmail.com") {
+                    alert("Unauthorized access. Admin Only.");
+                    getAuth().signOut();
+                  }
+                }).catch(() => {});
+              }} className={`p-4 rounded-2xl transition-all backdrop-blur-md border ${isAdmin ? 'bg-emerald-500 text-slate-900 border-emerald-400 shadow-lg shadow-emerald-500/20' : 'bg-white/10 text-white border-white/20 opacity-20 hover:opacity-100'}`}>
+                <Settings2 size={22}/>
+              </button>
             </div>
             
             <div className="absolute top-[40%] -translate-y-1/2 w-full flex flex-col items-center gap-4">
