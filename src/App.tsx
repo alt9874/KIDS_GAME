@@ -428,13 +428,24 @@ export default function App() {
     const nextMute = !isMuted;
     setIsMuted(nextMute);
     localStorage.setItem('pill_game_muted', nextMute.toString());
+    
     if (nextMute) {
-      stopBgm();
+      // 음소거 시 볼륨만 0으로 조절 (음악은 계속 흐름)
+      if (bgmGainNodeRef.current) {
+        bgmGainNodeRef.current.gain.setTargetAtTime(0, audioCtxRef.current?.currentTime || 0, 0.1);
+      }
     } else {
-      const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
-      playBgm(currentType);
+      // 음소거 해제 시 원래 볼륨으로 복구
+      if (bgmGainNodeRef.current) {
+        const targetVol = audioSettings?.volume || 0.5;
+        bgmGainNodeRef.current.gain.setTargetAtTime(targetVol, audioCtxRef.current?.currentTime || 0, 0.1);
+      } else {
+        // 혹시 노드가 유실되었다면 다시 재생
+        const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
+        playBgm(currentType);
+      }
     }
-  }, [isMuted, gameState, playBgm, stopBgm]);
+  }, [isMuted, gameState, playBgm, audioSettings, audioCtxRef]);
 
   const playSfx = useCallback(async (type: 'hitPositive' | 'hitNegative') => {
     initAudioCtx();
@@ -647,7 +658,7 @@ export default function App() {
             </div>
             
             {/* Main Action Hub - 유동적인 레이아웃을 위해 absolute와 비율 기반 높이(%) 및 너비(vw) 사용 */}
-            <div className="absolute top-[42%] sm:top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
+            <div className="absolute top-[45%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
               {/* motion.button으로 부드러운 애니메이션 효과 부여 */}
               <motion.button 
                 onClick={() => {
@@ -683,42 +694,59 @@ export default function App() {
         )}
 
         {gameState === 'how-to' && (
-          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[210] flex items-center justify-center p-3 sm:p-4">
-            <div className="max-w-4xl w-full bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 shadow-2xl flex flex-col gap-5 sm:gap-8 max-h-[98vh] sm:max-h-[95vh] overflow-hidden">
-              <h2 className="text-2xl sm:text-5xl font-black text-center text-slate-800 border-b pb-4 sm:pb-6 shrink-0">게임 설명</h2>
-              <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-4 sm:gap-8 pr-1 custom-scrollbar overflow-x-hidden">
+          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[210] flex items-center justify-center p-4">
+            <div className="max-w-6xl w-full bg-white/95 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-14 shadow-2xl flex flex-col gap-6 sm:gap-10 max-h-[95vh] border border-white/20">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-100 italic">
+                <h2 className="text-3xl sm:text-6xl font-black text-slate-800 tracking-tighter">게임 설명</h2>
+                <div className="hidden sm:block text-right">
+                  <p className="text-emerald-600 font-black text-2xl">의약품 안전 상식 퀴즈</p>
+                  <p className="text-slate-400 font-bold text-sm">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 pr-4 custom-scrollbar">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
-                  <div key={p.id} className="flex items-center gap-3 sm:gap-8 p-1 sm:p-2 text-left">
-                    <div className="w-12 h-12 sm:w-32 sm:h-32 flex items-center justify-center shrink-0">
+                  <motion.div 
+                    key={p.id} 
+                    whileHover={{ scale: 1.02 }}
+                    className="flex flex-col items-center text-center bg-slate-50/50 p-6 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-xl transition-all"
+                  >
+                    <div className="w-24 h-24 sm:w-44 sm:h-44 mb-6 flex items-center justify-center bg-white rounded-full shadow-inner p-4">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
                           alt="" 
-                          className="w-full h-full object-contain drop-shadow-sm" 
+                          className="w-full h-full object-contain filter drop-shadow-md" 
                           referrerPolicy="no-referrer"
-                          key={`img-ht-${p.id}`}
                         />
                       ) : (
-                        <div className="w-8 h-8 sm:w-20 sm:h-20 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-16 h-16 sm:w-32 sm:h-32 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 py-1">
-                      <div className="font-black text-slate-800 text-sm sm:text-3xl mb-0.5 sm:mb-1 truncate">{p.label}</div>
-                      {p.description && <div className="text-[9px] sm:text-sm text-slate-500 font-bold mb-1 line-clamp-1">{p.description}</div>}
-                      <div className={`font-black text-lg sm:text-5xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{p.score > 0 ? `+${p.score}` : p.score} <span className="text-[10px] sm:text-lg opacity-50 font-bold uppercase tracking-widest">점</span></div>
+                    <div className="space-y-3">
+                      <div className="font-black text-slate-800 text-xl sm:text-3xl tracking-tight">{p.label}</div>
+                      {p.description && <div className="text-xs sm:text-base text-slate-500 font-bold leading-tight">{p.description}</div>}
+                      <div className={`mt-4 inline-block px-6 py-2 rounded-full font-black text-xl sm:text-4xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
+                        {p.score > 0 ? `+${p.score}` : p.score}
+                        <span className="ml-1 text-[10px] sm:text-sm opacity-60 uppercase tracking-widest">pts</span>
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-              <div className="text-center py-2 sm:py-4 shrink-0 border-t border-slate-100">
-                <p className="text-slate-600 font-black text-lg sm:text-3xl animate-pulse">안전한 의약품 정보만 클릭하세요!</p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-slate-100">
+                <div className="text-center sm:text-left">
+                  <p className="text-slate-500 font-black text-lg sm:text-3xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
+                  <p className="hidden sm:block text-slate-300 text-xs mt-1 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
+                </div>
+                <button 
+                  onClick={startGame} 
+                  className="w-full sm:w-auto px-12 sm:px-20 py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-4xl font-black rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-xl shadow-emerald-200 active:scale-95 flex items-center justify-center gap-4"
+                >
+                  시작하기 <ArrowRight className="w-6 h-6 sm:w-10 sm:h-10" />
+                </button>
               </div>
-              <button 
-                onClick={startGame} 
-                className="w-[90%] mx-auto py-3 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-3xl font-black rounded-2xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all flex items-center justify-center gap-3 shrink-0 shadow-lg shadow-emerald-200"
-              >
-                시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
-              </button>
             </div>
           </motion.div>
         )}
