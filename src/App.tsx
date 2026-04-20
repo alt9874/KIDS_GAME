@@ -339,41 +339,23 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    
-    // 브라우저 오토플레이 방지 정책 대응: 첫 상호작용 시 오디오 잠금 해제
-    const unblockAudio = () => {
-      setAudioBlocked(false);
-      if (audioCtxRef.current?.state === 'suspended') {
-        audioCtxRef.current.resume();
-      }
-      window.removeEventListener('click', unblockAudio);
-      window.removeEventListener('touchstart', unblockAudio);
-    };
-    window.addEventListener('click', unblockAudio);
-    window.addEventListener('touchstart', unblockAudio);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('click', unblockAudio);
-      window.removeEventListener('touchstart', unblockAudio);
-    };
-  }, []);
-
   const audioBufferCache = useRef<Record<string, AudioBuffer>>({});
   const bgmSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const bgmGainNodeRef = useRef<GainNode | null>(null);
-
   const initAudioCtx = useCallback(() => {
     if (!audioCtxRef.current && (window.AudioContext || (window as any).webkitAudioContext)) {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       audioCtxRef.current = new AudioCtx();
     }
     if (audioCtxRef.current?.state === 'suspended') {
-      audioCtxRef.current.resume();
+      audioCtxRef.current.resume().catch(() => {});
+    }
+  }, []);
+
+  const stopBgm = useCallback(() => {
+    if (bgmSourceRef.current) {
+      try { bgmSourceRef.current.stop(); } catch(e) {}
+      bgmSourceRef.current = null;
     }
   }, []);
 
@@ -392,13 +374,6 @@ export default function App() {
     }
   };
 
-  const stopBgm = useCallback(() => {
-    if (bgmSourceRef.current) {
-      try { bgmSourceRef.current.stop(); } catch(e) {}
-      bgmSourceRef.current = null;
-    }
-  }, []);
-
   const playBgm = useCallback(async (type: 'opening' | 'gameplay' | 'ending') => {
     initAudioCtx();
     if (isMuted) {
@@ -407,7 +382,7 @@ export default function App() {
     }
 
     let url = audioSettings ? (audioSettings as any)[type] : null;
-    if (!url && type === 'opening') url = BGM_URL;
+    if (!url && (type === 'opening' || type === 'gameplay')) url = BGM_URL;
     if (!url) return;
 
     const buffer = await loadAudioBuffer(url);
@@ -430,6 +405,18 @@ export default function App() {
     bgmGainNodeRef.current = gainNode;
   }, [isMuted, audioSettings, stopBgm]);
 
+  const toggleMute = useCallback(() => {
+    const nextMute = !isMuted;
+    setIsMuted(nextMute);
+    localStorage.setItem('pill_game_muted', nextMute.toString());
+    if (nextMute) {
+      stopBgm();
+    } else {
+      const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
+      playBgm(currentType);
+    }
+  }, [isMuted, gameState, playBgm, stopBgm]);
+
   const playSfx = useCallback(async (type: 'hitPositive' | 'hitNegative') => {
     initAudioCtx();
     if (!audioSettings || isMuted) return;
@@ -451,19 +438,28 @@ export default function App() {
     source.start(0);
   }, [isMuted, audioSettings]);
 
-  const toggleMute = useCallback(() => {
-    const nextMute = !isMuted;
-    setIsMuted(nextMute);
-    localStorage.setItem('pill_game_muted', nextMute.toString());
-    if (nextMute) {
-      stopBgm();
-    } else {
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    
+    const unblockAudio = () => {
+      initAudioCtx();
+      setAudioBlocked(false);
       const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
       playBgm(currentType);
-    }
-  }, [isMuted, gameState, playBgm, stopBgm]);
+      window.removeEventListener('click', unblockAudio, true);
+      window.removeEventListener('touchstart', unblockAudio, true);
+    };
+    
+    window.addEventListener('click', unblockAudio, true);
+    window.addEventListener('touchstart', unblockAudio, true);
 
-  // --- 오디오 동기화 (화면 레이어별 자동 재생/정지) ---
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('click', unblockAudio, true);
+      window.removeEventListener('touchstart', unblockAudio, true);
+    };
+  }, [gameState, playBgm, initAudioCtx]);
   useEffect(() => {
     if (audioBlocked) return;
     
