@@ -718,10 +718,10 @@ export default function App() {
         )}
 
         {gameState === 'how-to' && (
-          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[210] flex items-center justify-center p-2 sm:p-4">
-            <div className="max-w-7xl w-full bg-white/95 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-10 shadow-2xl flex flex-col gap-3 sm:gap-6 max-h-[96vh] sm:max-h-[98vh] border border-white/20 overflow-hidden">
-              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 border-b border-slate-100 shrink-0">
-                <h2 className="text-2xl sm:text-5xl font-black text-slate-800 tracking-tighter">게임 설명</h2>
+          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[210] flex items-center justify-center p-0 sm:p-4">
+            <div className="max-w-7xl w-full bg-transparent sm:bg-white/95 sm:backdrop-blur-xl sm:rounded-[2.5rem] p-4 sm:p-10 flex flex-col gap-3 sm:gap-6 max-h-screen sm:max-h-[98vh] sm:border sm:border-white/20 overflow-hidden">
+              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 border-b border-white/20 sm:border-slate-100 shrink-0">
+                <h2 className="text-3xl sm:text-5xl font-black text-white sm:text-slate-800 tracking-tighter">게임 설명</h2>
                 <div className="hidden sm:block text-right">
                   <p className="text-emerald-600 font-black text-xl">의약품 안전 상식 퀴즈</p>
                   <p className="text-slate-400 font-bold text-xs">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
@@ -779,8 +779,8 @@ export default function App() {
                         <div className="w-14 h-14 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-1 overflow-hidden">
-                      <div className="font-black text-slate-800 text-[16px] tracking-tight leading-tight truncate w-full">{p.label}</div>
+                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-1 overflow-visible py-1">
+                      <div className="font-black text-slate-800 text-[16px] tracking-tight leading-[1.1] w-full whitespace-normal break-keep uppercase">{p.label}</div>
                       <div className={`font-black text-[14px] ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
                         <span className="ml-1 text-[11px] opacity-60 font-black">점</span>
@@ -790,14 +790,14 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-2 sm:pt-4 border-t border-slate-100 shrink-0">
+              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-4 shrink-0 mb-2 sm:mb-0">
                 <div className="text-center sm:text-left">
-                  <p className="text-slate-500 font-black text-base sm:text-2xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
+                  <p className="text-white sm:text-slate-500 font-black text-xl sm:text-2xl animate-pulse -mt-1 sm:mt-0">알맞은 의약품 정보만 클릭하세요!</p>
                   <p className="hidden sm:block text-slate-300 text-[10px] mt-0.5 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
                 </div>
                 <button 
                   onClick={startGame} 
-                  className="w-full sm:w-auto px-10 sm:px-16 py-3 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-base sm:text-3xl font-black rounded-xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-4"
+                  className="w-full sm:w-auto px-10 sm:px-16 py-3.5 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-3xl font-black rounded-2xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-4"
                 >
                   시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
                 </button>
