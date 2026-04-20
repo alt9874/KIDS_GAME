@@ -543,12 +543,19 @@ export default function App() {
     }
   }, [combo, playSfx]);
 
-  const OpeningBg = useCallback(() => {
+  const OpeningBgStyle = useCallback(() => {
     const isMo = windowWidth < 640;
     const defaultImg = isMo ? OPENING_BG_IMAGE_MO : OPENING_BG_IMAGE_PC;
     const activeUrl = isMo ? openingBgImageMo : openingBgImage;
-    const url = (activeUrl && activeUrl.trim() !== "") ? activeUrl : defaultImg;
-    return `url("${url}")`;
+    
+    // 유효한 URL인지 확인 (공백이나 'undefined' 문자열 제외)
+    const url = (activeUrl && activeUrl.trim() !== "" && activeUrl !== 'undefined') ? activeUrl : defaultImg;
+    
+    return {
+      backgroundImage: `url("${url}")`,
+      backgroundColor: '#f0f7ff',
+      opacity: 1
+    };
   }, [openingBgImage, openingBgImageMo, windowWidth]);
 
   const CurrentPlayBg = useCallback(() => {
@@ -566,10 +573,11 @@ export default function App() {
           <motion.div key="start" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
             className="fixed inset-0 z-[200] overflow-hidden"
           >
-            {/* 고정 배경 레이어: 절대 사라지지 않도록 구조 변경 */}
+            {/* 고정 배경 레이어: 배경이 사라지지 않도록 구조 강화 */}
             <div className="absolute inset-0 z-0 bg-[#f0f7ff]">
-              <div className="w-full h-full bg-cover bg-center transition-opacity duration-1000" 
-                style={{ backgroundImage: OpeningBg() }} 
+              <div 
+                className="w-full h-full bg-cover bg-center no-repeat" 
+                style={OpeningBgStyle()} 
                 onClick={() => { if (audioBlocked) { playBgm('opening'); setAudioBlocked(false); } }}
               />
             </div>
@@ -598,10 +606,22 @@ export default function App() {
               </button>
             </div>
             
-            {/* Main Action Hub */}
-            <div className="absolute top-[42%] sm:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
+            {/* Main Action Hub - 유동적인 레이아웃을 위해 absolute와 비율 기반 높이(%) 및 너비(vw) 사용 */}
+            <div className="absolute top-[42%] sm:top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
+              {/* motion.button으로 부드러운 애니메이션 효과 부여 */}
               <motion.button onClick={() => setGameState('how-to')} animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
-                <img src={safeUrl(startButtonImage) || START_BUTTON_IMAGE} alt="시작" className="w-[32vw] sm:w-[8vw] h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:scale-110 transition-all active:scale-95" referrerPolicy="no-referrer" />
+                {/* 
+                  [시작 버튼 수정 가이드]
+                  1. PC 크기: sm:w-[11.2vw] (기존 8vw에서 140% 확대)
+                  2. PC 높이: sm:top-[35%] (기존 50%에서 위로 상향 조정)
+                  3. 브라우저 크기 대응: vw(viewport width) 단위를 사용하여 창 크기에 따라 실시간 반영
+                */}
+                <img 
+                  src={safeUrl(startButtonImage) || START_BUTTON_IMAGE} 
+                  alt="시작" 
+                  className="w-[32vw] sm:w-[11.2vw] h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:scale-110 transition-all active:scale-95" 
+                  referrerPolicy="no-referrer" 
+                />
               </motion.button>
             </div>
 
