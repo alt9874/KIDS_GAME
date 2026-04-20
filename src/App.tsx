@@ -149,8 +149,9 @@ const GamePlay = ({
       rand -= freq;
     }
 
-    const size = window.innerWidth < 640 ? 80 : 110;
-    const x = Math.random() * (window.innerWidth - size);
+    // 사용자가 설정한 고유 크기가 있으면 사용, 없으면 기본값 적용
+    const baseSize = selectedConfig.width || (window.innerWidth < 640 ? 80 : 110);
+    const x = Math.random() * (window.innerWidth - baseSize);
     const newPill: Pill = {
       id: Math.random(),
       configId: selectedConfig.id,
@@ -159,8 +160,8 @@ const GamePlay = ({
       color: selectedConfig.color,
       type: selectedConfig.type,
       image: selectedConfig.image ? safeUrl(selectedConfig.image) : '',
-      x, y: -size, vx: (Math.random() - 0.5) * 3, vy: 3 + Math.random() * 3,
-      width: size, height: size, angle: Math.random() * 360, angularVelocity: (Math.random() - 0.5) * 15
+      x, y: -baseSize, vx: (Math.random() - 0.5) * 3, vy: 3 + Math.random() * 3,
+      width: baseSize, height: baseSize, angle: Math.random() * 360, angularVelocity: (Math.random() - 0.5) * 15
     };
     
     setPills(prev => [...prev, newPill]);
@@ -638,11 +639,11 @@ export default function App() {
         {gameState === 'how-to' && (
           <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[210] flex items-center justify-center p-3 sm:p-4">
             <div className="max-w-4xl w-full bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 shadow-2xl flex flex-col gap-5 sm:gap-8 max-h-[98vh] sm:max-h-[95vh] overflow-hidden">
-              <h2 className="text-2xl sm:text-5xl font-black text-center text-slate-800 border-b pb-4 sm:pb-6 shrink-0">게임 방법</h2>
-              <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 pr-1 custom-scrollbar overflow-x-hidden">
+              <h2 className="text-2xl sm:text-5xl font-black text-center text-slate-800 border-b pb-4 sm:pb-6 shrink-0">게임 설명</h2>
+              <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-4 sm:gap-8 pr-1 custom-scrollbar overflow-x-hidden">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
-                  <div key={p.id} className="flex items-center gap-5 sm:gap-8 p-1 sm:p-2 text-left">
-                    <div className="w-16 h-16 sm:w-32 sm:h-32 flex items-center justify-center shrink-0">
+                  <div key={p.id} className="flex items-center gap-3 sm:gap-8 p-1 sm:p-2 text-left">
+                    <div className="w-12 h-12 sm:w-32 sm:h-32 flex items-center justify-center shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
@@ -652,12 +653,13 @@ export default function App() {
                           key={`img-ht-${p.id}`}
                         />
                       ) : (
-                        <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-8 h-8 sm:w-20 sm:h-20 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
                     <div className="flex-1 min-w-0 py-1">
-                      <div className="font-black text-slate-800 text-lg sm:text-3xl mb-1 sm:mb-2">{p.label}</div>
-                      <div className={`font-black text-2xl sm:text-5xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{p.score > 0 ? `+${p.score}` : p.score} <span className="text-xs sm:text-lg opacity-50 font-bold uppercase tracking-widest">Points</span></div>
+                      <div className="font-black text-slate-800 text-sm sm:text-3xl mb-0.5 sm:mb-1 truncate">{p.label}</div>
+                      {p.description && <div className="text-[9px] sm:text-sm text-slate-500 font-bold mb-1 line-clamp-1">{p.description}</div>}
+                      <div className={`font-black text-lg sm:text-5xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{p.score > 0 ? `+${p.score}` : p.score} <span className="text-[10px] sm:text-lg opacity-50 font-bold uppercase tracking-widest">점</span></div>
                     </div>
                   </div>
                 ))}
@@ -934,42 +936,54 @@ function AdminPage({
           {activeTab === 'items' && (
             <div className="animate-in fade-in duration-500">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-sm font-black text-slate-800">아이템 구성 정보</h3>
-                <button onClick={() => setLocalPills([...localPills, { id: Date.now(), label: '새 아이템', score: 10, color: '#141414', type: 'good', freq: 1.0, image: '' }])} className="px-4 py-2 bg-slate-900 text-white text-xs font-black rounded-lg hover:bg-emerald-500 hover:text-slate-900 transition-all flex items-center gap-2 tracking-tighter">추가하기 <ArrowRight size={14}/></button>
+                <h3 className="text-sm font-black text-slate-800">아이템 구성 정보 (이름, 점수, 크기, 빈도, 이미지 등)</h3>
+                <button onClick={() => setLocalPills([...localPills, { id: Date.now(), label: '새 아이템', score: 10, width: 100, freq: 1.0, color: '#141414', type: 'good', image: '' }])} className="px-4 py-2 bg-slate-900 text-white text-xs font-black rounded-lg hover:bg-emerald-500 hover:text-slate-900 transition-all flex items-center gap-2 tracking-tighter">추가하기 <ArrowRight size={14}/></button>
               </div>
 
               <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
-                <div className="grid grid-cols-[50px_1.5fr_0.8fr_2fr_1fr_50px] bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 py-3 px-2">
+                <div className="grid grid-cols-[50px_1fr_1.5fr_0.5fr_0.5fr_0.5fr_1.5fr_1fr_50px] bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 py-3 px-2">
                   <div className="text-center italic">정렬</div>
-                  <div className="px-2">아이템 이름</div>
+                  <div className="px-2">이름</div>
+                  <div className="px-2">설명(설명화면용)</div>
                   <div className="text-center">점수</div>
+                  <div className="text-center">크기</div>
+                  <div className="text-center">빈도</div>
                   <div className="px-2">이미지 주소</div>
                   <div className="text-center">분류</div>
                   <div className="text-center">삭제</div>
                 </div>
                 {localPills.map((p, idx) => (
-                  <div key={idx} className="grid grid-cols-[50px_1.5fr_0.8fr_2fr_1fr_50px] border-b border-slate-50 hover:bg-slate-50 transition-all items-center">
+                  <div key={idx} className="grid grid-cols-[50px_1fr_1.5fr_0.5fr_0.5fr_0.5fr_1.5fr_1fr_50px] border-b border-slate-50 hover:bg-slate-50 transition-all items-center">
                     <div className="p-2 border-r border-slate-50 flex flex-col gap-1 items-center">
                       <button onClick={() => moveItem(idx, 'up')} className="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-900"><ArrowUp size={12}/></button>
                       <button onClick={() => moveItem(idx, 'down')} className="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-900"><ArrowDown size={12}/></button>
                     </div>
-                    <div className="p-3 border-r border-slate-50">
-                      <input type="text" value={p.label} onChange={e => { const n = [...localPills]; n[idx].label = e.target.value; setLocalPills(n); }} className="w-full bg-transparent font-bold text-sm text-slate-800 outline-none" />
+                    <div className="p-2 border-r border-slate-50">
+                      <input type="text" value={p.label} onChange={e => { const n = [...localPills]; n[idx].label = e.target.value; setLocalPills(n); }} className="w-full bg-transparent font-bold text-xs text-slate-800 outline-none" />
                     </div>
-                    <div className="p-3 border-r border-slate-50 font-mono text-sm text-center">
+                    <div className="p-2 border-r border-slate-50">
+                      <input type="text" value={p.description || ''} placeholder="아이템 설명" onChange={e => { const n = [...localPills]; n[idx].description = e.target.value; setLocalPills(n); }} className="w-full bg-transparent text-[10px] text-slate-600 outline-none" />
+                    </div>
+                    <div className="p-1 border-r border-slate-50 font-mono text-xs text-center">
                         <input type="number" value={p.score} onChange={e => { const n = [...localPills]; n[idx].score = parseInt(e.target.value); setLocalPills(n); }} className="w-full bg-transparent text-center outline-none font-bold text-emerald-600" />
                     </div>
-                    <div className="p-3 border-r border-slate-50">
-                        <input type="text" value={p.image} placeholder="이미지 주소 (없으면 점/텍스트)" onChange={e => { const n = [...localPills]; n[idx].image = e.target.value; setLocalPills(n); }} className="w-full bg-transparent text-[10px] font-mono outline-none text-slate-400 focus:text-slate-900" />
+                    <div className="p-1 border-r border-slate-50 font-mono text-xs text-center">
+                        <input type="number" value={p.width || 100} placeholder="크기" onChange={e => { const n = [...localPills]; n[idx].width = parseInt(e.target.value); setLocalPills(n); }} className="w-full bg-transparent text-center outline-none font-bold text-sky-600" />
                     </div>
-                    <div className="p-3 border-r border-slate-50 flex justify-center">
-                        <select value={p.type} onChange={e => { const n = [...localPills]; n[idx].type = e.target.value; setLocalPills(n); }} className="bg-white border border-slate-200 rounded-md px-2 py-1 text-[10px] font-black outline-none cursor-pointer">
-                            <option value="good">올바른 습관 (긍정)</option>
-                            <option value="bad">위험한 습관 (부정)</option>
+                    <div className="p-1 border-r border-slate-50 font-mono text-xs text-center">
+                        <input type="number" step="0.1" value={p.freq || 1.0} placeholder="빈도" onChange={e => { const n = [...localPills]; n[idx].freq = parseFloat(e.target.value); setLocalPills(n); }} className="w-full bg-transparent text-center outline-none font-bold text-amber-600" />
+                    </div>
+                    <div className="p-2 border-r border-slate-50">
+                        <input type="text" value={p.image || ''} placeholder="이미지 주소" onChange={e => { const n = [...localPills]; n[idx].image = e.target.value; setLocalPills(n); }} className="w-full bg-transparent text-[10px] font-mono outline-none text-slate-400 focus:text-slate-900" />
+                    </div>
+                    <div className="p-2 border-r border-slate-50 flex justify-center">
+                        <select value={p.type} onChange={e => { const n = [...localPills]; n[idx].type = e.target.value; setLocalPills(n); }} className="bg-white border border-slate-200 rounded-md px-1 py-1 text-[9px] font-black outline-none cursor-pointer">
+                            <option value="good">긍정</option>
+                            <option value="bad">부정</option>
                         </select>
                     </div>
-                    <div className="p-3 flex justify-center">
-                        <button onClick={() => setLocalPills(localPills.filter((_, i) => i !== idx))} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-rose-50 text-rose-300 hover:text-rose-500 transition-all"><Trash2 size={16}/></button>
+                    <div className="p-2 flex justify-center">
+                        <button onClick={() => setLocalPills(localPills.filter((_, i) => i !== idx))} className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-rose-50 text-rose-300 hover:text-rose-500 transition-all"><Trash2 size={14}/></button>
                     </div>
                   </div>
                 ))}
