@@ -718,30 +718,30 @@ export default function App() {
         )}
 
         {gameState === 'how-to' && (
-          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[210] flex items-center justify-center p-0 sm:p-4">
-            <div className="max-w-7xl w-full bg-transparent sm:bg-white/95 sm:backdrop-blur-xl sm:rounded-[2.5rem] p-4 sm:p-10 flex flex-col gap-3 sm:gap-6 max-h-screen sm:max-h-[98vh] sm:border sm:border-white/20 overflow-hidden">
-              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 border-b border-white/20 sm:border-slate-100 shrink-0">
-                <h2 className="text-3xl sm:text-5xl font-black text-white sm:text-slate-800 tracking-tighter">게임 설명</h2>
+          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#F8F9FA]/90 backdrop-blur-xl z-[210] flex items-center justify-center p-0 sm:p-4">
+            <div className="max-w-7xl w-full bg-transparent p-4 sm:p-10 flex flex-col gap-3 sm:gap-6 max-h-screen sm:max-h-[98vh] overflow-hidden">
+              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-4 sm:pb-6 border-b border-slate-200/60 shrink-0">
+                <h2 className="text-xl sm:text-4xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
                 <div className="hidden sm:block text-right">
-                  <p className="text-emerald-600 font-black text-xl">의약품 안전 상식 퀴즈</p>
-                  <p className="text-slate-400 font-bold text-xs">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
+                  <p className="text-emerald-600 font-black text-2xl">의약품 안전 상식 퀴즈</p>
+                  <p className="text-slate-500 font-bold text-sm">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
                 </div>
               </div>
 
               {/* PC 전용 레이아웃 (768px 이상) */}
-              <div className="hidden sm:grid flex-1 overflow-y-auto grid-cols-2 gap-4 gap-y-6 pr-1 custom-scrollbar">
+              <div className="hidden sm:grid flex-1 overflow-y-auto grid-cols-2 gap-4 gap-y-6 pr-1 custom-scrollbar px-2 py-4">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
-                    whileHover={{ scale: 1.01 }}
-                    className="flex flex-row items-center text-left bg-slate-50/50 p-6 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-lg transition-all gap-8"
+                    whileHover={{ scale: 1.01, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
+                    className="flex flex-row items-center text-left bg-white/40 backdrop-blur-md p-6 rounded-[2.5rem] border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all gap-8"
                   >
-                    <div className="w-32 h-32 flex items-center justify-center bg-white rounded-full shadow-inner p-4 shrink-0">
+                    <div className="w-32 h-32 flex items-center justify-center bg-white/80 rounded-full shadow-inner p-4 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
                           alt="" 
-                          className="w-full h-full object-contain filter drop-shadow-md" 
+                          className="w-full h-full object-contain filter drop-shadow-lg" 
                           referrerPolicy="no-referrer"
                         />
                       ) : (
@@ -749,11 +749,11 @@ export default function App() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0 space-y-2">
-                      <div className="font-black text-slate-800 text-3xl tracking-tight leading-tight">{p.label}</div>
-                      {p.description && <div className="text-sm text-slate-500 font-bold leading-tight line-clamp-2">{p.description}</div>}
-                      <div className={`mt-2 font-black text-3xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      <div className="font-black text-slate-900 text-3xl tracking-tight leading-tight">{p.label}</div>
+                      {p.description && <div className="text-sm text-slate-500 font-semibold leading-tight line-clamp-2">{p.description}</div>}
+                      <div className={`mt-2 font-black text-4xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-base opacity-60 font-black">점</span>
+                        <span className="ml-1 text-lg opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
@@ -761,13 +761,13 @@ export default function App() {
               </div>
 
               {/* 모바일 전용 레이아웃 (768px 미만) */}
-              <div className="grid sm:hidden flex-1 overflow-hidden grid-cols-2 gap-px bg-slate-100/20 rounded-2xl border border-slate-100/40">
+              <div className="grid sm:hidden flex-1 overflow-hidden grid-cols-2 gap-2 p-1">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
-                    className="flex flex-row items-center text-left bg-white p-3 gap-3 overflow-hidden"
+                    className="flex flex-row items-center text-left bg-white/50 backdrop-blur-sm p-2 gap-2 overflow-hidden border border-white/80 rounded-2xl shadow-sm"
                   >
-                    <div className="w-20 h-20 flex items-center justify-center p-1 shrink-0">
+                    <div className="w-16 h-16 flex items-center justify-center p-1 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
@@ -776,30 +776,30 @@ export default function App() {
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-12 h-12 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-1 overflow-visible py-1">
-                      <div className="font-black text-slate-800 text-[16px] tracking-tight leading-[1.1] w-full whitespace-normal break-keep uppercase">{p.label}</div>
+                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-0.5 overflow-visible py-1">
+                      <div className="font-black text-slate-900 text-[15px] tracking-tight leading-[1.1] w-full whitespace-normal break-keep">{p.label}</div>
                       <div className={`font-black text-[14px] ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-[11px] opacity-60 font-black">점</span>
+                        <span className="ml-1 text-[10px] opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-4 shrink-0 mb-2 sm:mb-0">
+              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 shrink-0 mb-4 sm:mb-0">
                 <div className="text-center sm:text-left">
-                  <p className="text-white sm:text-slate-500 font-black text-xl sm:text-2xl animate-pulse -mt-1 sm:mt-0">알맞은 의약품 정보만 클릭하세요!</p>
-                  <p className="hidden sm:block text-slate-300 text-[10px] mt-0.5 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
+                  <p className="text-slate-800 sm:text-slate-900 font-black text-2xl sm:text-4xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
+                  <p className="hidden sm:block text-slate-400 text-xs mt-1 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
                 </div>
                 <button 
                   onClick={startGame} 
-                  className="w-full sm:w-auto px-10 sm:px-16 py-3.5 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-3xl font-black rounded-2xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-4"
+                  className="w-full sm:w-auto px-10 sm:px-20 py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-4xl font-black rounded-2xl sm:rounded-[2rem] hover:from-emerald-600 hover:to-sky-600 transition-all shadow-[0_15px_45px_rgba(16,185,129,0.3)] active:scale-95 flex items-center justify-center gap-4 mt-2 sm:mt-0"
                 >
-                  시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
+                  시작하기 <ArrowRight className="w-6 h-6 sm:w-10 sm:h-10" />
                 </button>
               </div>
             </div>
