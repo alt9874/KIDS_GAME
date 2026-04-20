@@ -728,29 +728,29 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto sm:overflow-y-hidden grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 pr-1 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto sm:overflow-y-hidden grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pr-1 custom-scrollbar">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
-                    whileHover={{ scale: 1.02 }}
-                    className="flex flex-col items-center text-center bg-slate-50/50 p-4 sm:p-5 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-lg transition-all"
+                    whileHover={{ scale: 1.01 }}
+                    className="flex flex-row items-center text-left bg-slate-50/50 p-3 sm:p-4 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-md transition-all gap-4"
                   >
-                    <div className="w-20 h-20 sm:w-28 sm:h-28 mb-3 flex items-center justify-center bg-white rounded-full shadow-inner p-3">
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-full shadow-inner p-2 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
                           alt="" 
-                          className="w-full h-full object-contain filter drop-shadow-md" 
+                          className="w-full h-full object-contain filter drop-shadow-sm" 
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="space-y-1">
-                      <div className="font-black text-slate-800 text-lg sm:text-xl tracking-tight leading-tight">{p.label}</div>
-                      {p.description && <div className="text-[10px] sm:text-xs text-slate-500 font-bold leading-tight line-clamp-2">{p.description}</div>}
-                      <div className={`mt-2 inline-block px-4 py-1 rounded-full font-black text-lg sm:text-2xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="font-black text-slate-800 text-lg sm:text-2xl tracking-tight leading-tight truncate">{p.label}</div>
+                      {p.description && <div className="text-[10px] sm:text-sm text-slate-500 font-bold leading-tight">{p.description}</div>}
+                      <div className={`mt-2 inline-block px-4 py-1 rounded-full font-black text-base sm:text-xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
                         <span className="ml-1 text-[10px] sm:text-sm opacity-60 font-black">점</span>
                       </div>
