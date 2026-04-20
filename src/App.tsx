@@ -640,54 +640,58 @@ export default function App() {
         {/* 결과 화면 (gameState === 'result') */}
         {gameState === 'result' && (
           <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-            className="fixed inset-0 z-[300] bg-[#f8fafc] flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-[300] bg-blue-50/50 flex items-center justify-center p-4 overflow-y-auto"
           >
-            <div className="w-full max-w-4xl bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col md:flex-row min-h-[80vh]">
-              {/* 좌측: 점수 정보 */}
-              <div className="flex-1 p-8 sm:p-12 flex flex-col items-center justify-center text-center bg-slate-50/50">
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-6">
-                  <div className="inline-block p-4 bg-yellow-400 rounded-[2rem] shadow-lg shadow-yellow-200">
+            <div className="w-full max-w-4xl bg-white rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-blue-100 overflow-hidden flex flex-col md:flex-row min-h-[80vh]">
+              {/* 좌측: 점수 정보 - 밝은 하늘색 톤 */}
+              <div className="flex-1 p-8 sm:p-12 flex flex-col items-center justify-center text-center bg-sky-50/50 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none">
+                  <Sparkles className="w-full h-full text-sky-500" />
+                </div>
+                
+                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-6 z-10">
+                  <div className="inline-block p-4 bg-gradient-to-br from-amber-300 to-yellow-500 rounded-[2.5rem] shadow-xl shadow-yellow-200/50">
                     <Trophy className="w-12 h-12 text-white" />
                   </div>
                   
                   <div>
-                    <h2 className="text-3xl sm:text-4xl font-black text-slate-900">결과 분석</h2>
-                    <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">Drug Safety Assessment</p>
+                    <h2 className="text-3xl sm:text-4xl font-black text-sky-900 tracking-tight">게임 완료!</h2>
+                    <p className="text-sky-400 font-bold text-[10px] uppercase tracking-[0.2em] mt-2">Pill Safety Analysis</p>
                   </div>
 
-                  <div className="py-8">
-                    <div className="text-8xl sm:text-[10rem] font-black text-slate-900 leading-none tracking-tighter tabular-nums drop-shadow-sm">
+                  <div className="py-6">
+                    <div className="text-7xl sm:text-9xl font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
                       {score}
                     </div>
-                    <div className="text-slate-400 font-black text-xs sm:text-sm mt-4">최종 획득 점수</div>
+                    <div className="text-sky-400/60 font-black text-xs sm:text-sm mt-6 uppercase tracking-widest">Score Details</div>
                   </div>
 
-                  <div className="flex items-center justify-center gap-8 text-slate-400">
+                  <div className="flex items-center justify-center gap-10 bg-white/60 backdrop-blur-sm px-8 py-5 rounded-3xl border border-sky-100">
                     <div className="text-center">
-                      <div className="text-[10px] font-bold uppercase tracking-wider mb-1">최고 점수</div>
-                      <div className="text-xl font-black text-slate-900">{highScore}</div>
+                      <div className="text-[9px] font-black text-sky-300 uppercase tracking-widest mb-1">최고 기록</div>
+                      <div className="text-xl font-black text-sky-900">{highScore}</div>
                     </div>
-                    <div className="w-px h-8 bg-slate-200" />
+                    <div className="w-px h-8 bg-sky-100" />
                     <div className="text-center">
-                      <div className="text-[10px] font-bold uppercase tracking-wider mb-1">콤보 보너스</div>
+                      <div className="text-[9px] font-black text-sky-300 uppercase tracking-widest mb-1">콤보 보너스</div>
                       <div className="text-xl font-black text-emerald-500">+{Math.floor(score / 10)}</div>
                     </div>
                   </div>
                 </motion.div>
               </div>
 
-              {/* 우측: 등급 및 행동 */}
+              {/* 우측: 등급 및 행동 - 경쾌한 그린/블루 톤 */}
               <div className="flex-1 p-8 sm:p-12 flex flex-col items-center justify-between bg-white">
-                <div className="w-full space-y-8 text-center sm:text-left">
+                <div className="w-full space-y-10 text-center sm:text-left">
                   {/* 등급 시스템 */}
-                  <div className="space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 text-white text-[10px] font-black rounded-full uppercase tracking-widest">
-                      {score >= 601 ? 'Lv.5' : score >= 401 ? 'Lv.4' : score >= 251 ? 'Lv.3' : score >= 101 ? 'Lv.2' : 'Lv.1'} 숙련도
+                  <div className="space-y-5">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-sky-600 text-white text-[11px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-sky-200">
+                      Level {score >= 601 ? '5' : score >= 401 ? '4' : score >= 251 ? '3' : score >= 101 ? '2' : '1'} 숙련도
                     </div>
-                    <h3 className="text-2xl sm:text-4xl font-black text-slate-900 leading-tight">
+                    <h3 className="text-3xl sm:text-5xl font-black text-slate-900 leading-tight">
                       {score >= 601 ? '안전 전문가' : score >= 401 ? '안전 실천가' : score >= 251 ? '올바른 선택' : score >= 101 ? '기초 이해' : '주의 필요'}
                     </h3>
-                    <p className="text-slate-500 font-bold text-sm sm:text-lg leading-relaxed">
+                    <p className="text-slate-500 font-bold text-base sm:text-xl leading-relaxed max-w-xs mx-auto sm:mx-0">
                       {score >= 601 ? '“의약품 안전 정보를 정확히 이해하고 있어요”' : 
                        score >= 401 ? '“의약품 안전 사용을 잘 실천하고 있어요”' : 
                        score >= 251 ? '“의약품 안전 정보를 올바르게 선택하고 있어요”' : 
@@ -696,21 +700,20 @@ export default function App() {
                     </p>
                   </div>
 
-                  <div className="space-y-3 pt-4">
-                    <button onClick={startGame} className="w-full py-5 bg-slate-900 text-white text-xl font-black rounded-2xl hover:bg-emerald-500 transition-all shadow-xl shadow-slate-200 active:scale-95 flex items-center justify-center gap-3">
-                      <RotateCcw size={20}/> 다시 시작하기
+                  <div className="space-y-4 pt-4">
+                    <button onClick={startGame} className="w-full py-5 bg-sky-500 text-white text-xl font-black rounded-2xl hover:bg-sky-400 hover:shadow-2xl hover:-translate-y-1 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-3">
+                      <RotateCcw size={22} className="animate-spin-slow"/> 다시 도전하기
                     </button>
-                    <button onClick={() => setGameState('start')} className="w-full py-5 bg-slate-100 text-slate-600 text-xl font-black rounded-2xl hover:bg-slate-200 transition-all active:scale-95">
-                      처음으로 돌아가기
+                    <button onClick={() => setGameState('start')} className="w-full py-5 bg-white text-sky-600 border-2 border-sky-50 text-xl font-black rounded-2xl hover:bg-sky-50 transition-all active:scale-95">
+                      홈으로 가기
                     </button>
                   </div>
                 </div>
 
-                {/* 하단 로고 및 링크 */}
-                <div className="pt-12 w-full flex flex-col items-center gap-4">
-                  <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" alt="한국의약품안전관리원" className="h-8 sm:h-10 object-contain" referrerPolicy="no-referrer" />
-                    <span className="text-[10px] font-bold text-slate-400 border-b border-slate-200 pb-0.5">한국의약품안전관리원 바로가기</span>
+                {/* 하단 로고 - 텍스트 삭제 및 깔끔한 배치 */}
+                <div className="pt-12 w-full flex flex-col items-center">
+                  <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
+                    <img src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" alt="한국의약품안전관리원" className="h-10 sm:h-12 object-contain" referrerPolicy="no-referrer" />
                   </a>
                 </div>
               </div>
