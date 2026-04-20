@@ -184,12 +184,27 @@ const GamePlay = ({
       lastTime = time;
 
       setPills(prev => {
-        const next = prev.map(p => ({
-          ...p,
-          x: p.x + p.vx * dt,
-          y: p.y + p.vy * dt,
-          angle: p.angle + p.angularVelocity * dt
-        })).filter(p => p.y < window.innerHeight + 150);
+        const next = prev.map(p => {
+          let nextX = p.x + p.vx * dt;
+          let nextVx = p.vx;
+          
+          // 좌우 벽 충돌 감지 및 튕기기
+          if (nextX < 0) {
+            nextX = 0;
+            nextVx = Math.abs(p.vx); // 오른쪽으로 튕김
+          } else if (nextX > window.innerWidth - p.width) {
+            nextX = window.innerWidth - p.width;
+            nextVx = -Math.abs(p.vx); // 왼쪽으로 튕김
+          }
+
+          return {
+            ...p,
+            x: nextX,
+            vx: nextVx,
+            y: p.y + p.vy * dt,
+            angle: p.angle + p.angularVelocity * dt
+          };
+        }).filter(p => p.y < window.innerHeight + 150);
         return next;
       });
 
