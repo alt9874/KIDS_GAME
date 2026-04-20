@@ -767,12 +767,12 @@ export default function App() {
                     key={p.id} 
                     className="flex flex-row items-center text-left bg-white p-3 gap-3 overflow-hidden"
                   >
-                    <div className="w-20 h-20 flex items-center justify-center bg-white rounded-xl shadow-inner p-2 shrink-0">
+                    <div className="w-20 h-20 flex items-center justify-center p-1 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
                           alt="" 
-                          className="w-full h-full object-contain filter drop-shadow-md" 
+                          className="w-full h-full object-contain" 
                           referrerPolicy="no-referrer"
                         />
                       ) : (
@@ -792,7 +792,7 @@ export default function App() {
 
               <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-2 sm:pt-4 border-t border-slate-100 shrink-0">
                 <div className="text-center sm:text-left">
-                  <p className="text-slate-500 font-black text-sm sm:text-2xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
+                  <p className="text-slate-500 font-black text-base sm:text-2xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
                   <p className="hidden sm:block text-slate-300 text-[10px] mt-0.5 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
                 </div>
                 <button 
