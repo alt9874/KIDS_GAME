@@ -718,24 +718,24 @@ export default function App() {
         )}
 
         {gameState === 'how-to' && (
-          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[210] flex items-center justify-center p-4">
-            <div className="max-w-7xl w-full bg-white/95 backdrop-blur-xl rounded-[2.5rem] p-6 sm:p-10 shadow-2xl flex flex-col gap-4 sm:gap-6 max-h-[98vh] border border-white/20 overflow-hidden">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-100 italic shrink-0">
-                <h2 className="text-3xl sm:text-5xl font-black text-slate-800 tracking-tighter">게임 설명</h2>
+          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[210] flex items-center justify-center p-2 sm:p-4">
+            <div className="max-w-7xl w-full bg-white/95 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-10 shadow-2xl flex flex-col gap-3 sm:gap-6 max-h-[96vh] sm:max-h-[98vh] border border-white/20 overflow-hidden">
+              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 border-b border-slate-100 shrink-0">
+                <h2 className="text-2xl sm:text-5xl font-black text-slate-800 tracking-tighter">게임 설명</h2>
                 <div className="hidden sm:block text-right">
                   <p className="text-emerald-600 font-black text-xl">의약품 안전 상식 퀴즈</p>
                   <p className="text-slate-400 font-bold text-xs">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto sm:overflow-y-hidden grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pr-1 custom-scrollbar">
+              <div className="flex-1 overflow-hidden grid grid-cols-2 sm:grid-cols-2 gap-1.5 sm:gap-4 pr-0 sm:pr-1">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
                     whileHover={{ scale: 1.01 }}
-                    className="flex flex-row items-center text-left bg-slate-50/50 p-3 sm:p-4 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-md transition-all gap-4"
+                    className="flex flex-col sm:flex-row items-center sm:text-left text-center bg-slate-50/40 p-2 sm:p-4 rounded-xl sm:rounded-3xl border border-slate-100/50 hover:bg-white transition-all gap-1 sm:gap-4 overflow-hidden"
                   >
-                    <div className="w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-full shadow-inner p-2 shrink-0">
+                    <div className="w-8 h-8 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-full shadow-inner p-1 sm:p-2 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
@@ -744,29 +744,29 @@ export default function App() {
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-5 h-5 sm:w-16 sm:h-16 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="font-black text-slate-800 text-lg sm:text-2xl tracking-tight leading-tight truncate">{p.label}</div>
-                      {p.description && <div className="text-[10px] sm:text-sm text-slate-500 font-bold leading-tight">{p.description}</div>}
-                      <div className={`mt-2 inline-block px-4 py-1 rounded-full font-black text-base sm:text-xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
+                    <div className="flex-1 min-w-0 flex flex-col items-center sm:items-start space-y-0 sm:space-y-1 w-full">
+                      <div className="font-black text-slate-800 text-[10px] sm:text-2xl tracking-tight leading-tight truncate w-full">{p.label}</div>
+                      {p.description && <div className="hidden sm:block text-[10px] sm:text-sm text-slate-500 font-bold leading-tight">{p.description}</div>}
+                      <div className={`mt-0.5 sm:mt-2 inline-block px-1.5 sm:px-4 py-0 sm:py-1 rounded-full font-black text-[9px] sm:text-xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-[10px] sm:text-sm opacity-60 font-black">점</span>
+                        <span className="ml-0.5 text-[7px] sm:text-sm opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100 shrink-0">
+              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-2 sm:pt-4 border-t border-slate-100 shrink-0">
                 <div className="text-center sm:text-left">
-                  <p className="text-slate-500 font-black text-lg sm:text-2xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
+                  <p className="text-slate-500 font-black text-sm sm:text-2xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
                   <p className="hidden sm:block text-slate-300 text-[10px] mt-0.5 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
                 </div>
                 <button 
                   onClick={startGame} 
-                  className="w-full sm:w-auto px-10 sm:px-16 py-3 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-3xl font-black rounded-2xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-xl shadow-emerald-200 active:scale-95 flex items-center justify-center gap-4"
+                  className="w-full sm:w-auto px-10 sm:px-16 py-3 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-base sm:text-3xl font-black rounded-xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-4"
                 >
                   시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
                 </button>
