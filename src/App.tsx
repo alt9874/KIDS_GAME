@@ -319,8 +319,8 @@ export default function App() {
 
   const [pillConfigs, setPillConfigs] = useState(DEFAULT_PILLS);
   const [gameSpeed, setGameSpeed] = useState({ duration: 30, spawnInterval: 800 });
-  const [openingBgImage, setOpeningBgImage] = useState(OPENING_BG_IMAGE_PC);
-  const [playBgImage, setPlayBgImage] = useState(PLAY_BG_IMAGE_PC);
+  const [openingBgImage, setOpeningBgImage] = useState<string>(OPENING_BG_IMAGE_PC);
+  const [playBgImage, setPlayBgImage] = useState<string>(PLAY_BG_IMAGE_PC);
   const [startButtonImage, setStartButtonImage] = useState(START_BUTTON_IMAGE);
   const [audioSettings, setAudioSettings] = useState<AudioSettings | null>(null);
 
@@ -529,6 +529,13 @@ export default function App() {
     }
   }, [combo, playSfx]);
 
+  const OpeningBg = useCallback(() => {
+    const isMo = windowWidth < 640;
+    const defaultImg = isMo ? OPENING_BG_IMAGE_MO : OPENING_BG_IMAGE_PC;
+    const url = openingBgImage && openingBgImage.trim() !== "" ? openingBgImage : defaultImg;
+    return `url(${url})`;
+  }, [openingBgImage, windowWidth]);
+
   return (
     <div className="fixed inset-0 w-full h-full bg-[#f0f7ff] overflow-hidden font-sans touch-none select-none">
       <AnimatePresence mode="wait">
@@ -536,11 +543,13 @@ export default function App() {
           <motion.div key="start" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
             className="fixed inset-0 z-[200] overflow-hidden"
           >
-            {/* Background Layer moved to Z-0 and using double quotes for stability */}
-            <div className="absolute inset-0 bg-cover bg-center z-0" 
-              style={{ backgroundImage: `url("${safeUrl(openingBgImage) || (windowWidth < 640 ? OPENING_BG_IMAGE_MO : OPENING_BG_IMAGE_PC)}")` }} 
-              onClick={() => { if (audioBlocked) { playBgm('opening'); setAudioBlocked(false); } }}
-            />
+            {/* 고정 배경 레이어: 절대 사라지지 않도록 구조 변경 */}
+            <div className="absolute inset-0 z-0 bg-[#f0f7ff]">
+              <div className="w-full h-full bg-cover bg-center transition-opacity duration-1000" 
+                style={{ backgroundImage: OpeningBg() }} 
+                onClick={() => { if (audioBlocked) { playBgm('opening'); setAudioBlocked(false); } }}
+              />
+            </div>
 
             {/* Admin Portal UI */}
             <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
