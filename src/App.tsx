@@ -52,14 +52,14 @@ const START_BUTTON_IMAGE = "https://raw.githubusercontent.com/alt9874/game/main/
 const BGM_URL = "https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3"; 
 
 const DEFAULT_PILLS = [
-  { id: 1, label: '올슨', score: 30, color: '#2ecc71', type: 'good', freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/ow.gif' },
-  { id: 2, label: '디디', score: 15, color: '#27ae60', type: 'good', freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/didi.gif' },
-  { id: 3, label: '정량 복용', score: 10, color: '#16a085', type: 'good', freq: 1.0, image: '' },
-  { id: 8, label: '유통기한 지킴', score: 10, color: '#3498db', type: 'good', freq: 0.8, image: '' },
-  { id: 4, label: '유효기간 경과', score: -10, color: '#f1c40f', type: 'bad', freq: 0.7, image: '' },
-  { id: 5, label: '보관 불량', score: -20, color: '#f39c12', type: 'bad', freq: 0.6, image: '' },
-  { id: 6, label: '의약품 오남용', score: -25, color: '#e74c3c', type: 'bad', freq: 0.5, image: 'https://raw.githubusercontent.com/alt9874/game/main/item_01.png' },
-  { id: 7, label: '중복 복용', score: -30, color: '#c0392b', type: 'bad', freq: 0.4, image: '' },
+  { id: 1, label: '올슨', description: '의약품안전관리원 캐릭터', score: 30, color: '#2ecc71', type: 'good', width: 110, freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/ow.gif' },
+  { id: 2, label: '디디', description: '의약품안전관리원 캐릭터', score: 15, color: '#27ae60', type: 'good', width: 110, freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/didi.gif' },
+  { id: 3, label: '정량 복용', description: '약은 정해진 양만 드세요', score: 10, color: '#16a085', type: 'good', width: 110, freq: 1.0, image: '' },
+  { id: 8, label: '유통기한 지킴', description: '유통기한 확인은 필수!', score: 10, color: '#3498db', type: 'good', width: 110, freq: 0.8, image: '' },
+  { id: 4, label: '유효기간 경과', description: '오래된 약은 버리세요', score: -10, color: '#f1c40f', type: 'bad', width: 110, freq: 0.7, image: '' },
+  { id: 5, label: '보관 불량', description: '습한 곳은 피해주세요', score: -20, color: '#f39c12', type: 'bad', width: 110, freq: 0.6, image: '' },
+  { id: 6, label: '의약품 오남용', description: '남용은 건강을 해칩니다', score: -25, color: '#e74c3c', type: 'bad', width: 110, freq: 0.5, image: 'https://raw.githubusercontent.com/alt9874/game/main/item_01.png' },
+  { id: 7, label: '중복 복용', description: '같은 성분의 약을 주의하세요', score: -30, color: '#c0392b', type: 'bad', width: 110, freq: 0.4, image: '' },
 ];
 
 type GameState = 'start' | 'how-to' | 'playing' | 'result' | 'admin';
@@ -343,7 +343,24 @@ export default function App() {
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    
+    // 브라우저 오토플레이 방지 정책 대응: 첫 상호작용 시 오디오 잠금 해제
+    const unblockAudio = () => {
+      setAudioBlocked(false);
+      if (audioCtxRef.current?.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+      window.removeEventListener('click', unblockAudio);
+      window.removeEventListener('touchstart', unblockAudio);
+    };
+    window.addEventListener('click', unblockAudio);
+    window.addEventListener('touchstart', unblockAudio);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('click', unblockAudio);
+      window.removeEventListener('touchstart', unblockAudio);
+    };
   }, []);
 
   const audioBufferCache = useRef<Record<string, AudioBuffer>>({});
@@ -610,7 +627,14 @@ export default function App() {
             {/* Main Action Hub - 유동적인 레이아웃을 위해 absolute와 비율 기반 높이(%) 및 너비(vw) 사용 */}
             <div className="absolute top-[42%] sm:top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
               {/* motion.button으로 부드러운 애니메이션 효과 부여 */}
-              <motion.button onClick={() => setGameState('how-to')} animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
+              <motion.button 
+                onClick={() => {
+                  if (audioBlocked) setAudioBlocked(false);
+                  setGameState('how-to');
+                }} 
+                animate={{ scale: [1, 1.05, 1] }} 
+                transition={{ repeat: Infinity, duration: 2 }}
+              >
                 {/* 
                   [시작 버튼 수정 가이드]
                   1. PC 크기: sm:w-[11.2vw] (기존 8vw에서 140% 확대)
