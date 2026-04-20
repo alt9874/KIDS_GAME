@@ -752,7 +752,7 @@ export default function App() {
                       {p.description && <div className="text-xs sm:text-base text-slate-500 font-bold leading-tight">{p.description}</div>}
                       <div className={`mt-4 inline-block px-6 py-2 rounded-full font-black text-xl sm:text-4xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-[10px] sm:text-sm opacity-60 uppercase tracking-widest">pts</span>
+                        <span className="ml-1 text-[10px] sm:text-lg opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
