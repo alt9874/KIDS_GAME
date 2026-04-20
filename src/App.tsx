@@ -720,7 +720,7 @@ export default function App() {
         {gameState === 'how-to' && (
           <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#F8F9FA]/90 backdrop-blur-xl z-[210] flex items-center justify-center p-0 sm:p-4">
             <div className="max-w-7xl w-full bg-transparent p-4 sm:p-10 flex flex-col gap-3 sm:gap-6 max-h-screen sm:max-h-[98vh] overflow-hidden">
-              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-4 sm:pb-6 border-b border-slate-200/60 shrink-0">
+              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 shrink-0">
                 <h2 className="text-xl sm:text-4xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
                 <div className="hidden sm:block text-right">
                   <p className="text-emerald-600 font-black text-2xl">의약품 안전 상식 퀴즈</p>
@@ -792,7 +792,7 @@ export default function App() {
 
               <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 shrink-0 mb-4 sm:mb-0">
                 <div className="text-center sm:text-left">
-                  <p className="text-slate-800 sm:text-slate-900 font-black text-2xl sm:text-4xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
+                  <p className="text-slate-800 sm:text-slate-900 font-black text-lg sm:text-2xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
                   <p className="hidden sm:block text-slate-400 text-xs mt-1 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
                 </div>
                 <button 
