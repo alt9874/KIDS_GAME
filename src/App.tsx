@@ -728,31 +728,31 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-hidden grid grid-cols-2 sm:grid-cols-2 gap-1.5 sm:gap-4 pr-0 sm:pr-1">
+              <div className="flex-1 overflow-hidden grid grid-cols-2 gap-x-2 gap-y-1.5 sm:gap-4 pr-0 sm:pr-1">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
                     whileHover={{ scale: 1.01 }}
-                    className="flex flex-col sm:flex-row items-center sm:text-left text-center bg-slate-50/40 p-2 sm:p-4 rounded-xl sm:rounded-3xl border border-slate-100/50 hover:bg-white transition-all gap-1 sm:gap-4 overflow-hidden"
+                    className="flex flex-row items-center text-left bg-slate-50/40 p-1.5 sm:p-4 rounded-xl sm:rounded-3xl border border-slate-100/50 hover:bg-white transition-all gap-2 sm:gap-4 overflow-hidden"
                   >
-                    <div className="w-8 h-8 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-full shadow-inner p-1 sm:p-2 shrink-0">
+                    <div className="w-14 h-14 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-lg sm:rounded-full shadow-inner p-1 sm:p-2 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
                           alt="" 
-                          className="w-full h-full object-contain filter drop-shadow-sm" 
+                          className="w-full h-full object-contain filter drop-shadow-md" 
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-5 h-5 sm:w-16 sm:h-16 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 flex flex-col items-center sm:items-start space-y-0 sm:space-y-1 w-full">
-                      <div className="font-black text-slate-800 text-[10px] sm:text-2xl tracking-tight leading-tight truncate w-full">{p.label}</div>
+                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-0 sm:space-y-1 overflow-hidden">
+                      <div className="font-black text-slate-800 text-[11px] sm:text-2xl tracking-tight leading-tight truncate w-full">{p.label}</div>
                       {p.description && <div className="hidden sm:block text-[10px] sm:text-sm text-slate-500 font-bold leading-tight">{p.description}</div>}
-                      <div className={`mt-0.5 sm:mt-2 inline-block px-1.5 sm:px-4 py-0 sm:py-1 rounded-full font-black text-[9px] sm:text-xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
+                      <div className={`inline-block px-2 py-0 sm:py-1 rounded-full font-black text-[10px] sm:text-xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-0.5 text-[7px] sm:text-sm opacity-60 font-black">점</span>
+                        <span className="ml-0.5 text-[8px] sm:text-sm opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
