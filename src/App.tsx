@@ -480,6 +480,7 @@ export default function App() {
         await addDoc(collection(db, 'visit_logs'), {
           ip: ipData.ip,
           userAgent: navigator.userAgent,
+          referrer: document.referrer || '직접 접속',
           timestamp: serverTimestamp()
         });
         await setDoc(statsRef, { totalVisits: increment(1) }, { merge: true });
@@ -771,7 +772,7 @@ function AdminPage({
   };
 
   const exportCSV = () => {
-    const csv = ["아이디,아이피,접속시간,데이터", ...logs.map(l => `${l.id},${l.ip},${l.timestamp?.toDate().toLocaleString()},"${l.userAgent?.replace(/"/g, '""')}"`)].join("\n");
+    const csv = ["아이디,아이피,접속시간,유입경로,디바이스정보", ...logs.map(l => `${l.id},${l.ip},${l.timestamp?.toDate().toLocaleString()},"${(l.referrer || '').replace(/"/g, '""')}","${(l.userAgent || '').replace(/"/g, '""')}"`)].join("\n");
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv' });
     const u = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -946,15 +947,16 @@ function AdminPage({
                   <div className="max-h-[350px] overflow-y-auto">
                     <table className="w-full text-left text-xs">
                         <thead className="sticky top-0 bg-white border-b border-slate-100 text-[10px] font-black text-slate-400">
-                            <tr><th className="px-6 py-4">시간</th><th className="px-6 py-4">아이피 (IP)</th><th className="px-6 py-4">디바이스 정보</th></tr>
+                            <tr><th className="px-6 py-4">시간</th><th className="px-6 py-4">아이피 (IP)</th><th className="px-6 py-4">유입 경로</th><th className="px-6 py-4">기기 정보</th></tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                             {isLoadingLogs ? <tr><td colSpan={3} className="p-20 text-center animate-pulse font-bold text-slate-300">로그 데이터를 불러오는 중입니다...</td></tr> : 
+                             {isLoadingLogs ? <tr><td colSpan={4} className="p-20 text-center animate-pulse font-bold text-slate-300">로그 데이터를 불러오는 중입니다...</td></tr> : 
                               logs.map((l, i) => (
                                 <tr key={i} className="hover:bg-slate-50 transition-colors">
                                   <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{l.timestamp?.toDate().toLocaleString()}</td>
                                   <td className="px-6 py-4 font-black text-slate-700">{l.ip}</td>
-                                  <td className="px-6 py-4 text-slate-400 truncate max-w-[200px] hover:max-w-none transition-all">{l.userAgent}</td>
+                                  <td className="px-6 py-4 text-slate-400 truncate max-w-[150px]">{l.referrer || '직접'}</td>
+                                  <td className="px-6 py-4 text-slate-300 truncate max-w-[150px] hover:max-w-none transition-all">{l.userAgent}</td>
                                 </tr>
                               ))
                              }
