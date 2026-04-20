@@ -342,6 +342,9 @@ export default function App() {
   const audioBufferCache = useRef<Record<string, AudioBuffer>>({});
   const bgmSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const bgmGainNodeRef = useRef<GainNode | null>(null);
+  const currentBgmTypeRef = useRef<'opening' | 'gameplay' | 'ending' | null>(null);
+  const isLoadingBgmRef = useRef<string | null>(null);
+
   const initAudioCtx = useCallback(() => {
     if (!audioCtxRef.current && (window.AudioContext || (window as any).webkitAudioContext)) {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -357,6 +360,8 @@ export default function App() {
       try { bgmSourceRef.current.stop(); } catch(e) {}
       bgmSourceRef.current = null;
     }
+    currentBgmTypeRef.current = null;
+    isLoadingBgmRef.current = null;
   }, []);
 
   const loadAudioBuffer = async (url: string): Promise<AudioBuffer | null> => {
@@ -375,6 +380,10 @@ export default function App() {
   };
 
   const playBgm = useCallback(async (type: 'opening' | 'gameplay' | 'ending') => {
+    // 이미 같은 타입의 음악이 재생 중이거나 로딩 중이면 중복 실행 방지
+    if (currentBgmTypeRef.current === type && bgmSourceRef.current) return;
+    if (isLoadingBgmRef.current === type) return;
+    
     initAudioCtx();
     if (isMuted) {
       stopBgm();
@@ -385,24 +394,34 @@ export default function App() {
     if (!url && (type === 'opening' || type === 'gameplay')) url = BGM_URL;
     if (!url) return;
 
-    const buffer = await loadAudioBuffer(url);
-    if (!buffer || !audioCtxRef.current) return;
+    isLoadingBgmRef.current = type;
 
-    stopBgm();
+    try {
+      const buffer = await loadAudioBuffer(url);
+      if (!buffer || !audioCtxRef.current || isLoadingBgmRef.current !== type) {
+        if (isLoadingBgmRef.current === type) isLoadingBgmRef.current = null;
+        return;
+      }
 
-    const source = audioCtxRef.current.createBufferSource();
-    const gainNode = audioCtxRef.current.createGain();
-    
-    source.buffer = buffer;
-    source.loop = true;
-    gainNode.gain.value = audioSettings?.volume || 0.5;
-    
-    source.connect(gainNode);
-    gainNode.connect(audioCtxRef.current.destination);
-    
-    source.start(0);
-    bgmSourceRef.current = source;
-    bgmGainNodeRef.current = gainNode;
+      stopBgm();
+
+      const source = audioCtxRef.current.createBufferSource();
+      const gainNode = audioCtxRef.current.createGain();
+      
+      source.buffer = buffer;
+      source.loop = true;
+      gainNode.gain.value = audioSettings?.volume || 0.5;
+      
+      source.connect(gainNode);
+      gainNode.connect(audioCtxRef.current.destination);
+      
+      source.start(0);
+      bgmSourceRef.current = source;
+      bgmGainNodeRef.current = gainNode;
+      currentBgmTypeRef.current = type;
+    } finally {
+      if (isLoadingBgmRef.current === type) isLoadingBgmRef.current = null;
+    }
   }, [isMuted, audioSettings, stopBgm]);
 
   const toggleMute = useCallback(() => {
@@ -442,24 +461,31 @@ export default function App() {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     
+    // 브라우저 오토플레이 방지 정책 대응: 첫 상호작용 시 오디오 잠금 해제 및 즉시 재생
     const unblockAudio = () => {
+      if (!audioBlocked) return;
+      
       initAudioCtx();
       setAudioBlocked(false);
+      
       const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
       playBgm(currentType);
+
       window.removeEventListener('click', unblockAudio, true);
       window.removeEventListener('touchstart', unblockAudio, true);
     };
     
-    window.addEventListener('click', unblockAudio, true);
-    window.addEventListener('touchstart', unblockAudio, true);
+    if (audioBlocked) {
+      window.addEventListener('click', unblockAudio, true);
+      window.addEventListener('touchstart', unblockAudio, true);
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('click', unblockAudio, true);
       window.removeEventListener('touchstart', unblockAudio, true);
     };
-  }, [gameState, playBgm, initAudioCtx]);
+  }, [gameState, playBgm, initAudioCtx, audioBlocked]);
   useEffect(() => {
     if (audioBlocked) return;
     
