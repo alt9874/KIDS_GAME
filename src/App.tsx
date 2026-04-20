@@ -129,12 +129,12 @@ const GamePlay = ({
   toggleMute: () => void,
   score: number
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pillsRef = useRef<Pill[]>([]);
+  const [pills, setPills] = useState<Pill[]>([]);
   const popupsRef = useRef<ScorePopup[]>([]);
-  const imagesCachedRef = useRef<Record<string, HTMLImageElement>>({});
   const localTimerRef = useRef<number>(gameSpeed.duration || 30);
   const [displayTime, setDisplayTime] = useState(gameSpeed.duration || 30);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const spawnPill = useCallback(() => {
     const enabledConfigs = pillConfigs.filter(p => !p.disabled);
@@ -149,40 +149,24 @@ const GamePlay = ({
       rand -= freq;
     }
 
-    const size = window.innerWidth < 640 ? 75 : 100;
+    const size = window.innerWidth < 640 ? 80 : 110;
     const x = Math.random() * (window.innerWidth - size);
     const newPill: Pill = {
-      id: Date.now() + Math.random(),
+      id: Math.random(),
       configId: selectedConfig.id,
       label: selectedConfig.label,
       score: selectedConfig.score,
       color: selectedConfig.color,
       type: selectedConfig.type,
       image: selectedConfig.image ? safeUrl(selectedConfig.image) : '',
-      x, y: -size, vx: (Math.random() - 0.5) * 2, vy: 2.5 + Math.random() * 2.5,
-      width: size, height: size, angle: Math.random() * 360, angularVelocity: (Math.random() - 0.5) * 10
+      x, y: -size, vx: (Math.random() - 0.5) * 3, vy: 3 + Math.random() * 3,
+      width: size, height: size, angle: Math.random() * 360, angularVelocity: (Math.random() - 0.5) * 15
     };
-    pillsRef.current.push(newPill);
     
-    const imgUrl = safeUrl(newPill.image);
-    if (imgUrl && !imagesCachedRef.current[imgUrl]) {
-      const img = new Image();
-      img.referrerPolicy = "no-referrer";
-      img.src = imgUrl;
-      imagesCachedRef.current[imgUrl] = img;
-    }
+    setPills(prev => [...prev, newPill]);
   }, [pillConfigs]);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    resize();
-    window.addEventListener('resize', resize);
-
     const timer = setInterval(() => {
       localTimerRef.current -= 1;
       if (localTimerRef.current <= 0) { clearInterval(timer); finishGame(); }
@@ -193,63 +177,50 @@ const GamePlay = ({
 
     let lastTime = performance.now();
     let frameId: number;
+    
     const loop = (time: number) => {
       const dt = Math.min((time - lastTime) / 16.67, 3);
       lastTime = time;
 
-      pillsRef.current.forEach(p => { 
-        p.x += p.vx * dt; 
-        p.y += p.vy * dt; 
-        p.angle += p.angularVelocity * dt; 
+      setPills(prev => {
+        const next = prev.map(p => ({
+          ...p,
+          x: p.x + p.vx * dt,
+          y: p.y + p.vy * dt,
+          angle: p.angle + p.angularVelocity * dt
+        })).filter(p => p.y < window.innerHeight + 150);
+        return next;
       });
-      pillsRef.current = pillsRef.current.filter(p => p.y < canvas.height + 150);
-      popupsRef.current = popupsRef.current.filter(pop => (performance.now() - pop.id) < 800);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      pillsRef.current.forEach(p => {
-        ctx.save();
-        ctx.translate(p.x + p.width/2, p.y + p.height/2);
-        ctx.rotate(p.angle * Math.PI / 180);
-        
-        // p.image는 생성 시 이미 safeUrl이 적용되어 있으므로 직접 사용
-        if (p.image && imagesCachedRef.current[p.image]?.complete) {
-          ctx.drawImage(imagesCachedRef.current[p.image], -p.width/2, -p.height/2, p.width, p.height);
-        } else {
-          ctx.fillStyle = p.color; 
-          ctx.beginPath();
-          // roundRect 대신 간단한 rect로 대체하거나 r값 최적화
-          const r = (p.type === 'good' || p.label === '중복 복용') ? 10 : p.width/2;
-          ctx.roundRect(-p.width/2, -p.height/2, p.width, p.height, r);
-          ctx.fill(); 
-          ctx.strokeStyle = 'rgba(255,255,255,0.4)'; 
-          ctx.lineWidth = 2; ctx.stroke();
-          ctx.fillStyle = '#ffffff'; 
-          ctx.font = `bold ${window.innerWidth < 640 ? '12px' : '16px'} sans-serif`;
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; 
-          ctx.fillText(p.label, 0, 1);
+      // 팝업 처리를 위한 캔버스 유지
+      if (canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+          }
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          popupsRef.current = popupsRef.current.filter(pop => (performance.now() - pop.id) < 800);
+          popupsRef.current.forEach(pop => {
+            const elapsed = performance.now() - pop.id;
+            const alpha = 1 - (elapsed / 800);
+            ctx.save(); 
+            ctx.font = 'bold 16px sans-serif'; 
+            ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.fillStyle = `rgba(${pop.score > 0 ? '52, 211, 153' : '239, 68, 68'}, ${alpha})`;
+            ctx.textAlign = 'center'; 
+            ctx.fillText(pop.score > 0 ? `+${pop.score}` : `${pop.score}`, pop.x, pop.y - (elapsed / 4));
+            ctx.restore();
+          });
         }
-        ctx.restore();
-      });
-
-      popupsRef.current.forEach(pop => {
-        const elapsed = performance.now() - pop.id;
-        const alpha = 1 - (elapsed / 800);
-        ctx.save(); 
-        ctx.font = 'bold 12px sans-serif'; 
-        ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.fillStyle = `rgba(${pop.score > 0 ? '52, 211, 153' : '239, 68, 68'}, ${alpha})`;
-        ctx.textAlign = 'center'; 
-        ctx.fillText(pop.score > 0 ? `+${pop.score}` : `${pop.score}`, pop.x, pop.y - (elapsed / 4));
-        ctx.restore();
-      });
+      }
 
       frameId = requestAnimationFrame(loop);
     };
     frameId = requestAnimationFrame(loop);
 
     return () => { 
-      window.removeEventListener('resize', resize); 
       clearInterval(timer); 
       clearInterval(spawnInterval); 
       cancelAnimationFrame(frameId); 
@@ -260,8 +231,9 @@ const GamePlay = ({
     const pageX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const pageY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
     
-    for (let i = pillsRef.current.length - 1; i >= 0; i--) {
-      const p = pillsRef.current[i];
+    // 알약 배열을 역순으로 확인 (가장 최근에 생성된/위에 있는 것부터)
+    for (let i = pills.length - 1; i >= 0; i--) {
+      const p = pills[i];
       const dx = pageX - (p.x + p.width/2);
       const dy = pageY - (p.y + p.height/2);
       const dist = Math.sqrt(dx*dx + dy*dy);
@@ -272,16 +244,51 @@ const GamePlay = ({
       if (hit) {
         onHit(p.score, p.type === 'good', pageX, pageY);
         popupsRef.current.push({ id: performance.now(), x: pageX, y: pageY, score: p.score });
-        pillsRef.current.splice(i, 1); 
+        setPills(prev => prev.filter(pill => pill.id !== p.id));
         return;
       }
     }
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden" onMouseDown={handleClick} onTouchStart={handleClick}>
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden" onMouseDown={handleClick} onTouchStart={handleClick}>
       <div className="absolute inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url("${safeUrl(playBgImage)}")`, backgroundColor: '#f0f7ff' }} />
-      <canvas ref={canvasRef} className="absolute inset-0 z-10 touch-none pointer-events-none" />
+      
+      {/* 알약들을 DOM 요소로 렌더링 (GIF 지원을 위함) */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        {pills.map(p => (
+          <div 
+            key={p.id}
+            className="absolute flex items-center justify-center overflow-hidden"
+            style={{
+              left: p.x,
+              top: p.y,
+              width: p.width,
+              height: p.height,
+              transform: `rotate(${p.angle}deg)`,
+              backgroundColor: p.image ? 'transparent' : p.color,
+              borderRadius: p.image ? '0' : ((p.type === 'good' || p.label === '중복 복용') ? '10px' : '50%'),
+              border: p.image ? 'none' : '2px solid rgba(255,255,255,0.4)'
+            }}
+          >
+            {p.image ? (
+              <img 
+                src={p.image} 
+                alt="" 
+                className="w-full h-full object-contain" 
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <span className="font-black text-white text-center text-xs sm:text-base pointer-events-none select-none">
+                {p.label}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <canvas ref={canvasRef} className="absolute inset-0 z-20 touch-none pointer-events-none" />
+
       <div className="fixed top-[calc(1rem+env(safe-area-inset-top))] left-4 right-4 z-50 flex justify-between items-center pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
           <button onClick={onHome} className="bg-white/90 backdrop-blur w-10 h-10 sm:w-14 sm:h-14 rounded-full shadow-xl border border-white flex items-center justify-center hover:bg-white transition-all"><Home className="w-5 h-5 sm:w-7 sm:h-7 text-gray-700"/></button>
@@ -671,12 +678,9 @@ export default function App() {
                 </div>
                 
                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-8 z-10">
-                  <div>
-                    <h2 className="text-3xl sm:text-5xl font-black text-sky-900 tracking-tight">게임 완료!</h2>
-                  </div>
-
                   <div className="py-2 sm:py-10">
-                    <div className="text-8xl sm:text-[10rem] font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
+                    <div className="text-gray-400 font-black text-xl sm:text-2xl mb-4 tracking-widest uppercase">최종 점수</div>
+                    <div className="text-8xl sm:text-[12rem] font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
                       {score}
                     </div>
                   </div>
@@ -688,9 +692,6 @@ export default function App() {
                 <div className="w-full space-y-6 sm:space-y-10 text-center sm:text-left">
                   {/* 등급 시스템 */}
                   <div className="space-y-3 sm:space-y-5">
-                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-sky-600 text-white text-[9px] sm:text-[11px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-sky-200">
-                      Level {score >= 601 ? '5' : score >= 401 ? '4' : score >= 251 ? '3' : score >= 101 ? '2' : '1'} 숙련도
-                    </div>
                     <h3 className="text-2xl sm:text-5xl font-black text-slate-900 leading-tight">
                       {score >= 601 ? '안전 전문가' : score >= 401 ? '안전 실천가' : score >= 251 ? '올바른 선택' : score >= 101 ? '기초 이해' : '주의 필요'}
                     </h3>
@@ -714,12 +715,12 @@ export default function App() {
                 </div>
 
                 {/* 하단 로고 */}
-                <div className="pt-8 sm:pt-16 w-full flex flex-col items-center">
-                  <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
+                <div className="pt-8 sm:pt-20 w-full flex flex-col items-center">
+                  <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform">
                     <img 
                       src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" 
                       alt="한국의약품안전관리원" 
-                      className="h-10 sm:h-14 object-contain" 
+                      className="h-14 sm:h-24 object-contain" 
                       referrerPolicy="no-referrer" 
                     />
                   </a>
