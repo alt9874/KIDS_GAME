@@ -609,89 +609,110 @@ export default function App() {
         )}
 
         {gameState === 'how-to' && (
-          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/60 backdrop-blur z-[210] flex items-center justify-center p-4">
-            <div className="max-w-4xl w-full bg-white rounded-[2.5rem] p-6 sm:p-10 shadow-2xl flex flex-col gap-6 max-h-[95vh]">
-              <h2 className="text-2xl sm:text-4xl font-black text-center text-slate-800 border-b pb-4">게임 방법</h2>
-              <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-3 sm:gap-4 pr-1 custom-scrollbar">
+          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[210] flex items-center justify-center p-3 sm:p-4">
+            <div className="max-w-4xl w-full bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-10 shadow-2xl flex flex-col gap-4 sm:gap-6 max-h-[98vh] sm:max-h-[95vh] overflow-hidden">
+              <h2 className="text-xl sm:text-4xl font-black text-center text-slate-800 border-b pb-3 sm:pb-4 shrink-0">게임 방법</h2>
+              <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-2 sm:gap-4 pr-1 custom-scrollbar overflow-x-hidden">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
-                  <div key={p.id} className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center sm:text-left">
-                    <div className="w-12 h-12 sm:w-20 sm:h-20 bg-white rounded-xl shadow-sm flex items-center justify-center shrink-0">
-                      {p.image ? <img src={safeUrl(p.image)} alt="" className="w-10 h-10 sm:w-16 sm:h-16 object-contain" referrerPolicy="no-referrer"/> : <div className="w-8 h-8 rounded-full" style={{backgroundColor: p.color}}/>}
+                  <div key={p.id} className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-2 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 text-center sm:text-left">
+                    <div className="w-10 h-10 sm:w-20 sm:h-20 bg-white rounded-lg sm:rounded-xl shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+                      {p.image ? (
+                        <img 
+                          src={safeUrl(p.image)} 
+                          alt="" 
+                          className="w-full h-full object-contain" 
+                          referrerPolicy="no-referrer"
+                          key={`img-${p.id}`} // GIF 리로딩 강제
+                        />
+                      ) : (
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full" style={{backgroundColor: p.color}}/>
+                      )}
                     </div>
-                    <div className="flex-1 overflow-hidden">
-                      <div className="font-black text-slate-800 text-[10px] sm:text-lg truncate">{p.label}</div>
-                      <div className={`font-black text-xs sm:text-2xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{p.score > 0 ? `+${p.score}` : p.score} <span className="text-[8px] sm:text-xs opacity-50 font-bold">점</span></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-black text-slate-800 text-[9px] sm:text-lg truncate">{p.label}</div>
+                      <div className={`font-black text-[10px] sm:text-2xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{p.score > 0 ? `+${p.score}` : p.score} <span className="text-[7px] sm:text-xs opacity-50 font-bold">점</span></div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="text-center py-2">
-                <p className="text-slate-600 font-black text-sm sm:text-xl animate-bounce">안전한 의약품 정보만 클릭하세요!</p>
+              <div className="text-center py-1 sm:py-2 shrink-0">
+                <p className="text-slate-600 font-black text-xs sm:text-xl animate-bounce">안전한 의약품 정보만 클릭하세요!</p>
               </div>
-              <button onClick={startGame} className="w-full py-4 sm:py-5 bg-slate-900 text-white text-xl sm:text-2xl font-black rounded-2xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2">시작하기 <ArrowRight/></button>
+              <button onClick={startGame} className="w-full py-3 sm:py-5 bg-slate-900 text-white text-lg sm:text-2xl font-black rounded-xl sm:rounded-2xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shrink-0">시작하기 <ArrowRight size={20}/></button>
             </div>
           </motion.div>
         )}
 
         {gameState === 'playing' && (
-          <GamePlay playBgImage={CurrentPlayBg()} gameSpeed={gameSpeed} pillConfigs={pillConfigs} finishGame={finishGame} onHit={handleHitResult} onHome={() => setGameState('start')} isMuted={isMuted} audioSettings={audioSettings} toggleMute={toggleMute} score={score} />
+          <GamePlay 
+            playBgImage={window.innerWidth > 768 ? playBgImage : playBgImageMo} 
+            gameSpeed={gameSpeed} 
+            pillConfigs={pillConfigs} 
+            finishGame={finishGame} 
+            onHit={handleHitResult} 
+            onHome={() => setGameState('start')} 
+            isMuted={isMuted} 
+            audioSettings={audioSettings} 
+            toggleMute={toggleMute} 
+            score={score} 
+          />
         )}
 
         {/* 결과 화면 (gameState === 'result') */}
         {gameState === 'result' && (
           <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-            className="fixed inset-0 z-[300] bg-blue-50/50 flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-[300] bg-blue-50 flex items-center justify-center p-3 sm:p-4 overflow-hidden"
           >
-            <div className="w-full max-w-4xl bg-white rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-blue-100 overflow-hidden flex flex-col md:flex-row min-h-[80vh]">
+            <div className="w-full max-w-4xl bg-white rounded-[2rem] sm:rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-blue-100 overflow-y-auto max-h-[98vh] flex flex-col md:flex-row custom-scrollbar">
               {/* 좌측: 점수 정보 - 밝은 하늘색 톤 */}
-              <div className="flex-1 p-8 sm:p-12 flex flex-col items-center justify-center text-center bg-sky-50/50 relative overflow-hidden">
+              <div className="flex-1 p-6 sm:p-12 flex flex-col items-center justify-center text-center bg-sky-50/50 relative overflow-hidden shrink-0">
                 <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none">
                   <Sparkles className="w-full h-full text-sky-500" />
                 </div>
                 
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-6 z-10">
-                  <div className="inline-block p-4 bg-gradient-to-br from-amber-300 to-yellow-500 rounded-[2.5rem] shadow-xl shadow-yellow-200/50">
-                    <Trophy className="w-12 h-12 text-white" />
+                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-4 sm:space-y-6 z-10">
+                  <div className="inline-block p-3 sm:p-4 bg-gradient-to-br from-amber-300 to-yellow-500 rounded-[2rem] sm:rounded-[2.5rem] shadow-xl shadow-yellow-200/50">
+                    <Trophy className="w-8 h-8 sm:w-12 sm:h-12 text-white" />
                   </div>
                   
                   <div>
-                    <h2 className="text-3xl sm:text-4xl font-black text-sky-900 tracking-tight">게임 완료!</h2>
-                    <p className="text-sky-400 font-bold text-[10px] uppercase tracking-[0.2em] mt-2">Pill Safety Analysis</p>
+                    <h2 className="text-2xl sm:text-4xl font-black text-sky-900 tracking-tight">게임 완료!</h2>
+                    <p className="text-sky-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] mt-1 sm:mt-2">Pill Safety Analysis</p>
                   </div>
 
-                  <div className="py-6">
-                    <div className="text-7xl sm:text-9xl font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
+                  <div className="py-2 sm:py-6">
+                    <div className="text-6xl sm:text-9xl font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
                       {score}
                     </div>
-                    <div className="text-sky-400/60 font-black text-xs sm:text-sm mt-6 uppercase tracking-widest">Score Details</div>
+                    <div className="text-sky-400/60 font-black text-[10px] sm:text-sm mt-3 sm:mt-6 uppercase tracking-widest">Score Details</div>
                   </div>
 
-                  <div className="flex items-center justify-center gap-10 bg-white/60 backdrop-blur-sm px-8 py-5 rounded-3xl border border-sky-100">
+                  <div className="flex items-center justify-center gap-6 sm:gap-10 bg-white/60 backdrop-blur-sm px-5 sm:px-8 py-3 sm:py-5 rounded-2xl sm:rounded-3xl border border-sky-100">
                     <div className="text-center">
-                      <div className="text-[9px] font-black text-sky-300 uppercase tracking-widest mb-1">최고 기록</div>
-                      <div className="text-xl font-black text-sky-900">{highScore}</div>
+                      <div className="text-[8px] sm:text-[9px] font-black text-sky-300 uppercase tracking-widest mb-0.5 sm:mb-1">최고 기록</div>
+                      <div className="text-lg sm:text-xl font-black text-sky-900">{highScore}</div>
                     </div>
-                    <div className="w-px h-8 bg-sky-100" />
+                    <div className="w-px h-6 sm:h-8 bg-sky-100" />
                     <div className="text-center">
-                      <div className="text-[9px] font-black text-sky-300 uppercase tracking-widest mb-1">콤보 보너스</div>
-                      <div className="text-xl font-black text-emerald-500">+{Math.floor(score / 10)}</div>
+                      <div className="text-[8px] sm:text-[9px] font-black text-sky-300 uppercase tracking-widest mb-0.5 sm:mb-1">콤보 보너스</div>
+                      <div className="text-lg sm:text-xl font-black text-emerald-500">+{Math.floor(score / 10)}</div>
                     </div>
                   </div>
                 </motion.div>
               </div>
 
               {/* 우측: 등급 및 행동 - 경쾌한 그린/블루 톤 */}
-              <div className="flex-1 p-8 sm:p-12 flex flex-col items-center justify-between bg-white">
-                <div className="w-full space-y-10 text-center sm:text-left">
+              <div className="flex-1 p-6 sm:p-12 flex flex-col items-center justify-between bg-white shrink-0">
+                <div className="w-full space-y-6 sm:space-y-10 text-center sm:text-left">
                   {/* 등급 시스템 */}
-                  <div className="space-y-5">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-sky-600 text-white text-[11px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-sky-200">
+                  <div className="space-y-3 sm:space-y-5">
+                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-sky-600 text-white text-[9px] sm:text-[11px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-sky-200">
                       Level {score >= 601 ? '5' : score >= 401 ? '4' : score >= 251 ? '3' : score >= 101 ? '2' : '1'} 숙련도
                     </div>
-                    <h3 className="text-3xl sm:text-5xl font-black text-slate-900 leading-tight">
+                    <h3 className="text-2xl sm:text-5xl font-black text-slate-900 leading-tight">
                       {score >= 601 ? '안전 전문가' : score >= 401 ? '안전 실천가' : score >= 251 ? '올바른 선택' : score >= 101 ? '기초 이해' : '주의 필요'}
                     </h3>
-                    <p className="text-slate-500 font-bold text-base sm:text-xl leading-relaxed max-w-xs mx-auto sm:mx-0">
+                    <p className="text-slate-500 font-bold text-sm sm:text-xl leading-relaxed max-w-xs mx-auto sm:mx-0">
                       {score >= 601 ? '“의약품 안전 정보를 정확히 이해하고 있어요”' : 
                        score >= 401 ? '“의약품 안전 사용을 잘 실천하고 있어요”' : 
                        score >= 251 ? '“의약품 안전 정보를 올바르게 선택하고 있어요”' : 
@@ -700,20 +721,20 @@ export default function App() {
                     </p>
                   </div>
 
-                  <div className="space-y-4 pt-4">
-                    <button onClick={startGame} className="w-full py-5 bg-sky-500 text-white text-xl font-black rounded-2xl hover:bg-sky-400 hover:shadow-2xl hover:-translate-y-1 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-3">
-                      <RotateCcw size={22} className="animate-spin-slow"/> 다시 도전하기
+                  <div className="space-y-3 sm:space-y-4 pt-2">
+                    <button onClick={startGame} className="w-full py-4 sm:py-5 bg-sky-500 text-white text-lg sm:text-xl font-black rounded-xl sm:rounded-2xl hover:bg-sky-400 hover:shadow-2xl hover:-translate-y-0.5 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-3">
+                      <RotateCcw size={20} className="animate-spin-slow"/> 다시 도전하기
                     </button>
-                    <button onClick={() => setGameState('start')} className="w-full py-5 bg-white text-sky-600 border-2 border-sky-50 text-xl font-black rounded-2xl hover:bg-sky-50 transition-all active:scale-95">
+                    <button onClick={() => setGameState('start')} className="w-full py-4 sm:py-5 bg-white text-sky-600 border-2 border-sky-50 text-lg sm:text-xl font-black rounded-xl sm:rounded-2xl hover:bg-sky-50 transition-all active:scale-95">
                       홈으로 가기
                     </button>
                   </div>
                 </div>
 
                 {/* 하단 로고 - 텍스트 삭제 및 깔끔한 배치 */}
-                <div className="pt-12 w-full flex flex-col items-center">
+                <div className="pt-8 sm:pt-12 w-full flex flex-col items-center">
                   <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
-                    <img src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" alt="한국의약품안전관리원" className="h-10 sm:h-12 object-contain" referrerPolicy="no-referrer" />
+                    <img src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" alt="한국의약품안전관리원" className="h-8 sm:h-12 object-contain" referrerPolicy="no-referrer" />
                   </a>
                 </div>
               </div>
