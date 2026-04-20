@@ -89,6 +89,7 @@ interface Pill {
   height: number;
   angle: number;
   angularVelocity: number;
+  noRotation?: boolean;
 }
 
 interface ScorePopup {
@@ -152,6 +153,11 @@ const GamePlay = ({
     // 사용자가 설정한 고유 크기가 있으면 사용, 없으면 기본값 적용
     const baseSize = selectedConfig.width || (window.innerWidth < 640 ? 80 : 110);
     const x = Math.random() * (window.innerWidth - baseSize);
+    const noRotation = selectedConfig.noRotation || false;
+    const initialAngle = (selectedConfig.initialAngle !== undefined && selectedConfig.initialAngle !== null) 
+      ? Number(selectedConfig.initialAngle) 
+      : Math.random() * 360;
+
     const newPill: Pill = {
       id: Math.random(),
       configId: selectedConfig.id,
@@ -161,7 +167,10 @@ const GamePlay = ({
       type: selectedConfig.type,
       image: selectedConfig.image ? safeUrl(selectedConfig.image) : '',
       x, y: -baseSize, vx: (Math.random() - 0.5) * 3, vy: 3 + Math.random() * 3,
-      width: baseSize, height: baseSize, angle: Math.random() * 360, angularVelocity: (Math.random() - 0.5) * 15
+      width: baseSize, height: baseSize, 
+      angle: initialAngle, 
+      angularVelocity: noRotation ? 0 : (Math.random() - 0.5) * 15,
+      noRotation
     };
     
     setPills(prev => [...prev, newPill]);
@@ -202,7 +211,7 @@ const GamePlay = ({
             x: nextX,
             vx: nextVx,
             y: p.y + p.vy * dt,
-            angle: p.angle + p.angularVelocity * dt
+            angle: p.noRotation ? p.angle : (p.angle + p.angularVelocity * dt)
           };
         }).filter(p => p.y < window.innerHeight + 150);
         return next;
@@ -424,7 +433,7 @@ export default function App() {
       const gainNode = audioCtxRef.current.createGain();
       
       source.buffer = buffer;
-      source.loop = true;
+      source.loop = type !== 'ending';
       
       // 현재 음소거 상태에 따라 초기 볼륨 설정
       const initialVol = isMutedRef.current ? 0 : (audioSettings?.volume || 0.5);
@@ -1035,19 +1044,21 @@ function AdminPage({
               </div>
 
               <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
-                <div className="grid grid-cols-[50px_1fr_1.5fr_0.5fr_0.5fr_0.5fr_1.5fr_1fr_50px] bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 py-3 px-2">
+                <div className="grid grid-cols-[50px_1fr_1.5fr_0.4fr_0.4fr_0.4fr_0.4fr_0.4fr_1fr_0.8fr_50px] bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 py-3 px-2">
                   <div className="text-center italic">정렬</div>
                   <div className="px-2">이름</div>
                   <div className="px-2">설명(설명화면용)</div>
                   <div className="text-center">점수</div>
                   <div className="text-center">크기</div>
                   <div className="text-center">빈도</div>
+                  <div className="text-center italic">회전X</div>
+                  <div className="text-center italic">각도</div>
                   <div className="px-2">이미지 주소</div>
                   <div className="text-center">분류</div>
                   <div className="text-center">삭제</div>
                 </div>
                 {localPills.map((p, idx) => (
-                  <div key={idx} className="grid grid-cols-[50px_1fr_1.5fr_0.5fr_0.5fr_0.5fr_1.5fr_1fr_50px] border-b border-slate-50 hover:bg-slate-50 transition-all items-center">
+                  <div key={idx} className="grid grid-cols-[50px_1fr_1.5fr_0.4fr_0.4fr_0.4fr_0.4fr_0.4fr_1fr_0.8fr_50px] border-b border-slate-50 hover:bg-slate-50 transition-all items-center">
                     <div className="p-2 border-r border-slate-50 flex flex-col gap-1 items-center">
                       <button onClick={() => moveItem(idx, 'up')} className="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-900"><ArrowUp size={12}/></button>
                       <button onClick={() => moveItem(idx, 'down')} className="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-900"><ArrowDown size={12}/></button>
@@ -1066,6 +1077,12 @@ function AdminPage({
                     </div>
                     <div className="p-1 border-r border-slate-50 font-mono text-xs text-center">
                         <input type="number" step="0.1" value={p.freq || 1.0} placeholder="빈도" onChange={e => { const n = [...localPills]; n[idx].freq = parseFloat(e.target.value); setLocalPills(n); }} className="w-full bg-transparent text-center outline-none font-bold text-amber-600" />
+                    </div>
+                    <div className="p-1 border-r border-slate-50 flex justify-center">
+                        <input type="checkbox" checked={p.noRotation || false} onChange={e => { const n = [...localPills]; n[idx].noRotation = e.target.checked; setLocalPills(n); }} className="w-4 h-4 cursor-pointer" />
+                    </div>
+                    <div className="p-1 border-r border-slate-50 font-mono text-xs text-center">
+                        <input type="number" value={p.initialAngle || 0} onChange={e => { const n = [...localPills]; n[idx].initialAngle = parseInt(e.target.value); setLocalPills(n); }} className="w-full bg-transparent text-center outline-none font-bold text-slate-500" />
                     </div>
                     <div className="p-2 border-r border-slate-50">
                         <input type="text" value={p.image || ''} placeholder="이미지 주소" onChange={e => { const n = [...localPills]; n[idx].image = e.target.value; setLocalPills(n); }} className="w-full bg-transparent text-[10px] font-mono outline-none text-slate-400 focus:text-slate-900" />
