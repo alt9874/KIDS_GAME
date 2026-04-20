@@ -711,9 +711,14 @@ export default function App() {
                 ))}
               </div>
               <div className="text-center py-2 sm:py-4 shrink-0 border-t border-slate-100">
-                <p className="text-slate-500 font-black text-sm sm:text-2xl animate-bounce">안전한 의약품 정보만 클릭하세요!</p>
+                <p className="text-slate-600 font-black text-lg sm:text-3xl animate-pulse">안전한 의약품 정보만 클릭하세요!</p>
               </div>
-              <button onClick={startGame} className="w-full py-4 sm:py-7 bg-slate-900 text-white text-xl sm:text-4xl font-black rounded-2xl sm:rounded-3xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-3 shrink-0">시작하기 <ArrowRight size={32}/></button>
+              <button 
+                onClick={startGame} 
+                className="w-[90%] mx-auto py-3 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-3xl font-black rounded-2xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all flex items-center justify-center gap-3 shrink-0 shadow-lg shadow-emerald-200"
+              >
+                시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
+              </button>
             </div>
           </motion.div>
         )}
