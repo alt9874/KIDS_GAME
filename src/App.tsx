@@ -592,9 +592,9 @@ export default function App() {
             </div>
             
             {/* Main Action Hub */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
+            <div className="absolute top-[55%] sm:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
               <motion.button onClick={() => setGameState('how-to')} animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
-                <img src={safeUrl(startButtonImage) || START_BUTTON_IMAGE} alt="시작" className="w-[40vw] sm:w-[10vw] h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:scale-110 transition-all active:scale-95" referrerPolicy="no-referrer" />
+                <img src={safeUrl(startButtonImage) || START_BUTTON_IMAGE} alt="시작" className="w-[32vw] sm:w-[8vw] h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:scale-110 transition-all active:scale-95" referrerPolicy="no-referrer" />
               </motion.button>
             </div>
 
@@ -609,36 +609,36 @@ export default function App() {
         )}
 
         {gameState === 'how-to' && (
-          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[210] flex items-center justify-center p-3 sm:p-4">
-            <div className="max-w-4xl w-full bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-10 shadow-2xl flex flex-col gap-4 sm:gap-6 max-h-[98vh] sm:max-h-[95vh] overflow-hidden">
-              <h2 className="text-xl sm:text-4xl font-black text-center text-slate-800 border-b pb-3 sm:pb-4 shrink-0">게임 방법</h2>
-              <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-2 sm:gap-4 pr-1 custom-scrollbar overflow-x-hidden">
+          <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[210] flex items-center justify-center p-3 sm:p-4">
+            <div className="max-w-4xl w-full bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 shadow-2xl flex flex-col gap-5 sm:gap-8 max-h-[98vh] sm:max-h-[95vh] overflow-hidden">
+              <h2 className="text-2xl sm:text-5xl font-black text-center text-slate-800 border-b pb-4 sm:pb-6 shrink-0">게임 방법</h2>
+              <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 pr-1 custom-scrollbar overflow-x-hidden">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
-                  <div key={p.id} className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-2 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 text-center sm:text-left">
-                    <div className="w-10 h-10 sm:w-20 sm:h-20 bg-white rounded-lg sm:rounded-xl shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+                  <div key={p.id} className="flex items-center gap-5 sm:gap-8 p-1 sm:p-2 text-left">
+                    <div className="w-16 h-16 sm:w-32 sm:h-32 flex items-center justify-center shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
                           alt="" 
-                          className="w-full h-full object-contain" 
+                          className="w-full h-full object-contain drop-shadow-sm" 
                           referrerPolicy="no-referrer"
-                          key={`img-${p.id}`} // GIF 리로딩 강제
+                          key={`img-ht-${p.id}`}
                         />
                       ) : (
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-black text-slate-800 text-[9px] sm:text-lg truncate">{p.label}</div>
-                      <div className={`font-black text-[10px] sm:text-2xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{p.score > 0 ? `+${p.score}` : p.score} <span className="text-[7px] sm:text-xs opacity-50 font-bold">점</span></div>
+                    <div className="flex-1 min-w-0 py-1">
+                      <div className="font-black text-slate-800 text-lg sm:text-3xl mb-1 sm:mb-2">{p.label}</div>
+                      <div className={`font-black text-2xl sm:text-5xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>{p.score > 0 ? `+${p.score}` : p.score} <span className="text-xs sm:text-lg opacity-50 font-bold uppercase tracking-widest">Points</span></div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="text-center py-1 sm:py-2 shrink-0">
-                <p className="text-slate-600 font-black text-xs sm:text-xl animate-bounce">안전한 의약품 정보만 클릭하세요!</p>
+              <div className="text-center py-2 sm:py-4 shrink-0 border-t border-slate-100">
+                <p className="text-slate-500 font-black text-sm sm:text-2xl animate-bounce">안전한 의약품 정보만 클릭하세요!</p>
               </div>
-              <button onClick={startGame} className="w-full py-3 sm:py-5 bg-slate-900 text-white text-lg sm:text-2xl font-black rounded-xl sm:rounded-2xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shrink-0">시작하기 <ArrowRight size={20}/></button>
+              <button onClick={startGame} className="w-full py-4 sm:py-7 bg-slate-900 text-white text-xl sm:text-4xl font-black rounded-2xl sm:rounded-3xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-3 shrink-0">시작하기 <ArrowRight size={32}/></button>
             </div>
           </motion.div>
         )}
@@ -673,14 +673,12 @@ export default function App() {
                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-8 z-10">
                   <div>
                     <h2 className="text-3xl sm:text-5xl font-black text-sky-900 tracking-tight">게임 완료!</h2>
-                    <p className="text-sky-400 font-bold text-[9px] sm:text-[11px] uppercase tracking-[0.2em] mt-2 sm:mt-3">Pill Safety Analysis</p>
                   </div>
 
                   <div className="py-2 sm:py-10">
                     <div className="text-8xl sm:text-[10rem] font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
                       {score}
                     </div>
-                    <div className="text-sky-400/60 font-black text-[11px] sm:text-sm mt-4 sm:mt-8 uppercase tracking-widest">Final Score</div>
                   </div>
                 </motion.div>
               </div>
