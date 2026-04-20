@@ -728,14 +728,15 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-hidden grid grid-cols-2 gap-px bg-slate-100/30 rounded-2xl sm:rounded-3xl border border-slate-100/50">
+              {/* PC 전용 레이아웃 (768px 이상) */}
+              <div className="hidden sm:grid flex-1 overflow-y-auto grid-cols-2 gap-4 gap-y-6 pr-1 custom-scrollbar">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
                     whileHover={{ scale: 1.01 }}
-                    className="flex flex-row items-center text-left bg-white p-3 sm:p-5 hover:bg-slate-50/50 transition-all gap-3 sm:gap-6 overflow-hidden"
+                    className="flex flex-row items-center text-left bg-slate-50/50 p-6 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-lg transition-all gap-8"
                   >
-                    <div className="w-16 h-16 sm:w-32 sm:h-32 flex items-center justify-center bg-white rounded-xl sm:rounded-full shadow-inner p-2 sm:p-3 shrink-0">
+                    <div className="w-32 h-32 flex items-center justify-center bg-white rounded-full shadow-inner p-4 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
@@ -744,15 +745,47 @@ export default function App() {
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-20 h-20 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-1 sm:space-y-2 overflow-hidden">
-                      <div className="font-black text-slate-800 text-[14px] sm:text-3xl tracking-tight leading-tight truncate w-full">{p.label}</div>
-                      {p.description && <div className="hidden sm:block text-[10px] sm:text-sm text-slate-500 font-bold leading-tight">{p.description}</div>}
-                      <div className={`font-black text-[12px] sm:text-2xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="font-black text-slate-800 text-3xl tracking-tight leading-tight">{p.label}</div>
+                      {p.description && <div className="text-sm text-slate-500 font-bold leading-tight line-clamp-2">{p.description}</div>}
+                      <div className={`mt-2 font-black text-3xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-[10px] sm:text-base opacity-60 font-black">점</span>
+                        <span className="ml-1 text-base opacity-60 font-black">점</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* 모바일 전용 레이아웃 (768px 미만) */}
+              <div className="grid sm:hidden flex-1 overflow-hidden grid-cols-2 gap-px bg-slate-100/10 rounded-2xl border border-slate-100/30">
+                {pillConfigs.filter(p => !p.disabled).map(p => (
+                  <motion.div 
+                    key={p.id} 
+                    className="flex flex-row items-center text-left bg-white p-2.5 gap-2 overflow-hidden min-h-[110px]"
+                  >
+                    <div className="w-24 h-24 flex items-center justify-center p-1 shrink-0">
+                      {p.image ? (
+                        <img 
+                          src={safeUrl(p.image)} 
+                          alt="" 
+                          className="w-full h-full object-contain" 
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full" style={{backgroundColor: p.color}}/>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-1.5 overflow-visible py-1">
+                      <div className="font-black text-slate-800 text-[17px] tracking-tight leading-[1.1] break-keep w-full whitespace-normal">
+                        {p.label}
+                      </div>
+                      <div className={`font-black text-[15px] ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        {p.score > 0 ? `+${p.score}` : p.score}
+                        <span className="ml-1 text-[11px] opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
