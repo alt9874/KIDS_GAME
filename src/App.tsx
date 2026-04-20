@@ -670,33 +670,17 @@ export default function App() {
                   <Sparkles className="w-full h-full text-sky-500" />
                 </div>
                 
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-4 sm:space-y-6 z-10">
-                  <div className="inline-block p-3 sm:p-4 bg-gradient-to-br from-amber-300 to-yellow-500 rounded-[2rem] sm:rounded-[2.5rem] shadow-xl shadow-yellow-200/50">
-                    <Trophy className="w-8 h-8 sm:w-12 sm:h-12 text-white" />
-                  </div>
-                  
+                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-8 z-10">
                   <div>
-                    <h2 className="text-2xl sm:text-4xl font-black text-sky-900 tracking-tight">게임 완료!</h2>
-                    <p className="text-sky-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] mt-1 sm:mt-2">Pill Safety Analysis</p>
+                    <h2 className="text-3xl sm:text-5xl font-black text-sky-900 tracking-tight">게임 완료!</h2>
+                    <p className="text-sky-400 font-bold text-[9px] sm:text-[11px] uppercase tracking-[0.2em] mt-2 sm:mt-3">Pill Safety Analysis</p>
                   </div>
 
-                  <div className="py-2 sm:py-6">
-                    <div className="text-6xl sm:text-9xl font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
+                  <div className="py-2 sm:py-10">
+                    <div className="text-8xl sm:text-[10rem] font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
                       {score}
                     </div>
-                    <div className="text-sky-400/60 font-black text-[10px] sm:text-sm mt-3 sm:mt-6 uppercase tracking-widest">Score Details</div>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-6 sm:gap-10 bg-white/60 backdrop-blur-sm px-5 sm:px-8 py-3 sm:py-5 rounded-2xl sm:rounded-3xl border border-sky-100">
-                    <div className="text-center">
-                      <div className="text-[8px] sm:text-[9px] font-black text-sky-300 uppercase tracking-widest mb-0.5 sm:mb-1">최고 기록</div>
-                      <div className="text-lg sm:text-xl font-black text-sky-900">{highScore}</div>
-                    </div>
-                    <div className="w-px h-6 sm:h-8 bg-sky-100" />
-                    <div className="text-center">
-                      <div className="text-[8px] sm:text-[9px] font-black text-sky-300 uppercase tracking-widest mb-0.5 sm:mb-1">콤보 보너스</div>
-                      <div className="text-lg sm:text-xl font-black text-emerald-500">+{Math.floor(score / 10)}</div>
-                    </div>
+                    <div className="text-sky-400/60 font-black text-[11px] sm:text-sm mt-4 sm:mt-8 uppercase tracking-widest">Final Score</div>
                   </div>
                 </motion.div>
               </div>
@@ -731,10 +715,15 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 하단 로고 - 텍스트 삭제 및 깔끔한 배치 */}
-                <div className="pt-8 sm:pt-12 w-full flex flex-col items-center">
+                {/* 하단 로고 */}
+                <div className="pt-8 sm:pt-16 w-full flex flex-col items-center">
                   <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
-                    <img src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" alt="한국의약품안전관리원" className="h-8 sm:h-12 object-contain" referrerPolicy="no-referrer" />
+                    <img 
+                      src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" 
+                      alt="한국의약품안전관리원" 
+                      className="h-10 sm:h-14 object-contain" 
+                      referrerPolicy="no-referrer" 
+                    />
                   </a>
                 </div>
               </div>
