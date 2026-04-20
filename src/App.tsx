@@ -317,15 +317,15 @@ const GamePlay = ({
       <div className="fixed top-[calc(1rem+env(safe-area-inset-top))] left-4 right-4 z-50 flex justify-between items-center pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
           <button onClick={onHome} className="bg-white/90 backdrop-blur w-10 h-10 sm:w-14 sm:h-14 rounded-full shadow-xl border border-white flex items-center justify-center hover:bg-white transition-all"><Home className="w-5 h-5 sm:w-7 sm:h-7 text-gray-700"/></button>
-          <div className="bg-white/90 backdrop-blur px-3 py-1.5 sm:px-6 sm:py-3 rounded-full shadow-xl border border-white flex items-center gap-2">
-            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500"/>
-            <span className="text-xl sm:text-2xl font-black text-gray-800 tabular-nums">{score}</span>
+          <div className="flex items-center gap-1 sm:gap-3 px-2 drop-shadow-xl">
+            <Trophy className="w-6 h-6 sm:w-10 sm:h-10 text-yellow-400 fill-yellow-400"/>
+            <span className="text-3xl sm:text-6xl font-black text-white tabular-nums">{score}</span>
           </div>
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">
-          <div className="bg-white/90 backdrop-blur px-3 py-1.5 sm:px-6 sm:py-3 rounded-full shadow-xl border-2 border-primary flex items-center gap-2">
-            <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-primary"/>
-            <span className="text-xl sm:text-2xl font-black text-primary tabular-nums">{displayTime}</span>
+          <div className="flex items-center gap-1 sm:gap-3 px-2 drop-shadow-xl">
+            <Timer className="w-6 h-6 sm:w-10 sm:h-10 text-white"/>
+            <span className="text-3xl sm:text-6xl font-black text-white tabular-nums">{displayTime}</span>
           </div>
           <button onClick={toggleMute} className="w-10 h-10 sm:w-14 sm:h-14 bg-white/90 backdrop-blur text-gray-700 rounded-full shadow-xl flex items-center justify-center hover:bg-white transition-all border border-white">
             {isMuted ? <VolumeX className="w-5 h-5 sm:w-7 sm:h-7" /> : <Volume2 className="w-5 h-5 sm:w-7 sm:h-7" />}
@@ -728,14 +728,14 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-hidden grid grid-cols-2 gap-x-2 gap-y-1.5 sm:gap-4 pr-0 sm:pr-1">
+              <div className="flex-1 overflow-hidden grid grid-cols-2 gap-x-2 gap-y-3 sm:gap-4 pr-0 sm:pr-1">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
                     whileHover={{ scale: 1.01 }}
-                    className="flex flex-row items-center text-left bg-slate-50/40 p-1.5 sm:p-4 rounded-xl sm:rounded-3xl border border-slate-100/50 hover:bg-white transition-all gap-2 sm:gap-4 overflow-hidden"
+                    className="flex flex-row items-center text-left bg-slate-50/40 p-2.5 sm:p-4 rounded-xl sm:rounded-3xl border border-slate-100/50 hover:bg-white transition-all gap-2 sm:gap-4 overflow-hidden"
                   >
-                    <div className="w-14 h-14 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-lg sm:rounded-full shadow-inner p-1 sm:p-2 shrink-0">
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center bg-white rounded-lg sm:rounded-full shadow-inner p-1 sm:p-2 shrink-0">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
@@ -744,15 +744,15 @@ export default function App() {
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-0 sm:space-y-1 overflow-hidden">
-                      <div className="font-black text-slate-800 text-[11px] sm:text-2xl tracking-tight leading-tight truncate w-full">{p.label}</div>
+                    <div className="flex-1 min-w-0 flex flex-col items-start space-y-0.5 sm:space-y-1 overflow-hidden">
+                      <div className="font-black text-slate-800 text-[13px] sm:text-2xl tracking-tight leading-tight truncate w-full">{p.label}</div>
                       {p.description && <div className="hidden sm:block text-[10px] sm:text-sm text-slate-500 font-bold leading-tight">{p.description}</div>}
-                      <div className={`inline-block px-2 py-0 sm:py-1 rounded-full font-black text-[10px] sm:text-xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
+                      <div className={`font-black text-[11px] sm:text-xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-0.5 text-[8px] sm:text-sm opacity-60 font-black">점</span>
+                        <span className="ml-1 text-[9px] sm:text-sm opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
