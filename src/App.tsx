@@ -599,7 +599,7 @@ export default function App() {
             </div>
             
             {/* Main Action Hub */}
-            <div className="absolute top-[44%] sm:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
+            <div className="absolute top-[42%] sm:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 z-20">
               <motion.button onClick={() => setGameState('how-to')} animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
                 <img src={safeUrl(startButtonImage) || START_BUTTON_IMAGE} alt="시작" className="w-[32vw] sm:w-[8vw] h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:scale-110 transition-all active:scale-95" referrerPolicy="no-referrer" />
               </motion.button>
