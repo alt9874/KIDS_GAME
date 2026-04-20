@@ -321,6 +321,9 @@ export default function App() {
   const [combo, setCombo] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [isMuted, setIsMuted] = useState(() => localStorage.getItem('pill_game_muted') === 'true');
+  const isMutedRef = useRef(isMuted);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+
   const [audioBlocked, setAudioBlocked] = useState(true);
   const [totalVisits, setTotalVisits] = useState(0);
   const [user, setUser] = useState<User | null>(null);
@@ -385,11 +388,8 @@ export default function App() {
     if (isLoadingBgmRef.current === type) return;
     
     initAudioCtx();
-    if (isMuted) {
-      stopBgm();
-      return;
-    }
-
+    
+    // playBgm 자체는 소리를 낼지 말지 결정하지 않고, 일단 재생은 하되 볼륨을 ref 기준으로 설정
     let url = audioSettings ? (audioSettings as any)[type] : null;
     if (!url && (type === 'opening' || type === 'gameplay')) url = BGM_URL;
     if (!url) return;
@@ -410,7 +410,10 @@ export default function App() {
       
       source.buffer = buffer;
       source.loop = true;
-      gainNode.gain.value = audioSettings?.volume || 0.5;
+      
+      // 현재 음소거 상태에 따라 초기 볼륨 설정
+      const initialVol = isMutedRef.current ? 0 : (audioSettings?.volume || 0.5);
+      gainNode.gain.value = initialVol;
       
       source.connect(gainNode);
       gainNode.connect(audioCtxRef.current.destination);
@@ -422,7 +425,7 @@ export default function App() {
     } finally {
       if (isLoadingBgmRef.current === type) isLoadingBgmRef.current = null;
     }
-  }, [isMuted, audioSettings, stopBgm]);
+  }, [audioSettings, stopBgm]); // isMuted를 의존성에서 제거하여 함수 재생성 및 음악 재시작 방지
 
   const toggleMute = useCallback(() => {
     const nextMute = !isMuted;
@@ -430,22 +433,19 @@ export default function App() {
     localStorage.setItem('pill_game_muted', nextMute.toString());
     
     if (nextMute) {
-      // 음소거 시 볼륨만 0으로 조절 (음악은 계속 흐름)
       if (bgmGainNodeRef.current) {
         bgmGainNodeRef.current.gain.setTargetAtTime(0, audioCtxRef.current?.currentTime || 0, 0.1);
       }
     } else {
-      // 음소거 해제 시 원래 볼륨으로 복구
       if (bgmGainNodeRef.current) {
         const targetVol = audioSettings?.volume || 0.5;
         bgmGainNodeRef.current.gain.setTargetAtTime(targetVol, audioCtxRef.current?.currentTime || 0, 0.1);
       } else {
-        // 혹시 노드가 유실되었다면 다시 재생
         const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
         playBgm(currentType);
       }
     }
-  }, [isMuted, gameState, playBgm, audioSettings, audioCtxRef]);
+  }, [isMuted, gameState, playBgm, audioSettings]);
 
   const playSfx = useCallback(async (type: 'hitPositive' | 'hitNegative') => {
     initAudioCtx();
