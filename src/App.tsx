@@ -719,23 +719,23 @@ export default function App() {
 
         {gameState === 'how-to' && (
           <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[210] flex items-center justify-center p-4">
-            <div className="max-w-6xl w-full bg-white/95 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-14 shadow-2xl flex flex-col gap-6 sm:gap-10 max-h-[95vh] border border-white/20">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-100 italic">
-                <h2 className="text-3xl sm:text-6xl font-black text-slate-800 tracking-tighter">게임 설명</h2>
+            <div className="max-w-7xl w-full bg-white/95 backdrop-blur-xl rounded-[2.5rem] p-6 sm:p-10 shadow-2xl flex flex-col gap-4 sm:gap-6 max-h-[98vh] border border-white/20 overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-100 italic shrink-0">
+                <h2 className="text-3xl sm:text-5xl font-black text-slate-800 tracking-tighter">게임 설명</h2>
                 <div className="hidden sm:block text-right">
-                  <p className="text-emerald-600 font-black text-2xl">의약품 안전 상식 퀴즈</p>
-                  <p className="text-slate-400 font-bold text-sm">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
+                  <p className="text-emerald-600 font-black text-xl">의약품 안전 상식 퀴즈</p>
+                  <p className="text-slate-400 font-bold text-xs">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 pr-4 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto sm:overflow-y-hidden grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 pr-1 custom-scrollbar">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
                     whileHover={{ scale: 1.02 }}
-                    className="flex flex-col items-center text-center bg-slate-50/50 p-6 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-xl transition-all"
+                    className="flex flex-col items-center text-center bg-slate-50/50 p-4 sm:p-5 rounded-3xl border border-slate-100/50 hover:bg-white hover:shadow-lg transition-all"
                   >
-                    <div className="w-24 h-24 sm:w-44 sm:h-44 mb-6 flex items-center justify-center bg-white rounded-full shadow-inner p-4">
+                    <div className="w-20 h-20 sm:w-28 sm:h-28 mb-3 flex items-center justify-center bg-white rounded-full shadow-inner p-3">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
@@ -744,31 +744,31 @@ export default function App() {
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-16 h-16 sm:w-32 sm:h-32 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="space-y-3">
-                      <div className="font-black text-slate-800 text-xl sm:text-3xl tracking-tight">{p.label}</div>
-                      {p.description && <div className="text-xs sm:text-base text-slate-500 font-bold leading-tight">{p.description}</div>}
-                      <div className={`mt-4 inline-block px-6 py-2 rounded-full font-black text-xl sm:text-4xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
+                    <div className="space-y-1">
+                      <div className="font-black text-slate-800 text-lg sm:text-xl tracking-tight leading-tight">{p.label}</div>
+                      {p.description && <div className="text-[10px] sm:text-xs text-slate-500 font-bold leading-tight line-clamp-2">{p.description}</div>}
+                      <div className={`mt-2 inline-block px-4 py-1 rounded-full font-black text-lg sm:text-2xl ${p.score > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-[10px] sm:text-lg opacity-60 font-black">점</span>
+                        <span className="ml-1 text-[10px] sm:text-sm opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-slate-100">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100 shrink-0">
                 <div className="text-center sm:text-left">
-                  <p className="text-slate-500 font-black text-lg sm:text-3xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
-                  <p className="hidden sm:block text-slate-300 text-xs mt-1 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
+                  <p className="text-slate-500 font-black text-lg sm:text-2xl animate-pulse">알맞은 의약품 정보만 클릭하세요!</p>
+                  <p className="hidden sm:block text-slate-300 text-[10px] mt-0.5 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
                 </div>
                 <button 
                   onClick={startGame} 
-                  className="w-full sm:w-auto px-12 sm:px-20 py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-4xl font-black rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-xl shadow-emerald-200 active:scale-95 flex items-center justify-center gap-4"
+                  className="w-full sm:w-auto px-10 sm:px-16 py-3 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-3xl font-black rounded-2xl sm:rounded-3xl hover:from-emerald-600 hover:to-sky-600 transition-all shadow-xl shadow-emerald-200 active:scale-95 flex items-center justify-center gap-4"
                 >
-                  시작하기 <ArrowRight className="w-6 h-6 sm:w-10 sm:h-10" />
+                  시작하기 <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8" />
                 </button>
               </div>
             </div>
