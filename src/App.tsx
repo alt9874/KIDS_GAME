@@ -51,6 +51,13 @@ const PLAY_BG_IMAGE_MO = "https://raw.githubusercontent.com/alt9874/game/main/ga
 const START_BUTTON_IMAGE = "https://raw.githubusercontent.com/alt9874/game/main/start_bt.png";
 const BGM_URL = "https://cdn.jsdelivr.net/gh/alt9874/game@main/opening.mp3"; 
 
+const ENDING_IMAGES = [
+  "https://raw.githubusercontent.com/alt9874/game/main/ending_01.png", // 최고 단계 (1단계)
+  "https://raw.githubusercontent.com/alt9874/game/main/ending_02.png", // 2단계
+  "https://raw.githubusercontent.com/alt9874/game/main/ending_03.png", // 3단계
+  "https://raw.githubusercontent.com/alt9874/game/main/ending_04.png"  // 4단계 (최하 단계)
+];
+
 const DEFAULT_PILLS = [
   { id: 1, label: '올슨', description: '의약품안전관리원 캐릭터', score: 30, color: '#2ecc71', type: 'good', width: 110, freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/ow.gif' },
   { id: 2, label: '디디', description: '의약품안전관리원 캐릭터', score: 15, color: '#27ae60', type: 'good', width: 110, freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/didi.gif' },
@@ -822,69 +829,108 @@ export default function App() {
         )}
 
         {/* 결과 화면 (gameState === 'result') */}
-        {gameState === 'result' && (
-          <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-            className="fixed inset-0 z-[300] bg-blue-50 flex items-center justify-center p-3 sm:p-4 overflow-hidden"
-          >
-            <div className="w-full max-w-4xl bg-white rounded-[2rem] sm:rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-blue-100 overflow-y-auto max-h-[98vh] flex flex-col md:flex-row custom-scrollbar">
-              {/* 좌측: 점수 정보 - 밝은 하늘색 톤 */}
-              <div className="flex-1 p-6 sm:p-12 flex flex-col items-center justify-center text-center bg-sky-50/50 relative overflow-hidden shrink-0">
-                <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none">
-                  <Sparkles className="w-full h-full text-sky-500" />
-                </div>
-                
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-8 z-10">
-                  <div className="py-2 sm:py-10">
-                    <div className="text-gray-400 font-black text-xl sm:text-2xl mb-4 tracking-widest uppercase">최종 점수</div>
-                    <div className="text-8xl sm:text-[12rem] font-black text-sky-600 leading-none tracking-tighter tabular-nums drop-shadow-md">
-                      {score}
+        {gameState === 'result' && (() => {
+          // 점수대별 엔딩 설정
+          let endingIndex = 0;
+          let rankTitle = "";
+          let rankDesc = "";
+
+          if (score >= 600) {
+            endingIndex = 0;
+            rankTitle = "의약품 안전 전문가";
+            rankDesc = "“의약품 안전 정보를 완벽하게 이해하고 마스터하셨군요! 대단합니다!”";
+          } else if (score >= 350) {
+            endingIndex = 1;
+            rankTitle = "의약품 안전 실천가";
+            rankDesc = "“훌륭한 실력입니다! 의약품 안전 사용에 대한 지식이 아주 높으시네요.”";
+          } else if (score >= 150) {
+            endingIndex = 2;
+            rankTitle = "의약품 안전 선택가";
+            rankDesc = "“충분히 잘하고 계세요! 조금 더 주의를 기울이면 전문가가 될 수 있습니다.”";
+          } else {
+            endingIndex = 3;
+            rankTitle = "의약품 안전 노력가";
+            rankDesc = "“의약품 정보를 구분하는 데 조금 더 연습이 필요해요. 다시 한번 도전해볼까요?”";
+          }
+
+          // 이론상 최저/최대 점수 계산 (30초 기준, 평균 800ms 간격으로 약 37개 생성)
+          // 최대: 30점 * 37개 = 1110, 최저: -30점 * 37개 = -1110
+          const theoreticalMax = 1110;
+          const theoreticalMin = -1110;
+
+          return (
+            <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+              className="fixed inset-0 z-[300] bg-black flex items-center justify-center p-0 sm:p-4 overflow-hidden"
+            >
+              {/* 배경 이미지 레이어 */}
+              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${ENDING_IMAGES[endingIndex]}")` }} />
+              <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+
+              <div className="relative w-full max-w-5xl bg-white/10 backdrop-blur-xl rounded-none sm:rounded-[4rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.5)] border border-white/20 overflow-y-auto max-h-screen sm:max-h-[95vh] flex flex-col md:flex-row custom-scrollbar">
+                {/* 좌측: 점수 정보 */}
+                <div className="flex-1 p-8 sm:p-14 flex flex-col items-center justify-center text-center relative overflow-hidden shrink-0 border-b md:border-b-0 md:border-r border-white/10">
+                  <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                    <Sparkles className="w-full h-full text-white" />
+                  </div>
+                  
+                  <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-6 z-10 w-full">
+                    <div className="space-y-2">
+                      <div className="text-white/60 font-black text-xl sm:text-2xl tracking-widest uppercase">FINAL SCORE</div>
+                      <div className="text-8xl sm:text-[13rem] font-black text-white leading-none tracking-tighter tabular-nums drop-shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+                        {score}
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </div>
-
-              {/* 우측: 등급 및 행동 - 경쾌한 그린/블루 톤 */}
-              <div className="flex-1 p-6 sm:p-12 flex flex-col items-center justify-between bg-white shrink-0">
-                <div className="w-full space-y-6 sm:space-y-10 text-center sm:text-left">
-                  {/* 등급 시스템 */}
-                  <div className="space-y-3 sm:space-y-5">
-                    <h3 className="text-2xl sm:text-5xl font-black text-slate-900 leading-tight">
-                      {score >= 601 ? '안전 전문가' : score >= 401 ? '안전 실천가' : score >= 251 ? '올바른 선택' : score >= 101 ? '기초 이해' : '주의 필요'}
-                    </h3>
-                    <p className="text-slate-500 font-bold text-sm sm:text-xl leading-relaxed max-w-xs mx-auto sm:mx-0">
-                      {score >= 601 ? '“의약품 안전 정보를 정확히 이해하고 있어요”' : 
-                       score >= 401 ? '“의약품 안전 사용을 잘 실천하고 있어요”' : 
-                       score >= 251 ? '“의약품 안전 정보를 올바르게 선택하고 있어요”' : 
-                       score >= 101 ? '“기본적인 의약품 안전 정보를 알고 있어요”' : 
-                       '“의약품 정보를 구분하는 데 주의가 필요해요”'}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 sm:space-y-4 pt-2">
-                    <button onClick={startGame} className="w-full py-4 sm:py-5 bg-sky-500 text-white text-lg sm:text-xl font-black rounded-xl sm:rounded-2xl hover:bg-sky-400 hover:shadow-2xl hover:-translate-y-0.5 transition-all shadow-xl shadow-sky-100 active:scale-95 flex items-center justify-center gap-3">
-                      <RotateCcw size={20} className="animate-spin-slow"/> 다시 도전하기
-                    </button>
-                    <button onClick={() => setGameState('start')} className="w-full py-4 sm:py-5 bg-white text-sky-600 border-2 border-sky-50 text-lg sm:text-xl font-black rounded-xl sm:rounded-2xl hover:bg-sky-50 transition-all active:scale-95">
-                      홈으로 가기
-                    </button>
-                  </div>
+                    
+                    <div className="bg-black/20 backdrop-blur-sm rounded-2xl py-4 px-6 inline-block">
+                      <div className="text-white/40 text-xs font-bold mb-1">THEORETICAL RANGE</div>
+                      <div className="text-white/80 font-black text-sm sm:text-base flex items-center justify-center gap-4">
+                        <span className="flex items-center gap-1"><ArrowDown size={14} className="text-rose-400"/> {theoreticalMin}</span>
+                        <span className="w-px h-3 bg-white/20"></span>
+                        <span className="flex items-center gap-1"><ArrowUp size={14} className="text-emerald-400"/> {theoreticalMax}</span>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
 
-                {/* 하단 로고 */}
-                <div className="pt-8 sm:pt-20 w-full flex flex-col items-center">
-                  <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform">
-                    <img 
-                      src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" 
-                      alt="한국의약품안전관리원" 
-                      className="h-14 sm:h-24 object-contain" 
-                      referrerPolicy="no-referrer" 
-                    />
-                  </a>
+                {/* 우측: 등급 및 메뉴 */}
+                <div className="flex-1 p-8 sm:p-14 flex flex-col items-center justify-between bg-white shrink-0">
+                  <div className="w-full space-y-8 sm:space-y-12 text-center sm:text-left">
+                    <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-4 sm:space-y-6">
+                      <div className="inline-block px-4 py-1.5 bg-sky-100 text-sky-600 rounded-full text-sm font-black tracking-tighter">LEVEL COMPLETE</div>
+                      <h3 className="text-3xl sm:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+                        {rankTitle}
+                      </h3>
+                      <p className="text-slate-500 font-bold text-lg sm:text-2xl leading-relaxed max-w-sm mx-auto sm:mx-0">
+                        {rankDesc}
+                      </p>
+                    </motion.div>
+
+                    <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="space-y-3 sm:space-y-4 pt-4">
+                      <button onClick={startGame} className="group w-full py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 ring-4 ring-sky-500/10">
+                        <RotateCcw size={24} className="group-hover:rotate-180 transition-transform duration-500"/> 다시 도전하기
+                      </button>
+                      <button onClick={() => setGameState('start')} className="w-full py-4 sm:py-6 bg-slate-50 text-slate-600 text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:bg-slate-100 transition-all active:scale-95">
+                        처음 화면으로
+                      </button>
+                    </motion.div>
+                  </div>
+
+                  {/* 하단 로고 */}
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="pt-10 sm:pt-16 w-full flex flex-col items-center">
+                    <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-all hover:scale-105">
+                      <img 
+                        src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" 
+                        alt="한국의약품안전관리원" 
+                        className="h-10 sm:h-16 object-contain grayscale brightness-50" 
+                        referrerPolicy="no-referrer" 
+                      />
+                    </a>
+                  </motion.div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          );
+        })()}
 
         {gameState === 'admin' && isAdmin && (
           <AdminPage 
