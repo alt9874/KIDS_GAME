@@ -885,15 +885,6 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="bg-black/20 backdrop-blur-sm rounded-2xl py-4 px-6 inline-block">
-                      <div className="text-white/40 text-xs font-bold mb-1">THEORETICAL RANGE</div>
-                      <div className="text-white/80 font-black text-sm sm:text-base flex items-center justify-center gap-4">
-                        <span className="flex items-center gap-1"><ArrowDown size={14} className="text-rose-400"/> {theoreticalMin}</span>
-                        <span className="w-px h-3 bg-white/20"></span>
-                        <span className="flex items-center gap-1"><ArrowUp size={14} className="text-emerald-400"/> {theoreticalMax}</span>
-                      </div>
-                    </div>
                   </motion.div>
                 </div>
 
@@ -901,7 +892,6 @@ export default function App() {
                 <div className="flex-1 p-8 sm:p-14 flex flex-col items-center justify-between bg-white shrink-0">
                   <div className="w-full space-y-8 sm:space-y-12 text-center sm:text-left">
                     <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-4 sm:space-y-6">
-                      <div className="inline-block px-4 py-1.5 bg-sky-100 text-sky-600 rounded-full text-sm font-black tracking-tighter">LEVEL COMPLETE</div>
                       <h3 className="text-3xl sm:text-6xl font-black text-slate-900 leading-tight tracking-tight">
                         {rankTitle}
                       </h3>
@@ -910,11 +900,11 @@ export default function App() {
                       </p>
                     </motion.div>
 
-                    <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="space-y-3 sm:space-y-4 pt-4">
-                      <button onClick={startGame} className="group w-full py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 ring-4 ring-sky-500/10">
-                        <RotateCcw size={24} className="group-hover:rotate-180 transition-transform duration-500"/> 다시 도전하기
+                    <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="space-y-3 pt-4">
+                      <button onClick={startGame} className="group w-full py-3 sm:py-4 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-xl font-black rounded-2xl sm:rounded-[1.5rem] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 ring-4 ring-sky-500/10">
+                        <RotateCcw size={20} className="group-hover:rotate-180 transition-transform duration-500"/> 다시 도전하기
                       </button>
-                      <button onClick={() => setGameState('start')} className="w-full py-4 sm:py-6 bg-slate-50 text-slate-600 text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:bg-slate-100 transition-all active:scale-95">
+                      <button onClick={() => setGameState('start')} className="w-full py-3 sm:py-4 bg-slate-50 text-slate-600 text-lg sm:text-xl font-black rounded-2xl sm:rounded-[1.5rem] hover:bg-slate-100 transition-all active:scale-95">
                         처음 화면으로
                       </button>
                     </motion.div>
@@ -922,11 +912,11 @@ export default function App() {
 
                   {/* 하단 로고 */}
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="pt-10 sm:pt-16 w-full flex flex-col items-center">
-                    <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-all hover:scale-105">
+                    <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="transition-all hover:scale-105">
                       <img 
                         src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" 
                         alt="한국의약품안전관리원" 
-                        className="h-10 sm:h-16 object-contain grayscale brightness-50" 
+                        className="h-10 sm:h-16 object-contain" 
                         referrerPolicy="no-referrer" 
                       />
                     </a>
