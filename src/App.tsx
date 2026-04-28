@@ -879,10 +879,10 @@ export default function App() {
                         referrerPolicy="no-referrer"
                       />
                       
-                      {/* 세련된 반투명 점수 박스 */}
-                      <div className="absolute -bottom-4 sm:-bottom-8 bg-white/85 backdrop-blur-xl text-slate-900 px-8 sm:px-12 py-2 sm:py-4 rounded-[1.5rem] sm:rounded-[2.5rem] font-black shadow-2xl border border-white/50 flex items-center gap-3 sm:gap-5 ring-8 ring-black/5">
-                        <span className="text-4xl sm:text-7xl text-sky-600 drop-shadow-sm">{score}</span>
-                        <span className="text-slate-400 text-base sm:text-2xl tracking-widest">점</span>
+                      {/* 세련된 반투명 점수 박스 (이미지 위로 위치 조정) */}
+                      <div className="absolute bottom-6 sm:bottom-10 bg-white/25 backdrop-blur-md text-black px-6 sm:px-10 py-1.5 sm:py-3 rounded-2xl sm:rounded-[2rem] font-black shadow-lg flex items-center gap-2 sm:gap-4 ring-1 ring-white/30">
+                        <span className="text-3xl sm:text-5xl drop-shadow-sm">{score}</span>
+                        <span className="text-black/60 text-sm sm:text-xl tracking-widest">점</span>
                       </div>
                     </div>
                   </motion.div>
