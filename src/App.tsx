@@ -860,38 +860,38 @@ export default function App() {
 
           return (
             <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-              className="fixed inset-0 z-[300] bg-black flex items-center justify-center p-0 sm:p-4 overflow-hidden"
+              className="fixed inset-0 z-[300] bg-[#F8FAFC] flex items-center justify-center p-0 sm:p-4 overflow-hidden"
             >
-              {/* 배경 이미지 레이어 */}
+              {/* 배경 이미지 레이어 및 밝은 오버레이 */}
               <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${ENDING_IMAGES[endingIndex]}")` }} />
-              <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
 
-              <div className="relative w-full max-w-5xl bg-white/10 backdrop-blur-xl rounded-none sm:rounded-[4rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.5)] border border-white/20 overflow-y-auto max-h-screen sm:max-h-[95vh] flex flex-col md:flex-row custom-scrollbar">
-                {/* 좌측: 결과 이미지 */}
-                <div className="flex-1 p-8 sm:p-14 flex flex-col items-center justify-center text-center relative overflow-hidden shrink-0 border-b md:border-b-0 md:border-r border-white/10">
-                  <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-6 z-10 w-full">
-                    <div className="space-y-4">
-                      {/* 점수 대신 이미지를 삽입 */}
-                      <div className="relative">
-                        <img 
-                          src={ENDING_IMAGES[endingIndex]} 
-                          alt={rankTitle}
-                          className="w-full max-w-[300px] sm:max-w-[450px] mx-auto rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] object-contain"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white text-slate-900 px-8 py-3 rounded-2xl font-black text-3xl sm:text-5xl shadow-2xl border-4 border-sky-100 flex items-center gap-3">
-                          <span className="text-sky-600">{score}</span>
-                          <span className="text-slate-300 text-sm sm:text-base tracking-widest">점</span>
-                        </div>
+              <div className="relative w-full max-w-5xl bg-white/30 backdrop-blur-2xl rounded-none sm:rounded-[4rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.15)] border border-white/40 overflow-y-auto max-h-screen sm:max-h-[92vh] flex flex-col md:flex-row custom-scrollbar">
+                {/* 좌측: 결과 이미지 및 스코어 */}
+                <div className="flex-1 p-6 sm:p-14 flex flex-col items-center justify-center text-center relative overflow-hidden shrink-0 border-b md:border-b-0 md:border-r border-white/20">
+                  <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="z-10 w-full flex flex-col items-center justify-center">
+                    <div className="relative w-full flex flex-col items-center">
+                      {/* 결과 이미지 */}
+                      <img 
+                        src={ENDING_IMAGES[endingIndex]} 
+                        alt={rankTitle}
+                        className="w-full max-w-[240px] sm:max-w-[420px] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                      
+                      {/* 세련된 반투명 점수 박스 */}
+                      <div className="absolute -bottom-4 sm:-bottom-8 bg-white/85 backdrop-blur-xl text-slate-900 px-8 sm:px-12 py-2 sm:py-4 rounded-[1.5rem] sm:rounded-[2.5rem] font-black shadow-2xl border border-white/50 flex items-center gap-3 sm:gap-5 ring-8 ring-black/5">
+                        <span className="text-4xl sm:text-7xl text-sky-600 drop-shadow-sm">{score}</span>
+                        <span className="text-slate-400 text-base sm:text-2xl tracking-widest">점</span>
                       </div>
                     </div>
                   </motion.div>
                 </div>
 
                 {/* 우측: 등급 및 메뉴 */}
-                <div className="flex-1 p-8 sm:p-14 flex flex-col items-center justify-between bg-white shrink-0">
-                  <div className="w-full space-y-8 sm:space-y-12 text-center sm:text-left">
-                    <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-4 sm:space-y-6">
+                <div className="flex-1 p-8 sm:p-16 flex flex-col items-center justify-between bg-white/90 backdrop-blur-md shrink-0">
+                  <div className="w-full space-y-6 sm:space-y-12 text-center sm:text-left">
+                    <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-3 sm:space-y-6">
                       <h3 className="text-3xl sm:text-6xl font-black text-slate-900 leading-tight tracking-tight">
                         {rankTitle}
                       </h3>
@@ -901,22 +901,22 @@ export default function App() {
                     </motion.div>
 
                     <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="space-y-3 pt-4">
-                      <button onClick={startGame} className="group w-full py-3 sm:py-4 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-xl font-black rounded-2xl sm:rounded-[1.5rem] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 ring-4 ring-sky-500/10">
-                        <RotateCcw size={20} className="group-hover:rotate-180 transition-transform duration-500"/> 다시 도전하기
+                      <button onClick={startGame} className="group w-full py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 ring-4 ring-sky-500/10">
+                        <RotateCcw size={24} className="group-hover:rotate-180 transition-transform duration-500"/> 다시 도전하기
                       </button>
-                      <button onClick={() => setGameState('start')} className="w-full py-3 sm:py-4 bg-slate-50 text-slate-600 text-lg sm:text-xl font-black rounded-2xl sm:rounded-[1.5rem] hover:bg-slate-100 transition-all active:scale-95">
+                      <button onClick={() => setGameState('start')} className="w-full py-4 sm:py-6 bg-slate-100/50 text-slate-600 text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:bg-slate-200 transition-all active:scale-95">
                         처음 화면으로
                       </button>
                     </motion.div>
                   </div>
 
-                  {/* 하단 로고 */}
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="pt-10 sm:pt-16 w-full flex flex-col items-center">
+                  {/* 하단 로고 (40% 확대) */}
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="pt-10 sm:pt-20 w-full flex flex-col items-center">
                     <a href="https://www.drugsafe.or.kr" target="_blank" rel="noopener noreferrer" className="transition-all hover:scale-105">
                       <img 
                         src="https://raw.githubusercontent.com/alt9874/game/main/logo.png" 
                         alt="한국의약품안전관리원" 
-                        className="h-10 sm:h-16 object-contain" 
+                        className="h-14 sm:h-24 object-contain" 
                         referrerPolicy="no-referrer" 
                       />
                     </a>
