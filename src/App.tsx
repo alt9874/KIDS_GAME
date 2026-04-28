@@ -838,19 +838,19 @@ export default function App() {
           if (score >= 600) {
             endingIndex = 0;
             rankTitle = "의약품 안전 전문가";
-            rankDesc = "“의약품 안전 정보를 완벽하게 이해하고 마스터하셨군요! 대단합니다!”";
+            rankDesc = "“의약품 안전 정보를 완벽하게 이해하셨군요!”";
           } else if (score >= 350) {
             endingIndex = 1;
             rankTitle = "의약품 안전 실천가";
-            rankDesc = "“훌륭한 실력입니다! 의약품 안전 사용에 대한 지식이 아주 높으시네요.”";
+            rankDesc = "“의약품 안전 사용에 대한 지식이 아주 높으시네요.”";
           } else if (score >= 150) {
             endingIndex = 2;
             rankTitle = "의약품 안전 선택가";
-            rankDesc = "“충분히 잘하고 계세요! 조금 더 주의를 기울이면 전문가가 될 수 있습니다.”";
+            rankDesc = "“조금 더 주의를 기울이면 전문가가 될 수 있습니다!”";
           } else {
             endingIndex = 3;
             rankTitle = "의약품 안전 노력가";
-            rankDesc = "“의약품 정보를 구분하는 데 조금 더 연습이 필요해요. 다시 한번 도전해볼까요?”";
+            rankDesc = "“조금 더 연습이 필요해요. 다시 한번 도전해볼까요?”";
           }
 
           // 이론상 최저/최대 점수 계산 (30초 기준, 평균 800ms 간격으로 약 37개 생성)
@@ -880,8 +880,8 @@ export default function App() {
                       />
                       
                       {/* 세련된 반투명 점수 박스 (이미지 위로 위치 조정) */}
-                      {/* bg-white/30: 배경 불투명도 (0~100 사이 숫자로 조절 가능) */}
-                      <div className="absolute bottom-6 sm:bottom-10 bg-white/30 backdrop-blur-md text-black px-6 sm:px-10 py-1.5 sm:py-3 rounded-2xl sm:rounded-[2rem] font-black shadow-lg flex items-center gap-2 sm:gap-4 ring-1 ring-white/30">
+                      {/* bg-white/20: 배경 불투명도 (숫자를 10~100 사이로 직접 수정하여 투명도 조절 가능) */}
+                      <div className="absolute bottom-6 sm:bottom-10 bg-white/20 backdrop-blur-md text-black px-6 sm:px-10 py-1.5 sm:py-3 rounded-2xl sm:rounded-[2rem] font-black shadow-lg flex items-center gap-2 sm:gap-4 ring-1 ring-white/30">
                         <span className="text-3xl sm:text-5xl drop-shadow-sm">{score}</span>
                         <span className="text-black/60 text-sm sm:text-xl tracking-widest">점</span>
                       </div>
@@ -893,6 +893,7 @@ export default function App() {
                 <div className="flex-1 p-8 sm:p-16 flex flex-col items-center justify-between bg-white/90 backdrop-blur-md shrink-0">
                   <div className="w-full space-y-6 sm:space-y-12 text-center sm:text-left">
                     <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-3 sm:space-y-6">
+                      {/* [폰트 크기 수정]: text-3xl(모바일), sm:text-6xl(PC) 부분을 직접 수정하세요 */}
                       <h3 className="text-3xl sm:text-6xl font-black text-slate-900 leading-tight tracking-tight">
                         {rankTitle}
                       </h3>
@@ -902,10 +903,10 @@ export default function App() {
                     </motion.div>
 
                     <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="space-y-3 pt-4">
-                      <button onClick={startGame} className="group w-full py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 ring-4 ring-sky-500/10">
-                        <RotateCcw size={24} className="group-hover:rotate-180 transition-transform duration-500"/> 다시 도전하기
+                      <button onClick={startGame} className="group w-full py-3.5 sm:py-5 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg sm:text-xl font-black rounded-2xl sm:rounded-[2rem] hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 ring-4 ring-sky-500/10">
+                        <RotateCcw size={20} className="group-hover:rotate-180 transition-transform duration-500"/> 다시 도전하기
                       </button>
-                      <button onClick={() => setGameState('start')} className="w-full py-4 sm:py-6 bg-slate-100/50 text-slate-600 text-xl sm:text-2xl font-black rounded-2xl sm:rounded-[2rem] hover:bg-slate-200 transition-all active:scale-95">
+                      <button onClick={() => setGameState('start')} className="w-full py-3.5 sm:py-5 bg-slate-100/50 text-slate-600 text-lg sm:text-xl font-black rounded-2xl sm:rounded-[2rem] hover:bg-slate-200 transition-all active:scale-95">
                         처음 화면으로
                       </button>
                     </motion.div>
