@@ -867,17 +867,22 @@ export default function App() {
               <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
 
               <div className="relative w-full max-w-5xl bg-white/10 backdrop-blur-xl rounded-none sm:rounded-[4rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.5)] border border-white/20 overflow-y-auto max-h-screen sm:max-h-[95vh] flex flex-col md:flex-row custom-scrollbar">
-                {/* 좌측: 점수 정보 */}
+                {/* 좌측: 결과 이미지 */}
                 <div className="flex-1 p-8 sm:p-14 flex flex-col items-center justify-center text-center relative overflow-hidden shrink-0 border-b md:border-b-0 md:border-r border-white/10">
-                  <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                    <Sparkles className="w-full h-full text-white" />
-                  </div>
-                  
                   <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-6 z-10 w-full">
-                    <div className="space-y-2">
-                      <div className="text-white/60 font-black text-xl sm:text-2xl tracking-widest uppercase">FINAL SCORE</div>
-                      <div className="text-8xl sm:text-[13rem] font-black text-white leading-none tracking-tighter tabular-nums drop-shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-                        {score}
+                    <div className="space-y-4">
+                      {/* 점수 대신 이미지를 삽입 */}
+                      <div className="relative">
+                        <img 
+                          src={ENDING_IMAGES[endingIndex]} 
+                          alt={rankTitle}
+                          className="w-full max-w-[300px] sm:max-w-[450px] mx-auto rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] object-contain"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white text-slate-900 px-8 py-3 rounded-2xl font-black text-3xl sm:text-5xl shadow-2xl border-4 border-sky-100 flex items-center gap-3">
+                          <span className="text-sky-600">{score}</span>
+                          <span className="text-slate-300 text-sm sm:text-base tracking-widest">점</span>
+                        </div>
                       </div>
                     </div>
                     
