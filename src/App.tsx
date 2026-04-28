@@ -880,7 +880,8 @@ export default function App() {
                       />
                       
                       {/* 세련된 반투명 점수 박스 (이미지 위로 위치 조정) */}
-                      <div className="absolute bottom-6 sm:bottom-10 bg-white/25 backdrop-blur-md text-black px-6 sm:px-10 py-1.5 sm:py-3 rounded-2xl sm:rounded-[2rem] font-black shadow-lg flex items-center gap-2 sm:gap-4 ring-1 ring-white/30">
+                      {/* bg-white/30: 배경 불투명도 (0~100 사이 숫자로 조절 가능) */}
+                      <div className="absolute bottom-6 sm:bottom-10 bg-white/30 backdrop-blur-md text-black px-6 sm:px-10 py-1.5 sm:py-3 rounded-2xl sm:rounded-[2rem] font-black shadow-lg flex items-center gap-2 sm:gap-4 ring-1 ring-white/30">
                         <span className="text-3xl sm:text-5xl drop-shadow-sm">{score}</span>
                         <span className="text-black/60 text-sm sm:text-xl tracking-widest">점</span>
                       </div>
