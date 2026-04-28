@@ -842,7 +842,7 @@ export default function App() {
           } else if (score >= 350) {
             endingIndex = 1;
             rankTitle = "의약품 안전 실천가";
-            rankDesc = "“의약품 안전 사용에 대한 지식이 아주 높으시네요.”";
+            rankDesc = "“의약품 안전 사용에 대해 잘 알고 있네요!.”";
           } else if (score >= 150) {
             endingIndex = 2;
             rankTitle = "의약품 안전 선택가";
@@ -850,7 +850,7 @@ export default function App() {
           } else {
             endingIndex = 3;
             rankTitle = "의약품 안전 노력가";
-            rankDesc = "“조금 더 연습이 필요해요. 다시 한번 도전해볼까요?”";
+            rankDesc = "“조금 더 연습이 필요해요. 다시 도전해볼까요?”";
           }
 
           // 이론상 최저/최대 점수 계산 (30초 기준, 평균 800ms 간격으로 약 37개 생성)
@@ -880,7 +880,7 @@ export default function App() {
                       />
                       
                       {/* 세련된 반투명 점수 박스 (이미지 위로 위치 조정) */}
-                      {/* bg-white/20: 배경 불투명도 (숫자를 10~100 사이로 직접 수정하여 투명도 조절 가능) */}
+                      {/* bg-white/10: 배경 불투명도 (숫자를 10~100 사이로 직접 수정하여 투명도 조절 가능) */}
                       <div className="absolute bottom-6 sm:bottom-10 bg-white/20 backdrop-blur-md text-black px-6 sm:px-10 py-1.5 sm:py-3 rounded-2xl sm:rounded-[2rem] font-black shadow-lg flex items-center gap-2 sm:gap-4 ring-1 ring-white/30">
                         <span className="text-3xl sm:text-5xl drop-shadow-sm">{score}</span>
                         <span className="text-black/60 text-sm sm:text-xl tracking-widest">점</span>
