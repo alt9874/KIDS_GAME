@@ -845,7 +845,7 @@ export default function App() {
             rankDesc = "“의약품 안전 사용에 대해 잘 알고 있네요!.”";
           } else if (score >= 150) {
             endingIndex = 2;
-            rankTitle = "의약품 안전 선택가";
+            rankTitle = "의약품 안전 초보자";
             rankDesc = "“조금 더 주의를 기울이면 전문가가 될 수 있습니다!”";
           } else {
             endingIndex = 3;
