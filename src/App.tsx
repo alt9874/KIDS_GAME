@@ -835,20 +835,27 @@ export default function App() {
           let rankTitle = "";
           let rankDesc = "";
 
-          if (score >= 600) {
-            endingIndex = 0;
+          // ==========================================
+          // [엔딩 등급 설정 가이드]
+          // 게임시간 30초 / 생성간격 400ms 기준
+          // - 이론적 최대 점수: 약 1,600~1,800점
+          // - 고득점자 평균: 약 1,000~1,200점
+          // 아래 점수(score >= 숫자)를 수정하여 등급 난이도를 조절하세요.
+          // ==========================================
+          if (score >= 1000) {
+            endingIndex = 0; // 1단계: 전문가
             rankTitle = "의약품 안전 전문가";
             rankDesc = "“의약품 안전 정보를 완벽하게 이해하셨군요!”";
-          } else if (score >= 350) {
-            endingIndex = 1;
+          } else if (score >= 600) {
+            endingIndex = 1; // 2단계: 실천가
             rankTitle = "의약품 안전 실천가";
             rankDesc = "“의약품 안전 사용에 대해 잘 알고 있어요!”";
-          } else if (score >= 150) {
-            endingIndex = 2;
+          } else if (score >= 300) {
+            endingIndex = 2; // 3단계: 초보자
             rankTitle = "의약품 안전 초보자";
             rankDesc = "“조금 더 주의를 기울여서 전문가가 되어보세요!”";
           } else {
-            endingIndex = 3;
+            endingIndex = 3; // 4단계: 노력가
             rankTitle = "의약품 안전 노력가";
             rankDesc = "“조금 더 연습이 필요해요. 다시 도전!”";
           }
