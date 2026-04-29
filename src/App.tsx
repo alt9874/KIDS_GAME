@@ -760,9 +760,10 @@ export default function App() {
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="font-black text-slate-900 text-3xl tracking-tight leading-tight">{p.label}</div>
                       {p.description && <div className="text-sm text-slate-500 font-semibold leading-tight line-clamp-2">{p.description}</div>}
-                      <div className={`mt-2 font-black text-4xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      {/* [아이템 점수 크기 수정]: 아래 text-4xl(기본 PC 크기)을 수정하세요 */}
+                      <div className={`mt-2 font-black text-5xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-lg opacity-60 font-black">점</span>
+                        <span className="ml-1 text-xl opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
@@ -790,9 +791,10 @@ export default function App() {
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col items-start space-y-0.5 overflow-visible py-1">
                       <div className="font-black text-slate-900 text-[15px] tracking-tight leading-[1.1] w-full whitespace-normal break-keep">{p.label}</div>
-                      <div className={`font-black text-[14px] ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      {/* [아이템 점수 크기 수정]: 아래 text-[20px](모바일 크기)을 수정하세요 */}
+                      <div className={`font-black text-[20px] ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-[10px] opacity-60 font-black">점</span>
+                        <span className="ml-1 text-[12px] opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
