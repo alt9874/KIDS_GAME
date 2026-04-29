@@ -730,10 +730,10 @@ export default function App() {
               <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 shrink-0">
                 <div className="flex flex-col items-center sm:items-start">
                   <h2 className="text-xl sm:text-4xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
-                  <p className="text-slate-500 font-bold text-xs sm:text-lg mt-1 sm:mt-2">올바른 의약품 정보만 클릭하세요!</p>
                 </div>
-                <div className="hidden sm:block text-right">
-                  <p className="text-emerald-600 font-black text-2xl">의약품 안전 상식 퀴즈</p>
+              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 shrink-0 mb-4 sm:mb-0">
+                <div className="text-center sm:text-left">
+                  <p className="text-slate-800 sm:text-slate-900 font-black text-lg sm:text-2xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
                 </div>
               </div>
 
@@ -799,11 +799,7 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 shrink-0 mb-4 sm:mb-0">
-                <div className="text-center sm:text-left">
-                  <p className="text-slate-800 sm:text-slate-900 font-black text-lg sm:text-2xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
-                  <p className="hidden sm:block text-slate-400 text-xs mt-1 font-bold">오답일 경우 점수가 감점되니 주의해 주세요.</p>
-                </div>
+
                 <button 
                   onClick={startGame} 
                   className="w-full sm:w-auto px-10 sm:px-20 py-4 sm:py-6 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-xl sm:text-4xl font-black rounded-2xl sm:rounded-[2rem] hover:from-emerald-600 hover:to-sky-600 transition-all shadow-[0_15px_45px_rgba(16,185,129,0.3)] active:scale-95 flex items-center justify-center gap-4 mt-2 sm:mt-0"
