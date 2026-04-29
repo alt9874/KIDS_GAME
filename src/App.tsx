@@ -729,11 +729,11 @@ export default function App() {
             <div className="max-w-7xl w-full bg-transparent p-4 sm:p-10 flex flex-col gap-3 sm:gap-6 max-h-screen sm:max-h-[98vh] overflow-hidden">
               <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 shrink-0">
                 <div className="flex flex-col items-center sm:items-start">
-                  <h2 className="text-xl sm:text-4xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
+                  <h2 className="text-xl sm:text-5xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
                 </div>
               <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 shrink-0 mb-4 sm:mb-0">
                 <div className="text-center sm:text-left">
-                  <p className="text-slate-800 sm:text-slate-900 font-black text-lg sm:text-2xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
+                  <p className="text-slate-800 sm:text-slate-900 font-black text-lg sm:text-3xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
                 </div>
               </div>
 
