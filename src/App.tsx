@@ -842,15 +842,15 @@ export default function App() {
           } else if (score >= 350) {
             endingIndex = 1;
             rankTitle = "의약품 안전 실천가";
-            rankDesc = "“의약품 안전 사용에 대해 잘 알고 있네요!.”";
+            rankDesc = "“의약품 안전 사용에 대해 잘 알고 있어요!”";
           } else if (score >= 150) {
             endingIndex = 2;
             rankTitle = "의약품 안전 초보자";
-            rankDesc = "“조금 더 주의를 기울이면 전문가가 될 수 있습니다!”";
+            rankDesc = "“조금 더 주의를 기울여서 전문가가 되어보세요!”";
           } else {
             endingIndex = 3;
             rankTitle = "의약품 안전 노력가";
-            rankDesc = "“조금 더 연습이 필요해요. 다시 도전해볼까요?”";
+            rankDesc = "“조금 더 연습이 필요해요. 다시 도전!”";
           }
 
           // 이론상 최저/최대 점수 계산 (30초 기준, 평균 800ms 간격으로 약 37개 생성)
