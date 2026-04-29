@@ -728,10 +728,12 @@ export default function App() {
           <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#F8F9FA]/90 backdrop-blur-xl z-[210] flex items-center justify-center p-0 sm:p-4">
             <div className="max-w-7xl w-full bg-transparent p-4 sm:p-10 flex flex-col gap-3 sm:gap-6 max-h-screen sm:max-h-[98vh] overflow-hidden">
               <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 shrink-0">
-                <h2 className="text-xl sm:text-4xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
+                <div className="flex flex-col items-center sm:items-start">
+                  <h2 className="text-xl sm:text-4xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
+                  <p className="text-slate-500 font-bold text-xs sm:text-lg mt-1 sm:mt-2">올바른 의약품 정보만 클릭하세요!</p>
+                </div>
                 <div className="hidden sm:block text-right">
                   <p className="text-emerald-600 font-black text-2xl">의약품 안전 상식 퀴즈</p>
-                  <p className="text-slate-500 font-bold text-sm">올바른 의약품을 클릭하여 높은 점수를 획득하세요!</p>
                 </div>
               </div>
 
