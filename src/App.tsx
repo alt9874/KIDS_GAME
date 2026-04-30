@@ -848,15 +848,15 @@ export default function App() {
           if (score >= 1000) {
             endingIndex = 0; // 1단계: 전문가
             rankTitle = "의약품 안전 전문가";
-            rankDesc = "“의약품 안전 정보를 완벽하게 이해하셨군요!”";
-          } else if (score >= 900) {
+            rankDesc = "“의약품 안전정보를 완벽하게 이해하셨군요!”";
+          } else if (score >= 800) {
             endingIndex = 1; // 2단계: 실천가
             rankTitle = "의약품 안전 실천가";
             rankDesc = "“의약품 안전 사용에 대해 잘 알고 있어요!”";
           } else if (score >= 500) {
             endingIndex = 2; // 3단계: 초보자
             rankTitle = "의약품 안전 초보자";
-            rankDesc = "“조금 더 주의를 기울여서 전문가가 되어보세요!”";
+            rankDesc = "“한 걸음만 더! 전문가가 되어보세요!”";
           } else {
             endingIndex = 3; // 4단계: 노력가
             rankTitle = "의약품 안전 노력가";
