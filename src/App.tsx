@@ -727,43 +727,42 @@ export default function App() {
         {gameState === 'how-to' && (
           <motion.div key="how-to" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#F8F9FA]/90 backdrop-blur-xl z-[210] flex items-center justify-center p-0 sm:p-4">
             <div className="max-w-7xl w-full bg-transparent p-4 sm:p-10 flex flex-col gap-3 sm:gap-6 max-h-screen sm:max-h-[98vh] overflow-hidden">
-              <div className="flex flex-col items-center sm:items-start sm:flex-row sm:justify-between gap-1 sm:gap-4 pb-2 sm:pb-4 shrink-0">
-                <div className="flex flex-col items-center sm:items-start">
-                  <h2 className="text-xl sm:text-5xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
+              <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 pb-4 sm:pb-8 shrink-0 border-b border-slate-200/50">
+                <div className="flex flex-col items-center sm:items-start space-y-1">
+                  <h2 className="text-3xl sm:text-6xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
+                  <p className="text-slate-500 font-bold text-sm sm:text-xl">올바른 의약품 정보만 클릭하세요!</p>
                 </div>
-              <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 shrink-0 mb-4 sm:mb-0">
-                <div className="text-center sm:text-left">
-                  <p className="text-slate-800 sm:text-slate-900 font-black text-lg sm:text-3xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
+                <div className="text-center sm:text-right">
+                  <p className="text-emerald-500 sm:text-emerald-600 font-black text-lg sm:text-3xl animate-pulse">고득점에 도전해보세요!</p>
                 </div>
               </div>
 
-              {/* PC 전용 레이아웃 (768px 이상) */}
-              <div className="hidden sm:grid flex-1 overflow-y-auto grid-cols-2 gap-4 gap-y-6 pr-1 custom-scrollbar px-2 py-4">
+              {/* PC 전용 레이아웃 (768px 이상) - 모바일의 직관성을 계승한 세련된 카드 시스템 */}
+              <div className="hidden sm:grid flex-1 overflow-y-auto grid-cols-2 lg:grid-cols-3 gap-6 pr-2 custom-scrollbar py-6">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
-                    whileHover={{ scale: 1.01, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
-                    className="flex flex-row items-center text-left bg-white/40 backdrop-blur-md p-6 rounded-[2.5rem] border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all gap-8"
+                    whileHover={{ y: -5, backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
+                    className="flex flex-row items-center bg-white/60 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-xl shadow-slate-200/20 transition-all gap-6"
                   >
-                    <div className="w-32 h-32 flex items-center justify-center bg-white/80 rounded-full shadow-inner p-4 shrink-0">
+                    <div className="w-24 h-24 flex items-center justify-center bg-white rounded-3xl shadow-sm p-3 shrink-0 ring-1 ring-slate-100">
                       {p.image ? (
                         <img 
                           src={safeUrl(p.image)} 
                           alt="" 
-                          className="w-full h-full object-contain filter drop-shadow-lg" 
+                          className="w-full h-full object-contain filter drop-shadow-md" 
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="w-20 h-20 rounded-full" style={{backgroundColor: p.color}}/>
+                        <div className="w-16 h-16 rounded-full shadow-inner" style={{backgroundColor: p.color}}/>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div className="font-black text-slate-900 text-3xl tracking-tight leading-tight">{p.label}</div>
-                      {p.description && <div className="text-sm text-slate-500 font-semibold leading-tight line-clamp-2">{p.description}</div>}
-                      {/* [아이템 점수 크기 수정]: 아래 text-4xl(기본 PC 크기)을 수정하세요 */}
-                      <div className={`mt-2 font-black text-5xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    <div className="flex-1 min-w-0 flex flex-col justify-center space-y-1">
+                      <div className="font-black text-slate-900 text-2xl tracking-tight leading-tight">{p.label}</div>
+                      {/* [아이템 점수 크기 수정]: 아래 text-4xl 부분을 수정하세요 */}
+                      <div className={`font-black text-4xl ${p.score > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {p.score > 0 ? `+${p.score}` : p.score}
-                        <span className="ml-1 text-xl opacity-60 font-black">점</span>
+                        <span className="ml-1 text-base opacity-60 font-black">점</span>
                       </div>
                     </div>
                   </motion.div>
@@ -771,7 +770,7 @@ export default function App() {
               </div>
 
               {/* 모바일 전용 레이아웃 (768px 미만) */}
-              <div className="grid sm:hidden flex-1 overflow-hidden grid-cols-2 gap-2 p-1">
+              <div className="grid sm:hidden flex-1 overflow-y-auto grid-cols-2 gap-2 p-1 custom-scrollbar">
                 {pillConfigs.filter(p => !p.disabled).map(p => (
                   <motion.div 
                     key={p.id} 
@@ -808,7 +807,6 @@ export default function App() {
                 >
                   시작하기 <ArrowRight className="w-6 h-6 sm:w-10 sm:h-10" />
                 </button>
-              </div>
             </div>
           </motion.div>
         )}
@@ -871,7 +869,7 @@ export default function App() {
             >
               {/* 배경 이미지 레이어 및 밝은 오버레이 */}
               <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${ENDING_IMAGES[endingIndex]}")` }} />
-              <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-transparent/0.5 backdrop-blur-[2px]" />
 
               <div className="relative w-full max-w-5xl bg-white/30 backdrop-blur-2xl rounded-none sm:rounded-[4rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.15)] border border-white/40 overflow-y-auto max-h-screen sm:max-h-[92vh] flex flex-col md:flex-row custom-scrollbar">
                 {/* 좌측: 결과 이미지 및 스코어 */}
