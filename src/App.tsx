@@ -738,10 +738,10 @@ export default function App() {
               <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 pb-4 sm:pb-8 shrink-0 border-b border-slate-200/50">
                 <div className="flex flex-col items-center sm:items-start space-y-1">
                   <h2 className="text-3xl sm:text-6xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
-                  <p className="text-slate-500 font-bold text-sm sm:text-xl">올바른 의약품 정보만 클릭하세요!</p>
+                  <p className="text-slate-500 font-bold text-sm sm:text-2xl">올바른 의약품 정보만 클릭하세요!</p>
                 </div>
                 <div className="text-center sm:text-right">
-                  <p className="text-emerald-500 sm:text-emerald-600 font-black text-lg sm:text-3xl animate-pulse">고득점에 도전해보세요!</p>
+                  <p className="text-emerald-500 sm:text-emerald-600 font-black text-lg sm:text-xl animate-pulse">고득점에 도전해보세요!</p>
                 </div>
               </div>
 
