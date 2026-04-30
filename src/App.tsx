@@ -867,9 +867,9 @@ export default function App() {
             <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
               className="fixed inset-0 z-[300] bg-[#F8FAFC] flex items-center justify-center p-0 sm:p-4 overflow-hidden"
             >
-              {/* 배경 이미지 레이어 및 밝은 오버레이 */}
-              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${ENDING_IMAGES[endingIndex]}")` }} />
-              <div className="absolute inset-0 bg-transparent/0.5 backdrop-blur-[2px]" />
+              {/* 배경 이미지 레이어 및 밝은 오버레이 (PC에서는 숨김 처리) */}
+              <div className="absolute inset-0 bg-cover bg-center sm:hidden" style={{ backgroundImage: `url("${ENDING_IMAGES[endingIndex]}")` }} />
+              <div className="absolute inset-0 bg-transparent/0.5 backdrop-blur-[2px] sm:hidden" />
 
               <div className="relative w-full max-w-5xl bg-white/30 backdrop-blur-2xl rounded-none sm:rounded-[4rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.15)] border border-white/40 overflow-y-auto max-h-screen sm:max-h-[92vh] flex flex-col md:flex-row custom-scrollbar">
                 {/* 좌측: 결과 이미지 및 스코어 */}
@@ -898,8 +898,8 @@ export default function App() {
                 <div className="flex-1 p-8 sm:p-16 flex flex-col items-center justify-between bg-white/90 backdrop-blur-md shrink-0">
                   <div className="w-full space-y-6 sm:space-y-12 text-center sm:text-left">
                     <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-3 sm:space-y-6">
-                      {/* [폰트 크기 수정]: text-3xl(모바일), sm:text-6xl(PC) 부분을 직접 수정하세요 */}
-                      <h3 className="text-3xl sm:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+                      {/* [폰트 크기 수정]: text-3xl(모바일), sm:text-5xl(PC) 부분을 직접 수정하세요 */}
+                      <h3 className="text-3xl sm:text-5xl font-black text-slate-900 leading-tight tracking-tight">
                         {rankTitle}
                       </h3>
                       <p className="text-slate-500 font-bold text-lg sm:text-2xl leading-relaxed max-w-sm mx-auto sm:mx-0">
