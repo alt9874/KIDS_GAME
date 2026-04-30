@@ -503,16 +503,12 @@ export default function App() {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     
-    // 브라우저 오토플레이 방지 정책 대응: 첫 상호작용 시 오디오 잠금 해제 및 즉시 재생
     const unblockAudio = () => {
       if (!audioBlocked) return;
-      
       initAudioCtx();
       setAudioBlocked(false);
-      
       const currentType = gameState === 'playing' ? 'gameplay' : (gameState === 'result' ? 'ending' : 'opening');
       playBgm(currentType);
-
       window.removeEventListener('click', unblockAudio, true);
       window.removeEventListener('touchstart', unblockAudio, true);
     };
@@ -528,17 +524,16 @@ export default function App() {
       window.removeEventListener('touchstart', unblockAudio, true);
     };
   }, [gameState, playBgm, initAudioCtx, audioBlocked]);
+
   useEffect(() => {
     if (audioBlocked) return;
     
     const syncAudio = async () => {
-      // 1. 상태에 맞는 오디오 타입 결정
       let targetType: 'opening' | 'gameplay' | 'ending' | null = null;
       if (gameState === 'start' || gameState === 'how-to') targetType = 'opening';
       else if (gameState === 'playing') targetType = 'gameplay';
       else if (gameState === 'result') targetType = 'ending';
 
-      // 2. 재생 시도
       if (targetType) {
         await playBgm(targetType);
       } else {
@@ -547,8 +542,6 @@ export default function App() {
     };
 
     syncAudio();
-    
-    // Cleanup: 컴포넌트 언마운트 시 정지
     return () => stopBgm();
   }, [gameState, audioBlocked, playBgm, stopBgm]);
 
@@ -609,8 +602,14 @@ export default function App() {
   const startGame = () => { setScore(0); setCombo(0); setGameState('playing'); };
   const finishGame = useCallback(() => {
     setGameState('result');
-    if (score > highScore) { setHighScore(score); localStorage.setItem('pill_game_high_score', score.toString()); }
-  }, [score, highScore]);
+  }, []);
+
+  useEffect(() => {
+    if (gameState === 'result' && score > highScore) {
+      setHighScore(score);
+      localStorage.setItem('pill_game_high_score', score.toString());
+    }
+  }, [gameState, score, highScore]);
 
   const handleHitResult = useCallback((point: number, isGood: boolean) => {
     if (isGood) {
