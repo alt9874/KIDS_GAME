@@ -58,16 +58,6 @@ const ENDING_IMAGES = [
   "https://raw.githubusercontent.com/alt9874/game/main/ending_04.png"  // 4단계 (최하 단계)
 ];
 
-const DEFAULT_PILLS = [
-  { id: 1, label: '올슨', description: '의약품안전관리원 캐릭터', score: 30, color: '#2ecc71', type: 'good', width: 110, freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/ow.gif' },
-  { id: 2, label: '디디', description: '의약품안전관리원 캐릭터', score: 15, color: '#27ae60', type: 'good', width: 110, freq: 1.0, image: 'https://raw.githubusercontent.com/alt9874/game/main/didi.gif' },
-  { id: 3, label: '정량 복용', description: '약은 정해진 양만 드세요', score: 10, color: '#16a085', type: 'good', width: 110, freq: 1.0, image: '' },
-  { id: 8, label: '유통기한 지킴', description: '유통기한 확인은 필수!', score: 10, color: '#3498db', type: 'good', width: 110, freq: 0.8, image: '' },
-  { id: 4, label: '유효기간 경과', description: '오래된 약은 버리세요', score: -10, color: '#f1c40f', type: 'bad', width: 110, freq: 0.7, image: '' },
-  { id: 5, label: '보관 불량', description: '습한 곳은 피해주세요', score: -20, color: '#f39c12', type: 'bad', width: 110, freq: 0.6, image: '' },
-  { id: 6, label: '의약품 오남용', description: '남용은 건강을 해칩니다', score: -25, color: '#e74c3c', type: 'bad', width: 110, freq: 0.5, image: 'https://raw.githubusercontent.com/alt9874/game/main/item_01.png' },
-  { id: 7, label: '중복 복용', description: '같은 성분의 약을 주의하세요', score: -30, color: '#c0392b', type: 'bad', width: 110, freq: 0.4, image: '' },
-];
 
 type GameState = 'start' | 'how-to' | 'playing' | 'result' | 'admin';
 
@@ -157,7 +147,6 @@ const GamePlay = ({
       rand -= freq;
     }
 
-    // 사용자가 설정한 고유 크기가 있으면 사용, 없으면 기본값 적용
     const baseSize = selectedConfig.width || (window.innerWidth < 640 ? 80 : 110);
     const x = Math.random() * (window.innerWidth - baseSize);
     const noRotation = selectedConfig.noRotation || false;
@@ -184,33 +173,39 @@ const GamePlay = ({
   }, [pillConfigs]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      localTimerRef.current -= 1;
-      if (localTimerRef.current <= 0) { clearInterval(timer); finishGame(); }
-      else setDisplayTime(localTimerRef.current);
-    }, 1000);
-
     const spawnInterval = setInterval(spawnPill, gameSpeed.spawnInterval || 800);
 
     let lastTime = performance.now();
+    let lastTimerTick = lastTime;
     let frameId: number;
     
     const loop = (time: number) => {
       const dt = Math.min((time - lastTime) / 16.67, 3);
       lastTime = time;
 
+      // 타이머 처리 (정확한 시간 계산)
+      if (time - lastTimerTick >= 1000) {
+        localTimerRef.current -= 1;
+        lastTimerTick = time;
+        if (localTimerRef.current <= 0) { 
+          finishGame(); 
+          return; 
+        }
+        setDisplayTime(localTimerRef.current);
+      }
+
       setPills(prev => {
-        const next = prev.map(p => {
+        if (prev.length === 0) return prev;
+        return prev.map(p => {
           let nextX = p.x + p.vx * dt;
           let nextVx = p.vx;
           
-          // 좌우 벽 충돌 감지 및 튕기기
           if (nextX < 0) {
             nextX = 0;
-            nextVx = Math.abs(p.vx); // 오른쪽으로 튕김
+            nextVx = Math.abs(p.vx);
           } else if (nextX > window.innerWidth - p.width) {
             nextX = window.innerWidth - p.width;
-            nextVx = -Math.abs(p.vx); // 왼쪽으로 튕김
+            nextVx = -Math.abs(p.vx);
           }
 
           return {
@@ -221,10 +216,8 @@ const GamePlay = ({
             angle: p.noRotation ? p.angle : (p.angle + p.angularVelocity * dt)
           };
         }).filter(p => p.y < window.innerHeight + 150);
-        return next;
       });
 
-      // 팝업 처리를 위한 캔버스 유지
       if (canvasRef.current) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -233,9 +226,9 @@ const GamePlay = ({
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
           }
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          popupsRef.current = popupsRef.current.filter(pop => (performance.now() - pop.id) < 800);
+          popupsRef.current = popupsRef.current.filter(pop => (time - pop.id) < 800);
           popupsRef.current.forEach(pop => {
-            const elapsed = performance.now() - pop.id;
+            const elapsed = time - pop.id;
             const alpha = 1 - (elapsed / 800);
             ctx.save(); 
             ctx.font = 'bold 16px sans-serif'; 
@@ -253,17 +246,16 @@ const GamePlay = ({
     frameId = requestAnimationFrame(loop);
 
     return () => { 
-      clearInterval(timer); 
       clearInterval(spawnInterval); 
       cancelAnimationFrame(frameId); 
     };
   }, [spawnPill, gameSpeed, finishGame]);
 
-  const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
-    const pageX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-    const pageY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+  const handlePointerDown = (e: React.PointerEvent) => {
+    const pageX = e.clientX;
+    const pageY = e.clientY;
     
-    // 알약 배열을 역순으로 확인 (가장 최근에 생성된/위에 있는 것부터)
+    // 알약 배열을 역순으로 확인
     for (let i = pills.length - 1; i >= 0; i--) {
       const p = pills[i];
       const dx = pageX - (p.x + p.width/2);
@@ -283,7 +275,7 @@ const GamePlay = ({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden" onMouseDown={handleClick} onTouchStart={handleClick}>
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden touch-none" onPointerDown={handlePointerDown}>
       <div className="absolute inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url("${safeUrl(playBgImage)}")`, backgroundColor: '#f0f7ff' }} />
       
       {/* 알약들을 DOM 요소로 렌더링 (GIF 지원을 위함) */}
@@ -361,7 +353,7 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
-  const [pillConfigs, setPillConfigs] = useState(DEFAULT_PILLS);
+  const [pillConfigs, setPillConfigs] = useState<any[]>([]);
   const [gameSpeed, setGameSpeed] = useState({ duration: 30, spawnInterval: 800 });
   const [openingBgImage, setOpeningBgImage] = useState<string>(OPENING_BG_IMAGE_PC);
   const [openingBgImageMo, setOpeningBgImageMo] = useState<string>(OPENING_BG_IMAGE_MO);
@@ -369,6 +361,23 @@ export default function App() {
   const [playBgImageMo, setPlayBgImageMo] = useState<string>(PLAY_BG_IMAGE_MO);
   const [startButtonImage, setStartButtonImage] = useState(START_BUTTON_IMAGE);
   const [audioSettings, setAudioSettings] = useState<AudioSettings | null>(null);
+
+  useEffect(() => {
+    if (audioSettings) {
+      const urls = [
+        audioSettings.opening,
+        audioSettings.gameplay,
+        audioSettings.ending,
+        audioSettings.hitPositive,
+        audioSettings.hitNegative
+      ];
+      urls.forEach(url => {
+        if (url && url.trim() !== '' && url !== 'undefined') {
+          loadAudioBuffer(url).catch(() => {});
+        }
+      });
+    }
+  }, [audioSettings]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -582,7 +591,7 @@ export default function App() {
     const unsubConfig = onSnapshot(configRef, (snap) => {
       if (snap.exists()) {
         const d = snap.data();
-        if (d.pillConfigs?.length > 0) setPillConfigs(d.pillConfigs);
+        if (d.pillConfigs) setPillConfigs(d.pillConfigs);
         if (d.openingBgImage?.trim()) setOpeningBgImage(d.openingBgImage);
         if (d.openingBgImageMo?.trim()) setOpeningBgImageMo(d.openingBgImageMo);
         if (d.playBgImage?.trim()) setPlayBgImage(d.playBgImage);
