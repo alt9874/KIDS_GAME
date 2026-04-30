@@ -740,9 +740,6 @@ export default function App() {
                   <h2 className="text-3xl sm:text-6xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
                   <p className="text-slate-500 font-bold text-lg sm:text-3xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
                 </div>
-                <div className="text-center sm:text-right">
-                  <p className="text-emerald-500 sm:text-emerald-600 font-black text-sm sm:text-xl">고득점에 도전해보세요</p>
-                </div>
               </div>
 
               {/* PC 전용 레이아웃 (768px 이상) - 모바일의 직관성을 계승한 세련된 카드 시스템 */}
