@@ -845,15 +845,15 @@ export default function App() {
           // - 고득점자 평균: 약 1,000~1,200점
           // 아래 점수(score >= 숫자)를 수정하여 등급 난이도를 조절하세요.
           // ==========================================
-          if (score >= 1000) {
+          if (score >= 1400) {
             endingIndex = 0; // 1단계: 전문가
             rankTitle = "의약품 안전 전문가";
             rankDesc = "“의약품 안전정보를 완벽하게 이해하셨군요!”";
-          } else if (score >= 800) {
+          } else if (score >= 1000) {
             endingIndex = 1; // 2단계: 실천가
             rankTitle = "의약품 안전 실천가";
             rankDesc = "“의약품 안전 사용에 대해 잘 알고 있어요!”";
-          } else if (score >= 500) {
+          } else if (score >= 700) {
             endingIndex = 2; // 3단계: 초보자
             rankTitle = "의약품 안전 초보자";
             rankDesc = "“한 걸음만 더! 전문가가 되어보세요!”";
