@@ -554,6 +554,29 @@ export default function App() {
     return () => stopBgm();
   }, [gameState, audioBlocked, playBgm, stopBgm]);
 
+  // ==========================================
+  // [IMAGE PRELOADING] 이미지 프리로딩 기능
+  // 게임 중 이미지가 처음 나타날 때 발생하는 지연이나 깜빡임을 방지하기 위해 
+  // 배경, 알약 아이템, 엔딩 이미지 등을 미리 로드하여 브라우저 캐시에 저장합니다.
+  // 코드에서 이 기능을 찾으려면 "IMAGE PRELOADING"으로 검색하세요.
+  // ==========================================
+  useEffect(() => {
+    const imagesToPreload = [
+      openingBgImage, openingBgImageMo,
+      playBgImage, playBgImageMo,
+      startButtonImage,
+      ...ENDING_IMAGES,
+      ...pillConfigs.map(p => p.image).filter(img => img && typeof img === 'string' && img.trim() !== '')
+    ];
+
+    imagesToPreload.forEach(url => {
+      if (url && typeof url === 'string' && url.trim() !== '' && url !== 'undefined') {
+        const img = new Image();
+        img.src = url;
+      }
+    });
+  }, [openingBgImage, openingBgImageMo, playBgImage, playBgImageMo, startButtonImage, pillConfigs]);
+
   useEffect(() => {
     const auth = getAuth();
     const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
@@ -738,7 +761,10 @@ export default function App() {
               <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 pb-4 sm:pb-8 shrink-0 border-b border-slate-200/50">
                 <div className="flex flex-col items-center sm:items-start space-y-1">
                   <h2 className="text-3xl sm:text-6xl font-black text-slate-900 tracking-tighter">게임 설명</h2>
-                  <p className="text-slate-500 font-bold text-lg sm:text-3xl animate-pulse">올바른 의약품 정보만 클릭하세요!</p>
+                  <p className="text-slate-500 font-bold text-sm sm:text-xl">올바른 의약품 정보만 클릭하세요!</p>
+                </div>
+                <div className="text-center sm:text-right">
+                  <p className="text-emerald-500 sm:text-emerald-600 font-black text-lg sm:text-3xl animate-pulse">고득점에 도전해보세요!</p>
                 </div>
               </div>
 
@@ -845,18 +871,18 @@ export default function App() {
           // - 고득점자 평균: 약 1,000~1,200점
           // 아래 점수(score >= 숫자)를 수정하여 등급 난이도를 조절하세요.
           // ==========================================
-          if (score >= 1400) {
+          if (score >= 4000) {
             endingIndex = 0; // 1단계: 전문가
             rankTitle = "의약품 안전 전문가";
-            rankDesc = "“의약품 안전정보를 완벽하게 이해하셨군요!”";
-          } else if (score >= 1000) {
+            rankDesc = "“의약품 안전 정보를 완벽하게 이해하셨군요!”";
+          } else if (score >= 3000) {
             endingIndex = 1; // 2단계: 실천가
             rankTitle = "의약품 안전 실천가";
             rankDesc = "“의약품 안전 사용에 대해 잘 알고 있어요!”";
-          } else if (score >= 700) {
+          } else if (score >= 2000) {
             endingIndex = 2; // 3단계: 초보자
             rankTitle = "의약품 안전 초보자";
-            rankDesc = "“한 걸음만 더! 전문가가 되어보세요!”";
+            rankDesc = "“조금 더 주의를 기울여서 전문가가 되어보세요!”";
           } else {
             endingIndex = 3; // 4단계: 노력가
             rankTitle = "의약품 안전 노력가";
